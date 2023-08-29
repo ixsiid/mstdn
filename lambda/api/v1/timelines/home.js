@@ -1,7 +1,9 @@
+import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { region, dynamodb_table_name } from '../data/config.js';
+
 module.exports = async (event, args) => {
-	const TableName = require('../../data/config.js').dynamodb_table_name;
-	const AWS = require('aws-sdk');
-	const dynamo = new AWS.DynamoDB.DocumentClient({ region: require('../data/config.js').region });
+	const TableName = dynamodb_table_name;
+	const dynamo = DynamoDB({ region });
 
 	const result = (await dynamo.query({
 		TableName,
@@ -23,5 +25,5 @@ module.exports = async (event, args) => {
 
 	console.log(result);
 
-	return result ? result : { error: 'database access error' };
+	return result ?? { error: 'database access error' };
 };

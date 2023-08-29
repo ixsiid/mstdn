@@ -1,17 +1,6 @@
-/**
- * @typedef Statuses
- */
+import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { region, dynamodb_table_name } from '../data/config.js';
 
-
-/*
-	status         no 	The text of the status	no
-	in_reply_to_id yes	local ID of the status you want to reply to	yes
-	media_ids      yes	Array of media IDs to attach to the status (maximum 4)	yes
-	sensitive      yes	Set this to mark the media of the status as NSFW	yes
-	spoiler_text   yes	Text to be shown as a warning before the actual content	yes
-	visibility     yes	Either "direct", "private", "unlisted" or "public"	yes
-	language       yes	ISO 639-2 language code of the toot, to skip automatic detection	yes
-*/
 /**
  * 
  * @param {*} event 
@@ -32,12 +21,11 @@ module.exports = async (event, id, args) => {
 			status.spoiler_text = post.spoiler_text || '';
 			status.visibility = post.visibility || 'public';
 
-			const TableName = require('../../data/config.js').dynamodb_table_name;
-			const AWS = require('aws-sdk');
+			const TableName = dynamodb_table_name;
 
 			let id = -1;
 
-			const dynamo = new AWS.DynamoDB.DocumentClient({ region: require('../data/config.js').region });
+			const dynamo = new DynamoDB({ region });
 			await dynamo.scan({
 				TableName,
 				KeyConditionExpression: 'id > 0',

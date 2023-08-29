@@ -130,7 +130,7 @@ dist
 .pnp.*
 
 
-/lambda/api/data/*.js
-/lambda/api/data/*.mjs
-/lambda/api/data/*.cjs
-!/lambda/api/data/*.sample.js
+/lambda/data/*.js
+/lambda/data/*.mjs
+/lambda/data/*.cjs
+!/lambda/data/*.sample.js

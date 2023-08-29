@@ -14,6 +14,12 @@ module.exports = async (event, id, args) => {
 		if (event.httpMethod === 'POST' && auth(event)) {
 			const post = JSON.parse(event.body);
 			const status = require('../data/status.js');
+			// ダミーデータから、Dynamo DBには保存しないキーを一度削除する
+			delete status.id;
+			delete status.uri;
+			delete status.created_at;
+			delete status.account;
+
 			status.content = post.status;
 			if (post.in_reply_to_id) status.in_reply_to_id = post.in_reply_to_id;
 			if (post.media_ids) status.media_attachments = post.media_ids;

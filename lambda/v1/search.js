@@ -7,7 +7,7 @@
 module.exports = (event, args) => {
 	return {
 		accounts: [require('../data/account.js')],
-		statuses: [require('../data/status_dummy.js')],
+		statuses: [require('../data/status.js')],
 		hashtags: [],
 	};
 };

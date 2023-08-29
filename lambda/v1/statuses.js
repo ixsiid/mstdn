@@ -1,5 +1,5 @@
-import { DynamoDB } from '@aws-sdk/client-dynamodb';
-import { region, dynamodb_table_name } from '../data/config.js';
+const { DynamoDB } = require("@aws-sdk/client-dynamodb");
+const { region, dynamodb_table_name } = require('../data/config.js');
 
 /**
  * 
@@ -27,42 +27,43 @@ module.exports = async (event, id, args) => {
 			status.spoiler_text = post.spoiler_text || '';
 			status.visibility = post.visibility || 'public';
 
-			const TableName = dynamodb_table_name;
-
 			let id = -1;
 
 			const dynamo = new DynamoDB({ region });
 			await dynamo.scan({
-				TableName,
+				TableName: dynamodb_table_name,
 				KeyConditionExpression: 'id > 0',
 				ProjectionExpression: 'id',
-			}, function (err, data) {
-				if (err) {
-					console.log(err);
-				} else {
-					console.log(data);
-					id = data.Count;
-				}
-			}).promise();
+			}).then(data => {
+				console.log(data);
+				id = data.Count;
+			}).catch(err => {
+				console.log(err);
+			});
 			console.log(`ID: ${id}`);
 
 			if (id < 0) return { error: 'database access error' };
 			const created_at = new Date().getTime();
 
-			await dynamo.put({
-				TableName,
+			await dynamo.putItem({
+				TableName: dynamodb_table_name,
 				Item: {
-					id, created_at, account_id: 0,
-					raw: JSON.stringify(status),
+					id: { N: '' + id },
+					created_at: { N: '' + created_at },
+					account_id: { N: '0' },
+					raw: { S: JSON.stringify(status) },
 				},
-			}, function (err, data) {
-				console.log(err || data);
-				return err || data;
-			}).promise();
+			}).then(data => {
+				console.log(data);
+				return data;
+			}).catch(err => {
+				console.log(err);
+				return err;
+			});
 
 			return require('../lib/toStatus.js')({ ...status, id, created_at });
 		}
 	}
 
-	return { error: 'not permitted' };
+	return { error: 'Not permitted' };
 };

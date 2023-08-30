@@ -1,1 +1,1 @@
-module.exports = args => [require('../data/oauth_token.js')];
+module.exports = args => [require('../data/config.js').oauth_token];

@@ -1,1 +1,0 @@
-module.exports = 'Your access token string';

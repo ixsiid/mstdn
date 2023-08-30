@@ -1,3 +1,5 @@
+const { domain, username, display_name } = require('./config.js');
+
 /**
  * @typedef Account
  * @property {number} id              The ID of the account
@@ -22,20 +24,20 @@
 */
 module.exports = {
 	id: 0,
-	username: 'name',
-	acct: 'name@domain.com',
-	display_name: 'Your name',
+	username,
+	acct: `${username}@${domain}`,
+	display_name,
 	locked: false,
 	created_at: '2000-01-01T00:00:00.000Z',
 	followers_count: 0,
 	following_count: 0,
 	statuses_count: 0,
 	note: 'It is my account for solo instance.',
-	url: 'https://domain.com',
-	avatar: 'https://hogehoge.fugafuga/avatar.png',
-	avatar_static: 'https://hogehoge.fugafuga/avatar.gif',
-	header: 'https://hogehoge.fugafuga/header.png',
-	header_static: 'https://hogehoge.fugafuga/header.gif',
+	url: `https://${domain}`,
+	avatar: `https://${domain}/avatar.png`,
+	avatar_static: `https://${domain}/avatar.gif`,
+	header: `https://${domain}/header.png`,
+	header_static: `https://${domain}/header.gif`,
 	emojis: [],
 	fields: [],
 	bot: false

@@ -1,3 +1,5 @@
+const { domain, email } = require('./config.js');
+
 /**
  * @typedef Instance
  * @property {string} uri
@@ -9,11 +11,11 @@
  * @property {Array<string>} languages
  */
 module.exports = {
-	uri: 'mstdn.halzion.net',
-	urls: 'https://mstdn.halzion.net',
-	title: 'mstdn.halzion.net',
-	description: 'For myself instance',
-	email: 'ixsiid@halzion.net',
+	uri: domain,
+	urls: `https://${domain}`,
+	title: `My Instance on ${domain}`,
+	description: 'For only myself instance',
+	email,
 	version: '2.5.0',
 	languages: ['jp', 'en'],
 };

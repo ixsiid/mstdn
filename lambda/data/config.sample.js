@@ -1,5 +1,6 @@
 const domain = 'your.domain.com';
 module.exports = {
+	domain: domain,
 	dynamodb_table_name: 'statuses.' + domain,
 	region: 'Your AWS Dynamo DB region',
 	username: 'your name',

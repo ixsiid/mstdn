@@ -9,7 +9,7 @@ const { region, dynamodb_table_name } = require('../data/config.js');
  * @returns 
  */
 module.exports = async (event, id, args) => {
-	if (id === undefined) {
+	if (id === undefined) { // 新しい投稿
 		const auth = require('../lib/auth.js');
 		if (event.httpMethod === 'POST' && auth(event)) {
 			const post = JSON.parse(event.body);

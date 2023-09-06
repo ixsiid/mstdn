@@ -44,7 +44,7 @@
       }
     },
     "/statuses" : {
-      "get" : {
+      "put" : {
         "responses" : {
           "default" : {
             "description" : "Default response for POST /statuses"

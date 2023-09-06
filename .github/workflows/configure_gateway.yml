@@ -28,36 +28,9 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 'stable'
-
       - name: configure python
         run: pip3 install awscli
 
-      - name: delete exists gateway
-        if: env.AWS_API_GATEWAY_ID != ''
-        env:
-          API_GATEWAY_ID: ${{ secrets.AWS_API_GATEWAY_ID }}
-        run: aws apigatewayv2 --api-id ${{ env.AWS_API_GATEWAY_ID }}
-
-      - name: create new gateway
-        id: import_gateway
-        run: |
-          sed -i "s@%URL%@${{ secrets.URL }}@" ./api_gateway/api.json
-          sed -i "s@%AUTHORIZER_URI%@${{ secrets.AUTHORIZER_URI }}@" ./api_gateway/api.json
-          
-          aws apigatewayv2 import-api --body file://api_gateway/api.json | jq ".ApiId" | awk '{print "AWS_API_GATEWAY_ID="$1}' >> $GITHUB_ENV
-      
-      - name: Store API_GATEWAY_ID on secrets2
-        run: echo ${{ env.AWS_API_GATEWAY_ID }}
-      
-      - name: Store API_GATEWAY_ID on secrets
-        run: |
-          go install github.com/doodlesbykumbi/github-secrets-writer@v0.2.0
-          github-secrets-writer --owner=${{ github.repository_owner }} --repo=${{ github.repository }} --from-literal=API_GATEWAY_ID=${{ env.AWS_API_GATEWAY_ID }}         
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Update gateway
+        run: aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_GATEWAY_APP_ID }} --body file://api_gateway/api.json
       

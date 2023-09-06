@@ -44,22 +44,19 @@ jobs:
 
       - name: create new gateway
         id: import_gateway
-        run: aws apigatewayv2 import-api --body file://api_gateway/api.json
+        run: |
+          sed "s/%URL%/${{ secrets.URL }}/" ./api_gateway/api.json > ./api_gateway/api.json
+          sed "s/%AUTHORIZER_URI%/${{ secrets.AUTHORIZER_URI }}/" ./api_gateway/api.json > ./api_gateway/api.json
+          aws apigatewayv2 import-api --body file://api_gateway/api.json | jq ".ApiId" | awk '{print "API_GATEWAY_ID="$1}' >> $GITHUB_ENV
       
       - name: Store API_GATEWAY_ID on secrets2
         run: echo $API_GATEWAY_ID
-        env:
-          API_GATEWAY_ID: ${{ toJSON(steps.import_gateway.outputs).ApiId }}
       
       - name: Store API_GATEWAY_ID on secrets
         run: |
-          sed "s/%URL%/${{ secrets.URL }}" ./api_gateway/api.json > ./api_gateway/api.json
-          sed "s/%AUTHORIZER_URI%/${{ secrets.AUTHORIZER_URI }}/" ./api_gateway/api.json > ./api_gateway/api.json
-
           GO111MODULE=on go get -u github.com/doodlesbykumbi/github-secrets-writer
-          github-secrets-writer --owner=${{ github.repository_owner }} --repo=${{ github.repository }} --from-literal=secretName1=secretValue1         
+          github-secrets-writer --owner=${{ github.repository_owner }} --repo=${{ github.repository }} --from-literal=API_GATEWAY_ID=${{ env.API_GATEWAY_ID }}         
         env:
-          API_GATEWAY_ID: ${{ toJSON(steps.import_gateway.outputs).ApiId }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       

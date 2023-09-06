@@ -32,5 +32,8 @@ jobs:
         run: pip3 install awscli
 
       - name: Update gateway
-        run: aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_GATEWAY_APP_ID }} --body file://api_gateway/api.json
-      
+        run: |
+          sed -i "s@%URL%@${{ secrets.URL }}@" ./api_gateway/api.json
+          sed -i "s@%AUTHORIZER_URI%@${{ secrets.AUTHORIZER_URI }}@" ./api_gateway/api.json
+          
+          aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_GATEWAY_APP_ID }} --body file://api_gateway/api.json

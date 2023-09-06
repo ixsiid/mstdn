@@ -1,0 +1,77 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "solo-mstdn-api-gateway",
+    "version" : "2023-09-04 14:31:46UTC"
+  },
+  "servers" : [ {
+    "url" : "%URL%",
+    "variables" : {
+      "basePath" : {
+        "default" : ""
+      }
+    }
+  } ],
+  "paths" : {
+    "/statuses/{id+}" : {
+      "get" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for GET /statuses/{id+}"
+          }
+        }
+      },
+      "parameters" : [ {
+        "name" : "id+",
+        "in" : "path",
+        "description" : "Generated path parameter for id+",
+        "required" : true,
+        "schema" : {
+          "type" : "string"
+        }
+      } ]
+    },
+    "/users/ixsiid" : {
+      "get" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for GET /users/ixsiid"
+          }
+        },
+        "security" : [ {
+          "simple-bearer-authorizer" : [ ]
+        } ]
+      }
+    },
+    "/statuses" : {
+      "get" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for POST /statuses"
+          }
+        },
+        "security" : [ {
+          "simple-bearer-authorizer" : [ ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "securitySchemes" : {
+      "simple-bearer-authorizer" : {
+        "type" : "apiKey",
+        "name" : "Authorization",
+        "in" : "header",
+        "x-amazon-apigateway-authorizer" : {
+          "identitySource" : "$request.header.Authorization",
+          "authorizerUri" : "%AUTHORIZER_URI%",
+          "authorizerPayloadFormatVersion" : "2.0",
+          "authorizerResultTtlInSeconds" : 3600,
+          "type" : "request",
+          "enableSimpleResponses" : true
+        }
+      }
+    }
+  },
+  "x-amazon-apigateway-importexport-version" : "1.0"
+}

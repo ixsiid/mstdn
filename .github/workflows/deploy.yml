@@ -28,9 +28,11 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: lambda update
+      - name: configure python
+        run: pip3 install awscli
+
+      - name: deploy lambda
         run: |
-          pip3 install awscli 
           cd lambda && zip -r package.zip ./*
           aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} --zip-file fileb://package.zip --publish
           

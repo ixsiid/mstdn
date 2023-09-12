@@ -1,0 +1,63 @@
+name: Initialize project
+on:
+  workflow_dispatch:
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: GitHubActions
+      
+      - name: get caller identity is allowed to run on role.
+        run: aws sts get-caller-identity
+
+      - name: Configure
+        run: |
+          sed -i "s@%REGION%@${{ secrets.AWS_REGION }}@g"           ./iam/deploy_policy.json
+          sed -i "s@%ACCOUNT_ID%@${{ secrets.AWS_ACCOUNT_ID }}@g"   ./iam/deploy_policy.json
+          sed -i "s@%INSTANCE_NAME%@${{ secrets.INSTANCE_NAME }}@g" ./iam/deploy_policy.json
+          
+          sed -i "s@%REGION%@${{ secrets.AWS_REGION }}@g"           ./iam/deploy_role.json
+          sed -i "s@%ACCOUNT_ID%@${{ secrets.AWS_ACCOUNT_ID }}@g"   ./iam/deploy_role.json
+          sed -i "s@%INSTANCE_NAME%@${{ secrets.INSTANCE_NAME }}@g" ./iam/deploy_role.json
+          
+          sed -i "s@%REGION%@${{ secrets.AWS_REGION }}@g"           ./iam/lambda_execute_policy.json
+          sed -i "s@%ACCOUNT_ID%@${{ secrets.AWS_ACCOUNT_ID }}@g"   ./iam/lambda_execute_policy.json
+          sed -i "s@%INSTANCE_NAME%@${{ secrets.INSTANCE_NAME }}@g" ./iam/lambda_execute_policy.json
+          
+          sed -i "s@%REGION%@${{ secrets.AWS_REGION }}@g"           ./iam/lambda_execute_role.json
+          sed -i "s@%ACCOUNT_ID%@${{ secrets.AWS_ACCOUNT_ID }}@g"   ./iam/lambda_execute_role.json
+          sed -i "s@%INSTANCE_NAME%@${{ secrets.INSTANCE_NAME }}@g" ./iam/lambda_execute_role.json
+
+      - name: Create role and policy
+        run: |
+          echo aaaa
+
+      - name: Create table of dynamodb
+        run: |
+          echo aaaa
+
+      - name: Create lambda function
+        run: |
+          echo aaaa
+
+      - name: Create api gateway
+        run: |
+          echo aaaa
+
+      - name: Notify project infomation
+        uses: aaaa
+        with:
+          email: ${{ secrets.OWNER_EMAIL }}

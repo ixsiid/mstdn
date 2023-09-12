@@ -1,4 +1,4 @@
-name: Configure API Gateway
+name: Deploy API Gateway
 on:
   workflow_dispatch:
 
@@ -23,17 +23,11 @@ jobs:
       - name: get caller identity is allowed to run on role.
         run: aws sts get-caller-identity
 
-      - name: setup python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.9'
-
-      - name: configure python
-        run: pip3 install awscli
-
       - name: Update gateway
         run: |
-          sed -i "s@%URL%@${{ secrets.URL }}@" ./api_gateway/api.json
-          sed -i "s@%AUTHORIZER_URI%@${{ secrets.AUTHORIZER_URI }}@" ./api_gateway/api.json
+          sed -i "s@%REGION%@${{ secrets.AWS_REGION }}@g" ./api_gateway/api.json
+          sed -i "s@%APP_ID%@${{ secrets.AWS_GATEWAY_APP_ID }}@g" ./api_gateway/api.json
+          sed -i "s@%FUNCTION%@${{ secrets.AWS_LAMBDA_FUNCTION_NAME }}@g" ./api_gateway/api.json
+          sed -i "s@%ACCOUNT_ID%@${{ secrets.AWS_ACCOUNT_ID }}@g" ./api_gateway/api.json
           
           aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_GATEWAY_APP_ID }} --body file://api_gateway/api.json

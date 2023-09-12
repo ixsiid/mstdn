@@ -1,77 +1,897 @@
 {
-  "openapi" : "3.0.1",
-  "info" : {
-    "title" : "solo-mstdn-api-gateway",
-    "version" : "2023-09-04 14:31:46UTC"
-  },
-  "servers" : [ {
-    "url" : "%URL%",
-    "variables" : {
-      "basePath" : {
-        "default" : ""
-      }
-    }
-  } ],
-  "paths" : {
-    "/statuses/{id+}" : {
-      "get" : {
-        "responses" : {
-          "default" : {
-            "description" : "Default response for GET /statuses/{id+}"
-          }
-        }
-      },
-      "parameters" : [ {
-        "name" : "id+",
-        "in" : "path",
-        "description" : "Generated path parameter for id+",
-        "required" : true,
-        "schema" : {
-          "type" : "string"
-        }
-      } ]
-    },
-    "/users/ixsiid" : {
-      "get" : {
-        "responses" : {
-          "default" : {
-            "description" : "Default response for GET /users/ixsiid"
-          }
-        },
-        "security" : [ {
-          "simple-bearer-authorizer" : [ ]
-        } ]
-      }
-    },
-    "/statuses" : {
-      "put" : {
-        "responses" : {
-          "default" : {
-            "description" : "Default response for POST /statuses"
-          }
-        },
-        "security" : [ {
-          "simple-bearer-authorizer" : [ ]
-        } ]
-      }
-    }
-  },
-  "components" : {
-    "securitySchemes" : {
-      "simple-bearer-authorizer" : {
-        "type" : "apiKey",
-        "name" : "Authorization",
-        "in" : "header",
-        "x-amazon-apigateway-authorizer" : {
-          "identitySource" : "$request.header.Authorization",
-          "authorizerUri" : "%AUTHORIZER_URI%",
-          "authorizerPayloadFormatVersion" : "2.0",
-          "authorizerResultTtlInSeconds" : 3600,
-          "type" : "request",
-          "enableSimpleResponses" : true
-        }
-      }
-    }
-  },
-  "x-amazon-apigateway-importexport-version" : "1.0"
+	"openapi": "3.0.1",
+	"info": {
+		"title": "%INSTANCE_NAME%-gateway"
+	},
+	"servers": [
+		{
+			"url": "https://%DOMAIN%/api/{basePath}",
+			"description": "Solo mastodon instance",
+			"variables": {
+				"basePath": {
+					"default": ""
+				}
+			}
+		}
+	],
+	"components": {
+		"securitySchemes": {
+			"simple-bearer-authorizer": {
+				"type": "apiKey",
+				"name": "Authorization",
+				"in": "header",
+				"x-amazon-apigateway-authorizer": {
+					"identitySource": "$request.header.Authorization",
+					"authorizerUri": "arn:aws:apigateway:%REGION%:lambda:path/2015-03-31/functions/arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%/invocations",
+					"authorizerPayloadFormatVersion": "2.0",
+					"authorizerResultTtlInSeconds": 3600,
+					"type": "request",
+					"enableSimpleResponses": true
+				}
+			}
+		},
+		"x-amazon-api-gateway-integrations": {
+			"lambda-integration": {
+				"payloadFormatVersion": "2.0",
+				"type": "aws_proxy",
+				"httpMethod": "POST",
+				"uri": "arn:aws:apigateway:%REGION%:lambda:path/2015-03-31/functions/arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%/invocations",
+				"connectionType": "INTERNET"
+			}
+		}
+	},
+	"x-amazon-apigateway-importexport-version": "1.0",
+	"paths": {
+		"/api/v1/accounts/{id+}": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET '/api/v1/accounts/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id+}",
+					"in": "path",
+					"description": "Generated path parameter for {id+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			],
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST '/api/v1/accounts/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/accounts/relationships": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/accounts/relationships",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/accounts/search": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/accounts/search",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/accounts/update_credentials": {
+			"patch": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for PATCH /api/v1/accounts/update_credentials",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/accounts/verify_credentials": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/accounts/verify_credentials",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/apps": {
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/apps",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/blocks": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/blocks",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/custom_emojis": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/custom_emojis",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/domain_blocks": {
+			"delete": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for DELETE /api/v1/domain_blocks",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/domain_blocks",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/domain_blocks",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/endorsements": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/endorsements",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/favourites": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/favourites",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/filters": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/filters",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/filters",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/filters/{id+}": {
+			"delete": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for DELETE '/api/v1/filters/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id+}",
+					"in": "path",
+					"description": "Generated path parameter for {id+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			],
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET '/api/v1/filters/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for PUT '/api/v1/filters/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/follow_requests": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/follow_requests",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/follows": {
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/follows",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/instance": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/instance",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/lists": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/lists",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/lists/{id+}": {
+			"delete": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for DELETE '/api/v1/lists/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id+}",
+					"in": "path",
+					"description": "Generated path parameter for {id+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			],
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET '/api/v1/lists/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST '/api/v1/lists/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for PUT '/api/v1/lists/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/media": {
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/media",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/media/{id+}": {
+			"put": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for PUT '/api/v1/media/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id+}",
+					"in": "path",
+					"description": "Generated path parameter for {id+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"/api/v1/mutes": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/mutes",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/notifications": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/notifications",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/notifications/clear": {
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/notifications/clear",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/notifications/dismiss": {
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/notifications/dismiss",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/notifications/{id+}": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET '/api/v1/notifications/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id+}",
+					"in": "path",
+					"description": "Generated path parameter for {id+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"/api/v1/push/subscription": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/push/subscription",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/push/subscription",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for PUT /api/v1/push/subscription",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/reports": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/reports",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/reports",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/search": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/search",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/statuses": {
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/statuses",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/statuses/{id+}": {
+			"delete": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for DELETE '/api/v1/statuses/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id+}",
+					"in": "path",
+					"description": "Generated path parameter for {id+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			],
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET '/api/v1/statuses/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST '/api/v1/statuses/{id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/suggestions": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/suggestions",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/suggestions/{account_id+}": {
+			"delete": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for DELETE '/api/v1/suggestions/{account_id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{account_id+}",
+					"in": "path",
+					"description": "Generated path parameter for {account_id+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"/api/v1/timelines/direct": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/timelines/direct",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/timelines/home": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/timelines/home",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/timelines/list/{list_id+}": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET '/api/v1/timelines/list/{list_id+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{list_id+}",
+					"in": "path",
+					"description": "Generated path parameter for {list_id+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"/api/v1/timelines/public": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/timelines/public",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/timelines/tag/{hashtag+}": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET '/api/v1/timelines/tag/{hashtag+}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{hashtag+}",
+					"in": "path",
+					"description": "Generated path parameter for {hashtag+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"/api/v2/search": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v2/search",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

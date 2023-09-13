@@ -5,7 +5,9 @@ exports.handler = async (event, context) => {
 		const effect = (event.headers.authorization.split(' ').filter(x => x)[1] === access_token);
 		return {
 			isAuthorized: effect,
-			context: {}
+			context: {
+				user: 0,
+			},
 		};
 	}
 

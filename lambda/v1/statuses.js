@@ -11,9 +11,8 @@ const { region, dynamodb_table_name } = require('../data/config.js');
  */
 module.exports = async (event, id, args) => {
 	if (id === undefined) { // 新しい投稿
-		const auth = require('../lib/auth.js');
 		const method = event.requestContext.http.method;
-		if (method === 'POST' && auth(event)) {
+		if (method === 'POST') {
 			const post = JSON.parse(event.body);
 			const status = require('../data/status.js');
 			// ダミーデータから、Dynamo DBには保存しないキーを一度削除する

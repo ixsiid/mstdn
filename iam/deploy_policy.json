@@ -6,12 +6,11 @@
 			"lambda:UpdateFunctionCode"
 		],
 		"Resource": "arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%"
-	},
-	{
+	}, {
 		"Effect": "Allow",
 		"Action": [
-			"apigateway:*"
+		    "apigateway:PUT"
 		],
-		"Resource": "arn:aws:apigateway:%REGION%::/apis/%GATEWAY_API_ID%/deployments"
+		"Resource": "arn:aws:apigateway:%REGION%::/apis/%GATEWAY_API_ID%"
 	}]
  }

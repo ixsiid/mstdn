@@ -10,6 +10,13 @@ jobs:
       contents: read
 
     steps:
+      - name: check branch is main
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "Branch is not main, exiting."
+            exit 1
+          fi
+
       - name: checkout
         uses: actions/checkout@v3
         
@@ -28,4 +35,4 @@ jobs:
           cd lambda && zip -r package.zip ./*
           aws lambda update-function-code --function-name ${{ env.AWS_LAMBDA_FUNCTION_NAME }} --zip-file fileb://package.zip --publish
         env:
-          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-function
+          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda

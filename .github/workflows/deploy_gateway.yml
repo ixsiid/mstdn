@@ -15,6 +15,13 @@ jobs:
       contents: read
 
     steps:
+      - name: check branch is main
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "Branch is not main, exiting."
+            exit 1
+          fi
+
       - name: checkout
         uses: actions/checkout@v3
 
@@ -45,4 +52,4 @@ jobs:
           
           aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_GATEWAY_API_ID }} --body file://aws-api.json
         env:
-          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-function
+          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda

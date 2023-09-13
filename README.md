@@ -94,3 +94,4 @@ Solo instance for mastodon by AWS lambda, DynamoDB and API Gateway
 - AWS_REGION
 - AWS_ROLE_ARN
 - DOMAIN
+- INSTANCE_NAME

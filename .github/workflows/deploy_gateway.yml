@@ -15,6 +15,13 @@ jobs:
       contents: read
 
     steps:
+      - name: check branch is main
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "Branch is not main, exiting."
+            exit 1
+          fi
+
       - name: checkout
         uses: actions/checkout@v3
 

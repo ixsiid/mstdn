@@ -30,7 +30,7 @@
 				}
 			}
 		},
-		"x-amazon-api-gateway-integrations": {
+		"x-amazon-apigateway-integrations": {
 			"lambda-integration": {
 				"payloadFormatVersion": "2.0",
 				"type": "aws_proxy",

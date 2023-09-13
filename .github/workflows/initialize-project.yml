@@ -1,0 +1,26 @@
+name: Initialize project
+on:
+  workflow_dispatch:
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_INITIALIZE_ROLE_ARN }}
+          role-session-name: GitHubActions
+      
+      - name: get caller identity is allowed to run on role.
+        run: aws sts get-caller-identity
+
+# Not implements

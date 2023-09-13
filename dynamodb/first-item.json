@@ -1,0 +1,18 @@
+{
+	"id": {"N": "0"},
+	"account_id": {"N": "0"},
+	"created_at": {"N": "0"},
+	"raw": {"M":{
+		"content": {"S":"Hello, world!!"},
+		"emojis": {"L":[]},
+		"replies_count": {"N":"0"},
+		"reblogs_count": {"N":"0"},
+		"favourites_count": {"N":"0"},
+		"sensitive": {"BOOL":false},
+		"spoiler_text": {"S":""},
+		"visibility": {"S":"public"},
+		"media_attachments": {"L":[]},
+		"mentions": {"L":[]},
+		"tags": {"L":[]}
+	}}
+}

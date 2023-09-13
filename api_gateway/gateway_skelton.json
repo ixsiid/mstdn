@@ -1,0 +1,18 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "Gateway skelton"
+  },
+  "paths" : {
+    "/api" : {
+      "x-amazon-apigateway-any-method" : {
+        "responses" : {
+          "default" : {
+            "description" : "Default response for ANY /api"
+          }
+        }
+      }
+    }
+  },
+  "x-amazon-apigateway-importexport-version" : "1.0"
+}

@@ -1,0 +1,17 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [{
+		"Effect": "Allow",
+		"Action": [
+			"lambda:UpdateFunctionCode"
+		],
+		"Resource": "arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%"
+	},
+	{
+		"Effect": "Allow",
+		"Action": [
+			"apigateway:*"
+		],
+		"Resource": "arn:aws:apigateway:%REGION%::/apis/%GATEWAY_API_ID%/deployments"
+	}]
+ }

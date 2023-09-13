@@ -18,7 +18,7 @@ jobs:
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: GitHubActions
+          role-session-name: "Deploy Lambda function by GitHub Actions"
       
       - name: get caller identity is allowed to run on role.
         run: aws sts get-caller-identity
@@ -26,5 +26,6 @@ jobs:
       - name: deploy lambda
         run: |
           cd lambda && zip -r package.zip ./*
-          aws lambda update-function-code --function-name ${{ secrets.AWS_LAMBDA_FUNCTION_NAME }} --zip-file fileb://package.zip --publish
-          
+          aws lambda update-function-code --function-name ${{ env.AWS_LAMBDA_FUNCTION_NAME }} --zip-file fileb://package.zip --publish
+        env:
+          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-function

@@ -1,9 +1,12 @@
 // import api from './api.json' assert { type: 'json' };
 // import integration from './integration.json' assert { type: 'json' };
 
+// node ./api_gateway/convert_aws_api.mjs INPUT_FILE OUTPUT_FILE
+// eg) node ./api_gateway/convert_aws_api.mjs ./api_gateway/api.json ./api.json
+
 import fs from 'node:fs/promises';
 
-fs.readFile('./api_gateway/api.json', 'utf-8')
+fs.readFile(process.argv[2], 'utf-8')
 	.then(t => JSON.parse(t))
 	.then((api) => {
 		const security = [{ [Object.keys(api.components.securitySchemes)[0]]: [] }];
@@ -27,8 +30,6 @@ fs.readFile('./api_gateway/api.json', 'utf-8')
 		return api;
 	})
 	.then(api => {
-		fs.writeFile('./aws_api.json', JSON.stringify(api, null, 2), 'utf-8');
+		fs.writeFile(process.argv[3], JSON.stringify(api, null, 2), 'utf-8');
 		return { success: true };
 	});
-
-

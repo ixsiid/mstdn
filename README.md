@@ -59,14 +59,38 @@ Solo instance for mastodon by AWS lambda, DynamoDB and API Gateway
 - GitHub PATの設定
 - GitHub secretsの設定
   * AWS settings
-  - AWS_INITIALIZE_ROLE_ARN=
-  - AWS_REGION=
-  - AWS_ACCOUNT_ID=
-  - INSTANCE_NAME=
+    - AWS_INITIALIZE_ROLE_ARN=
+    - AWS_REGION=
+    - AWS_ACCOUNT_ID=
+    - INSTANCE_NAME=
 
-  # instance settings
-  - DOMAIN=
-  - USERNAME=
-  - DISPLAY_NAME=
-  - EMAIL=
-  - INSTANCE_ACCESS_TOKEN=
+  * instance settings
+    - DOMAIN=
+    - USERNAME=
+    - DISPLAY_NAME=
+    - EMAIL=
+    - INSTANCE_ACCESS_TOKEN=
+  
+  * add GitHub secret
+    - GITHUB_PERSONAL_TOKEN
+
+## 無事にセットアップできたら次の項目は削除してよい
+* AWS
+  - セットアップ用Role / Policy
+* GitHub secrets
+  - AWS_INITIALIZE_ROLE_ARN
+  - GITHUB_PERSONAL_TOKEN
+  - USERNAME
+  - DISPLAY_NAME
+  - EMAIL
+  - INSTANCE_ACCESS_TOKEN
+
+## 無事にセットアップできたら新たに作られている secrets
+- AWS_GATEWAY_API_ID
+
+## 最終的なsecretsの状態
+- AWS_ACCOUNT_ID
+- AWS_GATEWAY_API_ID
+- AWS_REGION
+- AWS_ROLE_ARN
+- DOMAIN

@@ -28,7 +28,7 @@ jobs:
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: "Deploy Gateway by GitHub Actions"
+          role-session-name: deploy-gateway-from-github-actions
       
       - name: get caller identity is allowed to run on role.
         run: aws sts get-caller-identity

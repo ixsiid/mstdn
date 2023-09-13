@@ -1,4 +1,5 @@
 const { DynamoDB } = require("@aws-sdk/client-dynamodb");
+const { marshall } = require("@aws-sdk/util-dynamodb");
 const { region, dynamodb_table_name } = require('../data/config.js');
 
 /**
@@ -11,7 +12,8 @@ const { region, dynamodb_table_name } = require('../data/config.js');
 module.exports = async (event, id, args) => {
 	if (id === undefined) { // 新しい投稿
 		const auth = require('../lib/auth.js');
-		if (event.httpMethod === 'POST' && auth(event)) {
+		const method = event.requestContext.http.method;
+		if (method === 'POST' && auth(event)) {
 			const post = JSON.parse(event.body);
 			const status = require('../data/status.js');
 			// ダミーデータから、Dynamo DBには保存しないキーを一度削除する
@@ -47,12 +49,12 @@ module.exports = async (event, id, args) => {
 
 			await dynamo.putItem({
 				TableName: dynamodb_table_name,
-				Item: {
-					id: { N: '' + id },
-					created_at: { N: '' + created_at },
-					account_id: { N: '0' },
-					raw: { S: JSON.stringify(status) },
-				},
+				Item: marshall({
+					id,
+					created_at,
+					account_id: 0,
+					raw: status,
+				}),
 			}).then(data => {
 				console.log(data);
 				return data;

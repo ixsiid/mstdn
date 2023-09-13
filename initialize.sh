@@ -81,7 +81,7 @@ aws lambda create-function \
   --handler "index.handler" \
   --description "${INSTANCE_NAME}-api-processor" \
   --timeout 10 \
-  --environment "Variables={username=${USERNAME},display_name=${DISPLAY_NAME},email=${EMAIL},access_token=${INSTANCE_ACCESS_TOKEN}}" \
+  --environment "Variables={username=${USERNAME},display_name=${DISPLAY_NAME},email=${EMAIL},access_token=${INSTANCE_ACCESS_TOKEN},domain=${DOMAIN},region=${AWS_REGION},dynamodb_table_name=${AWS_DYNAMODB_TABLE_NAME}}" \
   > create-function.json
 
 aws lambda add-permission \

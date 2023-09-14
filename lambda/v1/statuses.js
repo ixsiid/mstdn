@@ -36,12 +36,12 @@ module.exports = async (event, id, args) => {
 				KeyConditionExpression: 'id > 0',
 				ProjectionExpression: 'id',
 			}).then(data => {
-				console.log(data);
+				console.debug(data);
 				id = data.Count;
 			}).catch(err => {
-				console.log(err);
+				console.debug(err);
 			});
-			console.log(`ID: ${id}`);
+			console.debug(`ID: ${id}`);
 
 			if (id < 0) return { error: 'database access error' };
 			const created_at = new Date().getTime();
@@ -55,10 +55,10 @@ module.exports = async (event, id, args) => {
 					raw: status,
 				}),
 			}).then(data => {
-				console.log(data);
+				console.debug(data);
 				return data;
 			}).catch(err => {
-				console.log(err);
+				console.debug(err);
 				return err;
 			});
 

@@ -131,4 +131,8 @@ dist
 
 /secret
 /*.json
+!package.json
+!package-lock.json
+!/test/integration/.env
 
+test/dynamodb_local_latest

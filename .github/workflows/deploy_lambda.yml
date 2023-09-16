@@ -33,6 +33,6 @@ jobs:
       - name: deploy lambda
         run: |
           cd lambda && zip -r package.zip ./*
-          aws lambda update-function-code --function-name ${{ env.AWS_LAMBDA_FUNCTION_NAME }} --zip-file fileb://package.zip --publish
+          aws lambda update-function-code --function-name ${{ env.AWS_LAMBDA_FUNCTION_NAME }} --zip-file fileb://package.zip --publish >/dev/null
         env:
           AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda

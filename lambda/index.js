@@ -39,7 +39,8 @@ exports.handler = async (event, context) => {
 
 	return await (async () => { })()
 		.then(() => require(`./${req.join('/')}.js`))
-		.catch(_ => { throw { statusCode: 501 }; })
+		.catch(() => require(`./${req.join('/')}.mjs`))
+		.catch(() => { throw { statusCode: 501 }; })
 		.then(func => func(event, ...query))
 		.then(result => {
 			if (typeof (result?.statusCode) === 'number') return result;
@@ -54,12 +55,4 @@ exports.handler = async (event, context) => {
 			if (typeof (result?.statusCode) === 'number') return result;
 			throw result;
 		}).then(result => result); // thenとcatchの結果を結合する
-};
-
-function errorResponse(message) {
-	const response = {
-		statusCode: 200,
-		body: 'Error: ' + message
-	};
-	return response;
 };

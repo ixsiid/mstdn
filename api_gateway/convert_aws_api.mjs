@@ -18,6 +18,7 @@ fs.readFile(process.argv[2], 'utf-8')
 			'/api/v1/timelines/tag:get',
 			'/api/v1/statuses:post',
 			'/api/v1/accounts/verify_credentials:get',
+			'/api/v1/accounts/{id+}:get'
 		];
 		const integration = { $ref: '#/components/x-amazon-apigateway-integrations/lambda-integration' };
 

@@ -1,15 +1,16 @@
-const { DynamoDB } = require("@aws-sdk/client-dynamodb");
-const { unmarshall } = require("@aws-sdk/util-dynamodb");
-const { region, dynamodb_table_name } = require('../../data/config.js');
+import { DynamoDB } from "@aws-sdk/client-dynamodb";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+import config from '../../data/config.mjs';
+const { region, dynamodb_table_name } = config;
 
-const to_status = require('../../lib/toStatus.js');
+import to_status from '../../lib/to_status.mjs';
 
-module.exports = async (event, args) => {
-	// publicの時は認証不要
+export default async (event, args) => {
+	// アクセス先がpublicの時は認証不要
 	// それ以外は認証必要
 	if (event.requestContext.http.path.split('/').pop() !== 'public') {
 		if (event.requestContext.authorizer?.lambda?.user !== 0) {
-			return { statusCode: 401, error: 'require authorization' };
+			return { statusCode: 401 };
 		}
 	}
 
@@ -46,5 +47,5 @@ module.exports = async (event, args) => {
 
 	console.debug(result);
 
-	return result ?? { error: 'database access error' };
+	return result ?? { statusCode: 505, error: 'database access error' };
 };

@@ -38,7 +38,10 @@ export const handler = async (event, context) => {
 	return await (async () => { })()
 		.then(() => import(`./${req.join('/')}.js`))
 		.catch(() => import(`./${req.join('/')}.mjs`))
-		.catch(() => { throw { statusCode: 501 }; })
+		.catch(err => {
+			console.error(err);
+			throw { statusCode: 501 };
+		})
 		.then(module => module.default)
 		.then(func => func(event, ...query))
 		.then(result => {
@@ -52,6 +55,7 @@ export const handler = async (event, context) => {
 		})
 		.catch(result => {
 			if (typeof (result?.statusCode) === 'number') return result;
+			console.error(result);
 			throw result;
 		}).then(result => result); // thenとcatchの結果を結合する
 };

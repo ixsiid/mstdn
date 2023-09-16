@@ -1,4 +1,5 @@
-const { domain, username, display_name } = require('./config.js');
+import config from './config.mjs';
+const { domain, username, display_name } = config;
 
 /**
  * @typedef Account
@@ -22,7 +23,7 @@ const { domain, username, display_name } = require('./config.js');
  * @property {?Array<*>} fields       Array of profile metadata field, each element has 'name' and 'value'
  * @property {?boolean} bot           Boolean to indicate that the account performs automated actions
 */
-module.exports = {
+export default {
 	id: 0,
 	username,
 	acct: `${username}@${domain}`,

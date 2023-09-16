@@ -1,4 +1,6 @@
-const { domain } = require('./config.js');
+import config from './config.mjs';
+const { domain } = config;
+import account from './account.mjs';
 
 /**
  * @typedef Status
@@ -18,12 +20,11 @@ const { domain } = require('./config.js');
  * @property {number} favourites_count
  * @property {number} replies_count
  */
-
-module.exports = {
+export default {
 	id: 0,
 	uri: `https://${domain}/statuses/0`,
 	created_at: '2000-01-01T00:01:00.000Z',
-	account: require('./account.js'),
+	account,
 	content: 'Empty',
 	visibility: 'public',
 	sensitive: false,

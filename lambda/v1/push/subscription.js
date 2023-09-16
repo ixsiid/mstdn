@@ -1,1 +1,0 @@
-module.exports = (event, args) => ({ error: 'not permitted' });

@@ -1,6 +1,11 @@
-const { DynamoDB } = require("@aws-sdk/client-dynamodb");
-const { marshall } = require("@aws-sdk/util-dynamodb");
-const { region, dynamodb_table_name } = require('../data/config.js');
+import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
+
+import config from '../data/config.mjs';
+const { region, dynamodb_table_name } = config;
+
+import status_template from '../data/status.mjs';
+import to_status from '../lib/to_status.mjs';
 
 /**
  * 
@@ -9,7 +14,7 @@ const { region, dynamodb_table_name } = require('../data/config.js');
  * @param {*} args 
  * @returns 
  */
-module.exports = async (event, id, args) => {
+export default async (event, id, args) => {
 	// 認証を求める。ユーザーは0固定
 	if (event.requestContext.authorizer?.lambda?.user !== 0) return { statusCode: 401 };
 
@@ -17,7 +22,7 @@ module.exports = async (event, id, args) => {
 		const method = event.requestContext.http.method;
 		if (method === 'POST') {
 			const post = JSON.parse(event.body);
-			const status = require('../data/status.js');
+			const status = JSON.parse(JSON.stringify(status_template));
 			// ダミーデータから、Dynamo DBには保存しないキーを一度削除する
 			delete status.id;
 			delete status.uri;
@@ -85,7 +90,7 @@ module.exports = async (event, id, args) => {
 				return err;
 			});
 
-			return require('../lib/toStatus.js')({ ...status, id, created_at });
+			return to_status({ ...status, id, created_at });
 		}
 	}
 

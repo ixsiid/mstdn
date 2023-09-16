@@ -19,22 +19,22 @@ const dynamo = new DynamoDB({ region: process.env.region, endpoint: process.env.
 console.debug = () => { };
 
 const ret = [{
-	"emojis": [], "reblogs_count": 0, "visibility": "public", "favourites_count": 0, "media_attachments": [],
-	"mentions": [], "spoiler_text": "", "replies_count": 0, "sensitive": false, "content": "Hello, world!!",
-	"tags": [], "id": 0, "created_at": "1970-01-01T00:00:00.000Z",
-	"uri": "https://fugafuga.hogehoge.com/statuses/0",
-	"account": {
-		"id": 0, "username": process.env.username, "acct": process.env.username + "@fugafuga.hogehoge.com",
-		"display_name": "USER", "locked": false,
-		"created_at": "2000-01-01T00:00:00.000Z",
-		"followers_count": 0, "following_count": 0, "statuses_count": 0,
-		"note": "It is my account for solo instance.",
-		"url": "https://fugafuga.hogehoge.com",
-		"avatar": "https://fugafuga.hogehoge.com/avatar.png",
-		"avatar_static": "https://fugafuga.hogehoge.com/avatar.gif",
-		"header": "https://fugafuga.hogehoge.com/header.png",
-		"header_static": "https://fugafuga.hogehoge.com/header.gif",
-		"emojis": [], "fields": [], "bot": false
+	emojis: [], reblogs_count: 0, visibility: "public", favourites_count: 0, media_attachments: [],
+	mentions: [], spoiler_text: "", replies_count: 0, sensitive: false, content: "Hello, world!!",
+	tags: [], id: 0, created_at: "1970-01-01T00:00:00.000Z",
+	uri: "https://fugafuga.hogehoge.com/statuses/0",
+	account: {
+		id: 0, username: process.env.username, acct: process.env.username + "@fugafuga.hogehoge.com",
+		display_name: "USER", locked: false,
+		created_at: "2000-01-01T00:00:00.000Z",
+		followers_count: 0, following_count: 0, statuses_count: 0,
+		note: "It is my account for solo instance.",
+		url: "https://fugafuga.hogehoge.com",
+		avatar: "https://fugafuga.hogehoge.com/avatar.png",
+		avatar_static: "https://fugafuga.hogehoge.com/avatar.gif",
+		header: "https://fugafuga.hogehoge.com/header.png",
+		header_static: "https://fugafuga.hogehoge.com/header.gif",
+		emojis: [], fields: [], bot: false
 	}
 }];
 
@@ -96,13 +96,31 @@ test('Integration', async t => {
 		}))
 		// ポスト ボディがおかしいのは、受け付けない
 		.then(() => handler(q.generate_event('/api/v1/statuses', 'post', auth_context, '', Buffer.from(JSON.stringify({ aaa: 'hogehoge' })))))
+		.then(res => t.test('/api/v1/statuses:post with invalid body', () => assert.equal(res.statusCode, 422)))
 		// Not implements
 		// ポスト 正常
-		.then(() => handler(q.generate_event('/api/v1/statuses', 'post', auth_context, '', Buffer.from(JSON.stringify({ aaa: 'hogehoge' })))))
+		.then(() => handler(q.generate_event('/api/v1/statuses', 'post', auth_context, '', Buffer.from(JSON.stringify({ status: 'hogehoge' })))))
+		.then(res => t.test('/api/v1/statuses:post with valid body', () => assert.equal(res.statusCode, 200)))
 		.then(() => handler(q.generate_event('/api/v1/timelines/public', 'get')))
-		.then(res => {
-			console.log(res);
-		})
+		.then(res => t.test('/api/v1/timelines/public:get with new post', () => {
+			assert.equal(res.statusCode, 200);
+			const new_post = JSON.parse(JSON.stringify(ret[0]));
+			new_post.content = 'hogehoge';
+			new_post.id = 1;
+			new_post.uri = new_post.uri.replace(/[0-9]+$/, new_post.id);
+			ret.unshift(new_post);
+
+			// タイムスタンプはチェックしない
+			const timelines = JSON.parse(res.body).map(x => ({
+				...x,
+				created_at: '',
+			}));
+			const compare = ret.map(x => ({
+				...x,
+				created_at: '',
+			}));
+			assert.deepEqual(timelines, compare);
+		}))
 		.catch(err => {
 			console.error(err);
 			throw err;

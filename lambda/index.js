@@ -34,17 +34,15 @@ exports.handler = async (event, context) => {
 
 	const d = JSON.stringify(req);
 	if (req.shift() !== 'api') {
-		return errorResponse('No mastodon api request' + d);
+		return { statusCode: 404 };
 	}
 
 	return await (async () => { })()
 		.then(() => require(`./${req.join('/')}.js`))
+		.catch(_ => { throw { statusCode: 501 }; })
 		.then(func => func(event, ...query))
-		.catch(err => { throw 501; })
 		.then(result => {
-			if (result.statusCode && (result.statusCode < 200 || result.statusCode >= 300)) {
-				throw result.statusCode;
-			}
+			if (typeof (result?.statusCode) === 'number') return result;
 
 			return {
 				statusCode: 200,
@@ -52,7 +50,10 @@ exports.handler = async (event, context) => {
 				body: result === undefined ? '' : JSON.stringify(result),
 			};
 		})
-		.catch(statusCode => ({ statusCode }));
+		.catch(result => {
+			if (typeof (result?.statusCode) === 'number') return result;
+			throw result;
+		}).then(result => result); // thenとcatchの結果を結合する
 };
 
 function errorResponse(message) {

@@ -42,7 +42,7 @@
 	},
 	"x-amazon-apigateway-importexport-version": "1.0",
 	"paths": {
-		"/api/v1/accounts/{id+}": {
+		"/v1/accounts/{id+}": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -81,7 +81,7 @@
 				}
 			]
 		},
-		"/api/v1/accounts/relationships": {
+		"/v1/accounts/relationships": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -96,7 +96,7 @@
 				}
 			}
 		},
-		"/api/v1/accounts/search": {
+		"/v1/accounts/search": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -111,7 +111,7 @@
 				}
 			}
 		},
-		"/api/v1/accounts/update_credentials": {
+		"/v1/accounts/update_credentials": {
 			"patch": {
 				"summary": "",
 				"responses": {
@@ -126,7 +126,7 @@
 				}
 			}
 		},
-		"/api/v1/accounts/verify_credentials": {
+		"/v1/accounts/verify_credentials": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -141,7 +141,7 @@
 				}
 			}
 		},
-		"/api/v1/apps": {
+		"/v1/apps": {
 			"post": {
 				"summary": "",
 				"responses": {
@@ -156,7 +156,7 @@
 				}
 			}
 		},
-		"/api/v1/blocks": {
+		"/v1/blocks": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -171,7 +171,7 @@
 				}
 			}
 		},
-		"/api/v1/custom_emojis": {
+		"/v1/custom_emojis": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -186,7 +186,7 @@
 				}
 			}
 		},
-		"/api/v1/domain_blocks": {
+		"/v1/domain_blocks": {
 			"delete": {
 				"summary": "",
 				"responses": {
@@ -227,7 +227,7 @@
 				}
 			}
 		},
-		"/api/v1/endorsements": {
+		"/v1/endorsements": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -242,7 +242,7 @@
 				}
 			}
 		},
-		"/api/v1/favourites": {
+		"/v1/favourites": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -257,7 +257,7 @@
 				}
 			}
 		},
-		"/api/v1/filters": {
+		"/v1/filters": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -285,7 +285,7 @@
 				}
 			}
 		},
-		"/api/v1/filters/{id+}": {
+		"/v1/filters/{id+}": {
 			"delete": {
 				"summary": "",
 				"responses": {
@@ -337,7 +337,7 @@
 				}
 			}
 		},
-		"/api/v1/follow_requests": {
+		"/v1/follow_requests": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -352,7 +352,7 @@
 				}
 			}
 		},
-		"/api/v1/follows": {
+		"/v1/follows": {
 			"post": {
 				"summary": "",
 				"responses": {
@@ -367,7 +367,7 @@
 				}
 			}
 		},
-		"/api/v1/instance": {
+		"/v1/instance": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -382,7 +382,7 @@
 				}
 			}
 		},
-		"/api/v1/lists": {
+		"/v1/lists": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -397,7 +397,7 @@
 				}
 			}
 		},
-		"/api/v1/lists/{id+}": {
+		"/v1/lists/{id+}": {
 			"delete": {
 				"summary": "",
 				"responses": {
@@ -462,7 +462,7 @@
 				}
 			}
 		},
-		"/api/v1/media": {
+		"/v1/media": {
 			"post": {
 				"summary": "",
 				"responses": {
@@ -477,7 +477,7 @@
 				}
 			}
 		},
-		"/api/v1/media/{id+}": {
+		"/v1/media/{id+}": {
 			"put": {
 				"summary": "",
 				"responses": {
@@ -503,7 +503,7 @@
 				}
 			]
 		},
-		"/api/v1/mutes": {
+		"/v1/mutes": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -518,7 +518,7 @@
 				}
 			}
 		},
-		"/api/v1/notifications": {
+		"/v1/notifications": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -533,7 +533,7 @@
 				}
 			}
 		},
-		"/api/v1/notifications/clear": {
+		"/v1/notifications/clear": {
 			"post": {
 				"summary": "",
 				"responses": {
@@ -548,7 +548,7 @@
 				}
 			}
 		},
-		"/api/v1/notifications/dismiss": {
+		"/v1/notifications/dismiss": {
 			"post": {
 				"summary": "",
 				"responses": {
@@ -563,7 +563,7 @@
 				}
 			}
 		},
-		"/api/v1/notifications/{id+}": {
+		"/v1/notifications/{id+}": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -589,7 +589,7 @@
 				}
 			]
 		},
-		"/api/v1/push/subscription": {
+		"/v1/push/subscription": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -630,7 +630,7 @@
 				}
 			}
 		},
-		"/api/v1/reports": {
+		"/v1/reports": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -658,7 +658,7 @@
 				}
 			}
 		},
-		"/api/v1/search": {
+		"/v1/search": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -673,7 +673,7 @@
 				}
 			}
 		},
-		"/api/v1/statuses": {
+		"/v1/statuses": {
 			"post": {
 				"summary": "",
 				"responses": {
@@ -688,7 +688,7 @@
 				}
 			}
 		},
-		"/api/v1/statuses/{id+}": {
+		"/v1/statuses/{id+}": {
 			"delete": {
 				"summary": "",
 				"responses": {
@@ -740,7 +740,7 @@
 				}
 			}
 		},
-		"/api/v1/suggestions": {
+		"/v1/suggestions": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -755,7 +755,7 @@
 				}
 			}
 		},
-		"/api/v1/suggestions/{account_id+}": {
+		"/v1/suggestions/{account_id+}": {
 			"delete": {
 				"summary": "",
 				"responses": {
@@ -781,7 +781,7 @@
 				}
 			]
 		},
-		"/api/v1/timelines/direct": {
+		"/v1/timelines/direct": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -796,7 +796,7 @@
 				}
 			}
 		},
-		"/api/v1/timelines/home": {
+		"/v1/timelines/home": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -811,7 +811,7 @@
 				}
 			}
 		},
-		"/api/v1/timelines/list/{list_id+}": {
+		"/v1/timelines/list/{list_id+}": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -837,7 +837,7 @@
 				}
 			]
 		},
-		"/api/v1/timelines/public": {
+		"/v1/timelines/public": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -852,7 +852,7 @@
 				}
 			}
 		},
-		"/api/v1/timelines/tag/{hashtag+}": {
+		"/v1/timelines/tag/{hashtag+}": {
 			"get": {
 				"summary": "",
 				"responses": {
@@ -878,7 +878,7 @@
 				}
 			]
 		},
-		"/api/v2/search": {
+		"/v2/search": {
 			"get": {
 				"summary": "",
 				"responses": {

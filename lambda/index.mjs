@@ -1,6 +1,7 @@
-const { access_token } = require('./data/config.js');
+import config from './data/config.js';
+const access_token = config.access_token;
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
 	if (event.type === 'REQUEST') { // API Gatewayよりオーソライザーリクエスト
 		const effect = (event.headers.authorization.split(' ').filter(x => x)[1] === access_token);
 		if (effect) {
@@ -32,15 +33,13 @@ exports.handler = async (event, context) => {
 	req.shift();
 	query.shift();
 
-	const d = JSON.stringify(req);
-	if (req.shift() !== 'api') {
-		return { statusCode: 404 };
-	}
+	if (req.shift() !== 'api') return { statusCode: 404 };
 
 	return await (async () => { })()
-		.then(() => require(`./${req.join('/')}.js`))
-		.catch(_ => { throw { statusCode: 501 }; })
-		.then(func => func(event, ...query))
+		.then(() => import(`./${req.join('/')}.js`))
+		.catch(() => import(`./${req.join('/')}.mjs`))
+		.catch(() => { throw { statusCode: 501 }; })
+		.then(func => func.default(event, ...query))
 		.then(result => {
 			if (typeof (result?.statusCode) === 'number') return result;
 
@@ -54,12 +53,4 @@ exports.handler = async (event, context) => {
 			if (typeof (result?.statusCode) === 'number') return result;
 			throw result;
 		}).then(result => result); // thenとcatchの結果を結合する
-};
-
-function errorResponse(message) {
-	const response = {
-		statusCode: 200,
-		body: 'Error: ' + message
-	};
-	return response;
 };

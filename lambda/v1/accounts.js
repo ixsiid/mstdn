@@ -1,29 +1,27 @@
-module.exports = (event, id, command) => {
-	if (id !== '1') {
-		 return { error: "Invalid user id" };
-	}
-	if (command) {
-		 const error = {
-			  error: "Invalid access token"
-		 };
-		 
-		 const relation = require('../data/relationship.js');
+const relation = require('../data/relationship.js');
 
-		 return ({
-			  followers: [],
-			  following: [],
-			  statuses: error,
-			  follow: relation,
-			  unfollow: relation,
-			  block: relation,
-			  unblock: relation,
-			  mute: relation,
-			  unmute: relation,
-			  pin: relation,
-			  unpin: relation,
-			  lists: error
-		 })[command]
+module.exports = (event, id, command) => {
+	const authorizer = event.requestContext.authorizer;
+	if (authorizer?.lambda?.user !== 0) return { statusCode: 401 };
+	if (authorizer.lambda.user !== id) return { statusCode: 401 };
+	if (id !== 0) return { statusCode: 404 };
+
+	if (command) {
+		return ({
+			followers: [],
+			following: [],
+			statuses: { statusCode: 404 },
+			follow: relation,
+			unfollow: relation,
+			block: relation,
+			unblock: relation,
+			mute: relation,
+			unmute: relation,
+			pin: relation,
+			unpin: relation,
+			lists: { statusCode: 404 },
+		})[command]
 	}
-	
+
 	return require('../data/account.js');
 };

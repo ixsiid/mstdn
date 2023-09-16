@@ -11,7 +11,7 @@ on:
 
 jobs:
   test-lambda-function:
-    runs-on: ubunt-latest
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:

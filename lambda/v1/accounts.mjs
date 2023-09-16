@@ -1,4 +1,5 @@
-const relation = require('../data/relationship.js');
+import account from '../data/account.mjs';
+import relationship from '../data/relationship.mjs';
 
 module.exports = (event, id, command) => {
 	const authorizer = event.requestContext.authorizer;
@@ -11,17 +12,17 @@ module.exports = (event, id, command) => {
 			followers: [],
 			following: [],
 			statuses: { statusCode: 404 },
-			follow: relation,
-			unfollow: relation,
-			block: relation,
-			unblock: relation,
-			mute: relation,
-			unmute: relation,
-			pin: relation,
-			unpin: relation,
+			follow: relationship,
+			unfollow: relationship,
+			block: relationship,
+			unblock: relationship,
+			mute: relationship,
+			unmute: relationship,
+			pin: relationship,
+			unpin: relationship,
 			lists: { statusCode: 404 },
 		})[command]
 	}
 
-	return require('../data/account.js');
+	return account;
 };

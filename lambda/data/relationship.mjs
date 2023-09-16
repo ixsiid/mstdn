@@ -7,7 +7,7 @@
  * @property {boolean} muting
  * @property {boolean} requested
  */
-module.exports = {
+export default {
 	id: 0,
 	following: false,
 	followed_by: false,

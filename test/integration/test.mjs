@@ -135,14 +135,8 @@ test('Integration', async t => {
 		}))
 		*/
 		// インスタンス取得
-		.then(() => handler(q.generate_event('/api/v1/instance', 'get')))
-		.then(res => t.test('/api/v1/instance:get', () => assert.equal(res.statusCode, 200)))
-		.then(() => handler(q.generate_event('/api/v1/search', 'get')))
-		.then(res => t.test('/api/v1/search:get', () => assert.equal(res.statusCode, 200)))
 		.then(() => handler(q.generate_event('/api/v2/search', 'get')))
 		.then(res => t.test('/api/v2/search:get', () => assert.equal(res.statusCode, 200)))
-		.then(() => handler(q.generate_event('/api/v1/push/subscription', 'get')))
-		.then(res => t.test('/api/v1/push/subscription:get', () => assert.equal(res.statusCode, 401)))
 		.catch(err => {
 			console.error(err);
 			throw err;
@@ -151,6 +145,8 @@ test('Integration', async t => {
 	// method === get, statusCode === 200だけチェック
 	await Promise.all(
 		[
+			'instance',
+			'search',
 			'suggestions',
 			'notifications',
 			'follows',
@@ -160,9 +156,23 @@ test('Integration', async t => {
 			'domain_blocks',
 			'custom_emojis',
 			'blocks',
+			'accounts/verify_credentials',
+			'accounts/search',
+			'accounts/relationships',
 		]
 			.map(x => '/api/v1/' + x)
 			.map(p => handler(q.generate_event(p, 'get'))
 				.then(res => t.test(p + ':get', () => assert.equal(res.statusCode, 200))))
+	);
+
+	// method === get, statusCode === 401だけチェック
+	await Promise.all(
+		[
+			'push/subscription',
+			'accounts/update_credentials',
+		]
+			.map(x => '/api/v1/' + x)
+			.map(p => handler(q.generate_event(p, 'get'))
+				.then(res => t.test(p + ':get', () => assert.equal(res.statusCode, 401))))
 	);
 });

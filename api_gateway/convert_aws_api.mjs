@@ -12,13 +12,13 @@ fs.readFile(process.argv[2], 'utf-8')
 		const security = [{ [Object.keys(api.components.securitySchemes)[0]]: [] }];
 
 		const authorization_required_paths = [
-			'/api/v1/timelines/home:get',
-			'/api/v1/timelines/direct:get',
-			'/api/v1/timelines/list:get',
-			'/api/v1/timelines/tag:get',
-			'/api/v1/statuses:post',
-			'/api/v1/accounts/verify_credentials:get',
-			'/api/v1/accounts/{id+}:get'
+			'/v1/timelines/home:get',
+			'/v1/timelines/direct:get',
+			'/v1/timelines/list:get',
+			'/v1/timelines/tag:get',
+			'/v1/statuses:post',
+			'/v1/accounts/verify_credentials:get',
+			'/v1/accounts/{id+}:get'
 		];
 		const integration = { $ref: '#/components/x-amazon-apigateway-integrations/lambda-integration' };
 

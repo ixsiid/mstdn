@@ -1,0 +1,17 @@
+name: Test lambda function
+on:
+  workflow_dispatch:
+
+jobs:
+  test-lambda-function:
+    runs-on: ubunt-latest
+
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local
+        ports:
+          - 8000:8000
+
+    steps:
+      - name: Run lambda test
+        run: node --test

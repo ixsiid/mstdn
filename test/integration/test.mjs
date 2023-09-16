@@ -95,6 +95,7 @@ test('Integration', async t => {
 			assert.deepEqual(JSON.parse(res.body), ret);
 		}))
 		// ポスト ボディがおかしいのは、受け付けない
+		.then(() => handler(q.generate_event('/api/v1/statuses', 'post', auth_context, '', Buffer.from(JSON.stringify({ aaa: 'hogehoge' })))))
 		// Not implements
 		// ポスト 正常
 		.then(() => handler(q.generate_event('/api/v1/statuses', 'post', auth_context, '', Buffer.from(JSON.stringify({ aaa: 'hogehoge' })))))

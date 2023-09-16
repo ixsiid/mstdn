@@ -13,9 +13,13 @@ jobs:
   test-lambda-function:
     runs-on: ubunt-latest
 
+    strategy:
+      matrix:
+        node-version: [18.x]
+
     services:
       dynamodb:
-        image: amazon/dynamodb-local
+        image: amazon/dynamodb-local:latest
         ports:
           - 8000:8000
 
@@ -23,5 +27,10 @@ jobs:
       dynamodb_endpoint: "http://dynamodb:8000"
 
     steps:
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
       - name: Run lambda test
         run: node --test

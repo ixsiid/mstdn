@@ -9,7 +9,7 @@ module.exports = async (event, args) => {
 	// それ以外は認証必要
 	if (event.requestContext.http.path.split('/').pop() !== 'public') {
 		if (event.requestContext.authorizer?.lambda?.user !== 0) {
-			return { error: 'require authorization' };
+			return { statusCode: 401, error: 'require authorization' };
 		}
 	}
 

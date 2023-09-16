@@ -40,16 +40,19 @@ exports.handler = async (event, context) => {
 	return await (async () => { })()
 		.then(() => require(`./${req.join('/')}.js`))
 		.then(func => func(event, ...query))
-		.then(result => ({
-			statusCode: 200,
-			headers: { 'content-type': 'application/json' },
-			body: result === undefined ? '' : JSON.stringify(result),
-		}))
-		.catch(err => {
-			console.debug(`[LAMBDA] find function error: ${`./${req.join('/')}.js`}`);
-			console.debug(err);
-			return { statusCode: 501 }
-		});
+		.catch(err => { throw 501; })
+		.then(result => {
+			if (result.statusCode && (result.statusCode < 200 || result.statusCode >= 300)) {
+				throw result.statusCode;
+			}
+
+			return {
+				statusCode: 200,
+				headers: { 'content-type': 'application/json' },
+				body: result === undefined ? '' : JSON.stringify(result),
+			};
+		})
+		.catch(statusCode => ({ statusCode }));
 };
 
 function errorResponse(message) {

@@ -1,4 +1,4 @@
-module.exports = (event, id) => {
+export default (event, id) => {
 	const filter = {
 		id: 1,
 		phrase: 'dummy',
@@ -11,7 +11,7 @@ module.exports = (event, id) => {
 		return ({
 			GET: [],
 			POST: filter
-		})[event.httpMethod];
+		})[event.requestContext.http.path];
 	}
 
 	return ({
@@ -19,5 +19,5 @@ module.exports = (event, id) => {
 		PUT: filter,
 		POST: filter,
 		DELETE: undefined
-	})[event.httpMethod];
+	})[event.requestContext.http.path];
 };

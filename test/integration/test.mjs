@@ -151,6 +151,13 @@ test('Integration', async t => {
 		[
 			'suggestions',
 			'notifications',
+			'follows',
+			'filters',
+			'favourites',
+			'endorsements',
+			'domain_blocks',
+			'custom_emojis',
+			'blocks',
 		]
 			.map(x => '/api/v1/' + x)
 			.map(p => handler(q.generate_event(p, 'get'))

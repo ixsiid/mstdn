@@ -144,5 +144,13 @@ test('Integration', async t => {
 		.catch(err => {
 			console.error(err);
 			throw err;
-		})
+		});
+
+	// method === get, statusCode === 200だけチェック
+	await Promise.all(
+		['/v1/suggestions']
+			.map(x => '/api' + x)
+			.map(p => handler(q.generate_event(p, 'get'))
+				.then(res => t.test(p + ':get', () => assert.equal(res.statusCode, 200))))
+	);
 });

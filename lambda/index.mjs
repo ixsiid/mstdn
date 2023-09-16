@@ -33,7 +33,7 @@ export const handler = async (event, context) => {
 	req.shift();
 	query.shift();
 
-	if (req.shift() !== 'api') return { statusCode: 404 };
+	// if (req.shift() !== 'api') return { statusCode: 404 };
 
 	return await (async () => { })()
 		.then(() => import(`./${req.join('/')}.js`))

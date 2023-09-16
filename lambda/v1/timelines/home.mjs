@@ -3,7 +3,7 @@ import { unmarshall } from "@aws-sdk/util-dynamodb";
 import config from '../../data/config.mjs';
 const { region, dynamodb_table_name } = config;
 
-import to_status from '../../lib/toStatus.js';
+import to_status from '../../lib/to_status.mjs';
 
 export default async (event, args) => {
 	// アクセス先がpublicの時は認証不要

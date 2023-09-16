@@ -5,7 +5,7 @@ import config from '../data/config.mjs';
 const { region, dynamodb_table_name } = config;
 
 import status_template from '../data/status.mjs';
-import to_status from '../lib/toStatus.js';
+import to_status from '../lib/to_status.mjs';
 
 /**
  * 

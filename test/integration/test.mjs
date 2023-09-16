@@ -148,8 +148,11 @@ test('Integration', async t => {
 
 	// method === get, statusCode === 200だけチェック
 	await Promise.all(
-		['/v1/suggestions']
-			.map(x => '/api' + x)
+		[
+			'suggestions',
+			'notifications',
+		]
+			.map(x => '/api/v1/' + x)
 			.map(p => handler(q.generate_event(p, 'get'))
 				.then(res => t.test(p + ':get', () => assert.equal(res.statusCode, 200))))
 	);

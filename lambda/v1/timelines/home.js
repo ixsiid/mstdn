@@ -5,6 +5,14 @@ const { region, dynamodb_table_name } = require('../../data/config.js');
 const to_status = require('../../lib/toStatus.js');
 
 module.exports = async (event, args) => {
+	// publicの時は認証不要
+	// それ以外は認証必要
+	if (event.requestContext.http.path.split('/').pop() !== 'public') {
+		if (event.requestContext.authorizer?.lambda?.user !== 0) {
+			return { statusCode: 401, error: 'require authorization' };
+		}
+	}
+
 	const option = { region };
 	if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
 	const dynamo = new DynamoDB(option);

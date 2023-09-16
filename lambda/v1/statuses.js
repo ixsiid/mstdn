@@ -10,6 +10,9 @@ const { region, dynamodb_table_name } = require('../data/config.js');
  * @returns 
  */
 module.exports = async (event, id, args) => {
+	// 認証を求める。ユーザーは0固定
+	if (event.requestContext.authorizer?.lambda?.user !== 0) return { statusCode: 401 };
+
 	if (id === undefined) { // 新しい投稿
 		const method = event.requestContext.http.method;
 		if (method === 'POST') {
@@ -21,6 +24,24 @@ module.exports = async (event, id, args) => {
 			delete status.created_at;
 			delete status.account;
 
+			// 本文(string)まはた添付メディア(media_ids)のいずれかが必要
+			// pollは非対応
+			if (typeof (post.status) !== 'string') {
+				if (!(post.media_ids instanceof Array)) return { statusCode: 422 };
+				const media_ids = post.media_ids.filter(x => typeof (x) === 'string');
+				if (media_ids.length === 0) return { statusCode: 422 };
+			}
+
+			// 不要なキーは削除する
+			const valid_keys = [
+				'status', 'media_ids', 'poll',
+				'in_reply_to_id', 'sensitive', 'spoiler_text',
+				'visibility', 'language', 'scheduled_at'
+			];
+			Object.keys(x => {
+				if (!(valid_keys.includes(x))) delete post[x];
+			});
+
 			status.content = post.status;
 			if (post.in_reply_to_id) status.in_reply_to_id = post.in_reply_to_id;
 			if (post.media_ids) status.media_attachments = post.media_ids;
@@ -30,7 +51,9 @@ module.exports = async (event, id, args) => {
 
 			let id = -1;
 
-			const dynamo = new DynamoDB({ region });
+			const option = { region };
+			if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
+			const dynamo = new DynamoDB(option);
 			await dynamo.scan({
 				TableName: dynamodb_table_name,
 				KeyConditionExpression: 'id > 0',
@@ -66,5 +89,5 @@ module.exports = async (event, id, args) => {
 		}
 	}
 
-	return { error: 'Not permitted' };
+	return { statusCode: 500 };
 };

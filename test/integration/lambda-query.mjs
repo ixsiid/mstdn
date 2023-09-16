@@ -40,12 +40,13 @@ const event = {
 /**
  * Create lambda event object
  * @param {string} path 
- * @param {string} method 
+ * @param {string} method
+ * @param {?object} auth_context
  * @param {string} query
  * @param {Buffer} body 
  * @returns {LambdaEvent}
  */
-const generate_event = (path, method, query = '', body = Buffer.from([])) => {
+const generate_event = (path, method, auth_context, query = '', body = Buffer.from([])) => {
 	const e = JSON.parse(JSON.stringify(event));
 	e.routeKey = `${method.toUpperCase()} ${path}`;
 	e.rawPath = `/${stage}${path}`;
@@ -63,9 +64,80 @@ const generate_event = (path, method, query = '', body = Buffer.from([])) => {
 	e.requestContext.routeKey = e.routeKey;
 	e.requestContext.stage = stage;
 
+	if (method.toUpperCase() === 'POST') e.body = body.toString();
+
+	if (auth_context) e.requestContext.authorizer = { lambda: auth_context };
+
+
 	return e;
+};
+
+
+
+const request_authorize_event = {
+	"version": "2.0",
+	"type": "REQUEST",
+	"identitySource": ["user1", "123"],
+	"routeKey": "$default",
+	"rawPath": "/my/path",
+	"rawQueryString": "parameter1=value1&parameter1=value2&parameter2=value",
+	"cookies": ["cookie1", "cookie2"],
+	"headers": {
+		"header1": "value1",
+		"header2": "value2"
+	},
+	"queryStringParameters": {
+		"parameter1": "value1,value2",
+		"parameter2": "value"
+	},
+	"requestContext": {
+		"accountId": "123456789012",
+		"apiId": "api-id",
+		"authentication": {
+			"clientCert": {
+				"clientCertPem": "CERT_CONTENT",
+				"subjectDN": "www.example.com",
+				"issuerDN": "Example issuer",
+				"serialNumber": "a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1:a1",
+				"validity": {
+					"notBefore": "May 28 12:30:02 2019 GMT",
+					"notAfter": "Aug  5 09:36:04 2021 GMT"
+				}
+			}
+		},
+		"domainName": "id.execute-api.us-east-1.amazonaws.com",
+		"domainPrefix": "id",
+		"http": {
+			"method": "POST",
+			"path": "/my/path",
+			"protocol": "HTTP/1.1",
+			"sourceIp": "IP",
+			"userAgent": "agent"
+		},
+		"requestId": "id",
+		"routeKey": "$default",
+		"stage": "$default",
+		"time": "12/Mar/2020:19:03:58 +0000",
+		"timeEpoch": 1583348638390
+	},
+	"pathParameters": { "parameter1": "value1" },
+	"stageVariables": { "stageVariable1": "value1", "stageVariable2": "value2" }
+};
+
+/**
+ * 
+ * @param {string} token 
+ * @returns {any}
+ */
+const generate_authorize_event = (token) => {
+	const event = JSON.parse(JSON.stringify(request_authorize_event));
+	event.routeArn = `arn:aws:execute-api:${process.env.region}:${process.env.aws_account_id}:${stage}/GET/request`;
+	event.headers.authorization = `Bearer ${token}`;
+
+	return event;
 };
 
 export default {
 	generate_event,
+	generate_authorize_event,
 };

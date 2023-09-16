@@ -1,3 +1,5 @@
+import { url } from './instance.mjs';
+
 /**
  * @typedef Media
  * @property {number} id           ID of the attachment
@@ -16,8 +18,7 @@
  * @param {number} id 
  * @returns {Media}
  */
-module.exports = (event, id) => {
-	const url = require('../data/instance.js').urls;
+export default (event, id) => {
 	if (id === undefined) {
 		return {
 			id: 1001,

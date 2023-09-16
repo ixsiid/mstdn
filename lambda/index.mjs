@@ -1,4 +1,4 @@
-import config from './data/config.js';
+import config from './data/config.mjs';
 const access_token = config.access_token;
 
 export const handler = async (event, context) => {

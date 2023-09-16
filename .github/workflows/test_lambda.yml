@@ -19,6 +19,9 @@ jobs:
         ports:
           - 8000:8000
 
+    env:
+      dynamodb_endpoint: "http://dynamodb:8000"
+
     steps:
       - name: Run lambda test
         run: node --test

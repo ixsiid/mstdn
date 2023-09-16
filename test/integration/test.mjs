@@ -25,6 +25,9 @@ const ret = {
 };
 
 test('Integration', async t => {
+	// テスト用認証情報
+	let auth = {};
+
 	// テスト用Dynamo DB localテーブル準備
 	await dynamo.deleteTable({ TableName: process.env.dynamodb_table_name })
 		.finally(() => { })
@@ -50,8 +53,46 @@ test('Integration', async t => {
 			});
 		})
 		.then(res => console.log('Prepared local db, starting test ...'))
+		// 非実装APIへのアクセス
+		.then(() => handler(q.generate_event('/api/v1/reports', 'get')))
+		.then(res => t.test('/api/v1/reports:get, It is not implemented api', () => assert.strictEqual(res.statusCode, 501)))
+		// 非認証アクセス可能
 		.then(() => handler(q.generate_event('/api/v1/timelines/public', 'get')))
 		.then(res => t.test('/api/v1/timelines/public:get', () => {
 			assert.deepEqual(res, ret);
-		}));
+		}))
+		// 非認証アクセス不可能
+		.then(() => handler(q.generate_event('/api/v1/timelines/direct', 'get')))
+		.then(res => {
+			t.todo('Not imeplements');
+			console.log(res);
+		})
+		// 認証失敗
+		.then(() => handler(q.generate_authorize_event('korehatadasikunaiakusesuto-kunndesu')))
+		.then(res => t.test('Authorization fail', () => assert(!res.isAuthorized)))
+		// 認証成功
+		.then(() => handler(q.generate_authorize_event(process.env.access_token)))
+		.then(res => t.test('Authorization success', () => {
+			assert(res.isAuthorized);
+			auth = res.context;
+		}))
+		// 認証後のアクセス
+		.then(() => handler(q.generate_event('/api/v1/timelines/direct', 'get', auth)))
+		.then(res => {
+			t.todo('Not imeplements');
+			console.log(res);
+		})
+		// ポスト
+		.then(() => handler(q.generate_event('/api/v1/statuses', 'post', auth, '', Buffer.from(JSON.stringify({ aaa: 'hogehoge' })))))
+		.then(() => handler(q.generate_event('/api/v1/timelines/public', 'get')))
+		.then(res => {
+			t.todo('Not imeplements');
+			console.log(res);
+		})
+		// ポストボディがおかしいのは、受け付けない
+		// Not implements
+		.catch(err => {
+			console.error(err);
+			throw err;
+		})
 });

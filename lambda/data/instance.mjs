@@ -11,7 +11,7 @@ import config from './config.mjs';
  * @property {Array<string>} languages
  */
 export default {
-	uri: domain,
+	uri: config.domain,
 	urls: `https://${config.domain}`,
 	title: `My Instance on ${config.domain}`,
 	description: 'For only myself instance',

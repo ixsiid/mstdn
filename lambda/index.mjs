@@ -39,7 +39,8 @@ export const handler = async (event, context) => {
 		.then(() => import(`./${req.join('/')}.js`))
 		.catch(() => import(`./${req.join('/')}.mjs`))
 		.catch(() => { throw { statusCode: 501 }; })
-		.then(func => func.default(event, ...query))
+		.then(module => module.default)
+		.then(func => func(event, ...query))
 		.then(result => {
 			if (typeof (result?.statusCode) === 'number') return result;
 

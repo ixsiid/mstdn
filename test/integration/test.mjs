@@ -5,7 +5,7 @@
 import './config.mjs';
 
 import q from './lambda-query.mjs';
-import { handler } from '../../lambda/index.js';
+import { handler } from '../../lambda/index.mjs';
 
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
 

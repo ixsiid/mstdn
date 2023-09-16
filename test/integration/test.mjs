@@ -134,6 +134,9 @@ test('Integration', async t => {
 			assert.deepEqual(JSON.parse(res.body), account);
 		}))
 		*/
+		// インスタンス取得
+		.then(() => handler(q.generate_event('/api/v1/instance', 'get')))
+		.then(res => t.test('/api/v1/instance:get', () => assert.equal(res.statusCode, 200)))
 		.catch(err => {
 			console.error(err);
 			throw err;

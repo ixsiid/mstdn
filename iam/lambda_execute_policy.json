@@ -10,7 +10,9 @@
 			"dynamodb:Scan",
 			"dynamodb:Query",
 			"dynamodb:UpdateItem",
-			"logs:CreateLogGroup"
+			"logs:CreateLogGroup",
+			"logs:CreateLogStream",
+			"logs:PutLogEvents"
 		],
 		"Resource": [
 			"arn:aws:dynamodb:%REGION%:%ACCOUNT_ID%:table/%TABLE%",

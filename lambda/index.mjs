@@ -2,6 +2,8 @@ import config from './data/config.mjs';
 const access_token = config.access_token;
 
 export const handler = async (event, context) => {
+	console.debug(`[LAMBDA] ${event.rawPath}`);
+	console.debug(JSON.stringify(event));
 	if (event.type === 'REQUEST') { // API Gatewayよりオーソライザーリクエスト
 		const effect = (event.headers.authorization.split(' ').filter(x => x)[1] === access_token);
 		if (effect) {
@@ -73,5 +75,10 @@ export const handler = async (event, context) => {
 			if (typeof (result?.statusCode) === 'number') return result;
 			console.error(result);
 			throw result;
-		}).then(result => result); // thenとcatchの結果を結合する
+		}).then(result => {
+			// thenとcatchの結果を結合する
+			console.debug(`[LAMBDA] response for ${event.rawPath}`);
+			console.debug(JSON.stringify(result));
+			return result;
+		});
 };

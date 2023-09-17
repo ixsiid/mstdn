@@ -3,7 +3,8 @@ import config from './config.mjs';
 /**
  * @typedef Instance
  * @property {string} uri
- * @property {string} urls
+ * @property {object} urls
+ * @property {string} urls.streaming_api
  * @property {string} title
  * @property {string} description
  * @property {string} email
@@ -12,7 +13,10 @@ import config from './config.mjs';
  */
 export default {
 	uri: config.domain,
-	urls: `https://${config.domain}`,
+	urls: {
+		rest_api: config.url,
+		// streaming_api: 'not implements',
+	},
 	title: `My Instance on ${config.domain}`,
 	description: 'For only myself instance',
 	email: config.email,

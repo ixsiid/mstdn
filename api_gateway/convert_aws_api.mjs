@@ -14,11 +14,12 @@ fs.readFile(process.argv[2], 'utf-8')
 		const authorization_required_paths = [
 			'/v1/timelines/home:get',
 			'/v1/timelines/direct:get',
-			'/v1/timelines/list:get',
-			'/v1/timelines/tag:get',
+			'/v1/timelines/list/{list_id+}:get',
+			'/v1/timelines/tag/{hashtag+}:get',
 			'/v1/statuses:post',
 			'/v1/accounts/verify_credentials:get',
-			'/v1/accounts/{id+}:get'
+			'/v1/accounts/{id+}:get',
+			'/v1/accounts/{id+}:post',
 		];
 		const integration = { $ref: '#/components/x-amazon-apigateway-integrations/lambda-integration' };
 

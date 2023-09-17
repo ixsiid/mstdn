@@ -68,6 +68,7 @@ aws apigatewayv2 create-stage \
 
 aws apigatewayv2 create-api-mapping \
   --api-id ${AWS_GATEWAY_API_ID} \
+  --api-mapping-key api \
   --domain-name "${DOMAIN}" \
   --stage default \
   > create-api-mapping.json

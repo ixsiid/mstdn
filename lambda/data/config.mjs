@@ -6,4 +6,5 @@ export default {
 	display_name: process.env.display_name,
 	email: process.env.email,
 	access_token: process.env.access_token,
+	url: `https://${process.env.domain}`,
 };

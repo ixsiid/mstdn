@@ -45,6 +45,7 @@ test('Integration', async t => {
 
 	// テスト用Dynamo DB localテーブル準備
 	await dynamo.deleteTable({ TableName: process.env.dynamodb_table_name })
+		.catch(() => { })
 		.finally(() => { })
 		.then(() => Promise.all([
 			fs.readFile('./dynamodb/schema.json'),

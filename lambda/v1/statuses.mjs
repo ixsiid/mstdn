@@ -21,7 +21,7 @@ export default async (event, id, args) => {
 	if (id === undefined) { // 新しい投稿
 		const method = event.requestContext.http.method;
 		if (method === 'POST') {
-			const post = JSON.parse(event.body);
+			const post = event.body;
 			const status = JSON.parse(JSON.stringify(status_template));
 			// ダミーデータから、Dynamo DBには保存しないキーを一度削除する
 			delete status.id;

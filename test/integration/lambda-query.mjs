@@ -47,6 +47,8 @@ const event = {
  * @returns {LambdaEvent}
  */
 const generate_event = (path, method, auth_context, query = '', body = Buffer.from([])) => {
+	if (path.startsWith('/api')) path = path.substring(4);
+
 	const e = JSON.parse(JSON.stringify(event));
 	e.routeKey = `${method.toUpperCase()} ${path}`;
 	e.rawPath = `/${stage}${path}`;
@@ -64,7 +66,10 @@ const generate_event = (path, method, auth_context, query = '', body = Buffer.fr
 	e.requestContext.routeKey = e.routeKey;
 	e.requestContext.stage = stage;
 
-	if (method.toUpperCase() === 'POST') e.body = body.toString();
+	if (method.toUpperCase() === 'POST') {
+		e.headers['content-type'] = 'application/json; charset=utf-8';
+		e.body = body.toString();
+	}
 
 	if (auth_context) e.requestContext.authorizer = { lambda: auth_context };
 

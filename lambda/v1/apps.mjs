@@ -1,3 +1,6 @@
+import config from "../data/config.mjs";
+const { client_id } = config;
+
 let vapid_key = undefined;
 
 export default event => {
@@ -9,5 +12,6 @@ export default event => {
 	return {
 		name: post.client_name,
 		vapid_key,
+		client_id,
 	};
 };

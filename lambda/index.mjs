@@ -21,7 +21,23 @@ export const handler = async (event, context) => {
 	const method = event.requestContext.http.method;
 	const path = event.requestContext.http.path;
 
-	if (method === 'POST') console.debug(`[LAMBDA] postMessage: ${JSON.stringify(JSON.parse(event.body), null, '\t')}`);
+	if (method === 'POST' && event.body) {
+		const decoded = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body;
+		const type = event.headers['content-type'].split(';')[0];
+		switch (type) {
+			case 'application/json':
+				event.body = JSON.parse(decoded);
+				break;
+			case 'application/x-www-form-urlencoded':
+				event.body = Object.fromEntries(
+					decoded.split('&').map(x => x.split('=').map(x => decodeURIComponent(x)))
+				);
+				break;
+			default:
+				event.body = decoded;
+		}
+		console.debug(`[LAMBDA] postMessage: ${JSON.stringify(event.body, null, '\t')}`);
+	}
 
 	const req = path
 		.replace(/\{[a-zA-Z0-9]+\+\}/, '')

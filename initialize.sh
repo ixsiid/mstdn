@@ -63,14 +63,16 @@ export AWS_GATEWAY_API_ID=`jq -r .ApiId import-api.json`
 aws apigatewayv2 create-stage \
   --api-id ${AWS_GATEWAY_API_ID} \
   --auto-deploy \
-  --stage-name default \
+  --stage-name api \
   > create-stage.json
 
+# API MappingはやめてCloudFrontへのオリジンとビヘイビアの追加にする
+# CloudFrontビヘイビアのパスパターンとAPI Gatewayのステージ名は一致させる必要がある
 aws apigatewayv2 create-api-mapping \
   --api-id ${AWS_GATEWAY_API_ID} \
   --api-mapping-key api \
   --domain-name "${DOMAIN}" \
-  --stage default \
+  --stage api \
   > create-api-mapping.json
 
 # Lambda Functionの作成

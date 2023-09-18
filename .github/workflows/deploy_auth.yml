@@ -1,4 +1,4 @@
-name: Deploy Api Gateway
+name: Deploy authorizer Api Gateway and Lambda
 on:
   workflow_dispatch:
 

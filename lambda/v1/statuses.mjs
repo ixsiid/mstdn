@@ -2,7 +2,7 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
 import config from '../data/config.mjs';
-const { region, dynamodb_table_name } = config;
+const { region, dynamodb_table_name, domain } = config;
 
 import status_template from '../data/status.mjs';
 import to_status from '../lib/to_status.mjs';
@@ -50,7 +50,16 @@ export default async (event, auth, id, args) => {
 
 			status.content = post.status;
 			if (post.in_reply_to_id) status.in_reply_to_id = post.in_reply_to_id;
-			if (post.media_ids) status.media_attachments = post.media_ids;
+			if (post.media_ids) {
+				status.media_attachments = post.media_ids.map(id => ({
+					id,
+					type: 'image/jpeg',
+					url: `https://${domain}/media/${id}`,
+					preview_url: `https://${domain}/media/${id}`,
+					remote_url: null,
+					text_url: null,
+				}));
+			}
 			status.sensitive = post.sensitive || false;
 			status.spoiler_text = post.spoiler_text || '';
 			status.visibility = post.visibility || 'public';

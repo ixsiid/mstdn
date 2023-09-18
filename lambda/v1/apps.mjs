@@ -9,6 +9,6 @@ export default event => {
 		name: event.body.client_name,
 		client_id,
 		website: event.body.website ?? null,
-		client_secret: '',
+		client_secret: 'dummy',
 	};
 };

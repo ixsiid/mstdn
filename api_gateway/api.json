@@ -506,6 +506,7 @@
 		"/v1/notifications": {
 			"get": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/notifications",
@@ -521,6 +522,7 @@
 		"/v1/notifications/clear": {
 			"post": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/notifications/clear",
@@ -533,9 +535,10 @@
 				}
 			}
 		},
-		"/v1/notifications/dismiss": {
+		"/v1/notifications/{id}/dismiss": {
 			"post": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/notifications/dismiss",
@@ -546,11 +549,23 @@
 						}
 					}
 				}
-			}
+			},
+			"parameters": [
+				{
+					"name": "{id}",
+					"in": "path",
+					"description": "Generated path parameter for {id}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"/v1/notifications/{id+}": {
 			"get": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET '/api/v1/notifications/{id+}'",

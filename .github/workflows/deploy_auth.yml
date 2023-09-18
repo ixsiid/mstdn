@@ -50,9 +50,9 @@ jobs:
           sed -i "s@%ACCOUNT%@${{ secrets.AWS_ACCOUNT_ID }}@g"           ./api.json
           sed -i "s@%AUTH_FUNCTION%@${{ env.AWS_AUTH_FUNCTION_NAME }}@g" ./api.json
           
-          aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_AUTH_GATEWAY_API_ID }} --body file://auth/api_gateway/api.json >/dev/null
+          aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_AUTH_GATEWAY_API_ID }} --body file://auth/api_gateway/api.json 
 
       - name: deploy lambda
         run: |
           cd auth/lambda && zip -r package.zip ./*
-          aws lambda update-function-code --function-name ${{ env.AWS_AUTH_FUNCTION_NAME }} --zip-file fileb://package.zip --publish >/dev/null
+          aws lambda update-function-code --function-name ${{ env.AWS_AUTH_FUNCTION_NAME }} --zip-file fileb://package.zip --publish

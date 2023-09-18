@@ -27,6 +27,7 @@
 		"/authorize": {
 			"get": {
 				"summary": "Provide login form",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
 				"responses": {
 					"default": {
 						"description": "",
@@ -38,6 +39,7 @@
 		"/login": {
 			"post": {
 				"summary": "Proceed login",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
 				"responses": {
 					"default": {
 						"description": "",
@@ -49,6 +51,7 @@
 		"/token": {
 			"post": {
 				"summary": "Provide token",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
 				"responses": {
 					"default": {
 						"description": "",
@@ -60,6 +63,7 @@
 		"/revoke": {
 			"post": {
 				"summary": "Revoke token",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
 				"responses": {
 					"default": {
 						"description": "",

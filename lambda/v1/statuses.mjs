@@ -14,9 +14,9 @@ import to_status from '../lib/to_status.mjs';
  * @param {*} args 
  * @returns 
  */
-export default async (event, id, args) => {
+export default async (event, auth, id, args) => {
 	// 認証を求める。ユーザーは0固定
-	if (event.requestContext.authorizer?.lambda?.user !== 0) return { statusCode: 401 };
+	if (auth?.account_id !== 0) return { statusCode: 401 };
 
 	if (id === undefined) { // 新しい投稿
 		const method = event.requestContext.http.method;

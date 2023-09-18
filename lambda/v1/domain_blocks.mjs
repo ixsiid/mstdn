@@ -1,4 +1,4 @@
-export default (event, args) => ({
+export default (event, auth, args) => ({
 	GET: [],
 	POST: undefined,
 	DELETE: undefined

@@ -1,24 +1,18 @@
-import config from './data/config.mjs';
-const access_token = config.access_token;
-
 export const handler = async (event, context) => {
 	console.debug(`[LAMBDA] ${event.rawPath}`);
 	console.debug(JSON.stringify(event));
-	if (event.type === 'REQUEST') { // API Gatewayよりオーソライザーリクエスト
-		const effect = (event.headers.authorization.split(' ').filter(x => x)[1] === access_token);
-		if (effect) {
-			//認証成功
+
+	const auth = (() => {
+		if (!event.requestContext.authorizer) return undefined;
+		const authorizer = event.requestContext.authorizer;
+		if ('jwt' in authorizer) {
 			return {
-				isAuthorized: true,
-				context: {
-					user: 0, //一人用のためユーザーIDは決め打ち
-				},
+				username: authorizer.jwt.claims?.username,
+				account_id: 0, // It's constant value for "Solo"
+				scopes: ['read', 'write', 'push'], // authorizer.jwt.scopes
 			};
-		} else {
-			// 認証失敗
-			return { isAuthorized: false };
 		}
-	}
+	})();
 
 	const method = event.requestContext.http.method;
 	const path = event.requestContext.http.path;
@@ -54,14 +48,13 @@ export const handler = async (event, context) => {
 	// if (req.shift() !== 'api') return { statusCode: 404 };
 
 	return await (async () => { })()
-		.then(() => import(`./${req.join('/')}.js`))
-		.catch(() => import(`./${req.join('/')}.mjs`))
+		.then(() => import(`./${req.join('/')}.mjs`))
 		.catch(err => {
 			console.error(err);
 			throw { statusCode: 501 };
 		})
 		.then(module => module.default)
-		.then(func => func(event, ...query))
+		.then(func => func(event, auth, ...query))
 		.then(result => {
 			if (typeof (result?.statusCode) === 'number') return result;
 

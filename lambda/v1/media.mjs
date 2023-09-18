@@ -18,7 +18,7 @@ import { url } from './instance.mjs';
  * @param {number} id 
  * @returns {Media}
  */
-export default (event, id) => {
+export default (event, auth, id) => {
 	if (id === undefined) {
 		return {
 			id: 1001,

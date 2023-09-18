@@ -1,6 +1,52 @@
-export const handler = async (event, context) => {
+const parse_body = (body, headers, isBase64Encoded) => {
+	const buffer = isBase64Encoded ? Buffer.from(body, 'base64') : undefined;
+	const type = headers['content-type'].split(';')[0];
+	switch (type) {
+		case 'application/json':
+			return JSON.parse(buffer?.toString() ?? body);
+		case 'application/x-www-form-urlencoded':
+			return Object.fromEntries(
+				(buffer?.toString() ?? body)
+					.split('&')
+					.map(x => x.split('=').map(x => decodeURIComponent(x)))
+			);
+		case 'multipart/form-data':
+			const boundary = Buffer.from('\r\n--' + headers['content-type'].split('boundary=').pop());
+			const buffer_parts = [];
+			let i = boundary.length;
+			while (true) {
+				const sep = buffer.indexOf(boundary, i);
+				if (sep < 0) break;
+				buffer_parts.push(buffer.subarray(i, sep - i));
+				i += sep + boundary.length + 2; // boudary後続の\r\n
+			}
+
+			const parts = buffer_parts.map(b => {
+				const s = b.indexOf(Buffer.from('\r\n\r\n'));
+				const header = Object.fromEntries(
+					b.subarray(0, s)
+						.toString()
+						.split('\r\n')
+						.map(x => x.split(': '))
+				);
+
+				const body = b.subarray(s + 4);
+
+				return {
+					header,
+					body,
+				};
+			});
+			console.debug(`${parts.map(x => `${JSON.stringify(x.header)}\n:::\n${x.body.length}`)}`);
+			return parts;
+		default:
+			return buffer?.toString() ?? body;
+	}
+};
+
+export const handler = async event => {
 	console.debug(`[LAMBDA] ${event.rawPath}`);
-	console.debug(JSON.stringify(event));
+	console.debug(JSON.stringify({ ...event, body: undefined }));
 
 	/** @type {Auth} */
 	const auth = (() => {
@@ -19,21 +65,10 @@ export const handler = async (event, context) => {
 	const path = event.requestContext.http.path;
 
 	if (method === 'POST' && event.body) {
-		const decoded = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body;
-		const type = event.headers['content-type'].split(';')[0];
-		switch (type) {
-			case 'application/json':
-				event.body = JSON.parse(decoded);
-				break;
-			case 'application/x-www-form-urlencoded':
-				event.body = Object.fromEntries(
-					decoded.split('&').map(x => x.split('=').map(x => decodeURIComponent(x)))
-				);
-				break;
-			default:
-				event.body = decoded;
-		}
-		console.debug(`[LAMBDA] postMessage: ${JSON.stringify(event.body, null, '\t')}`);
+		event.parsed_body = parse_body(event.body, event.headers, event.isBase64Encoded);
+		
+		// 互換性のため
+		event.body = event.parse_body;
 	}
 
 	const req = path

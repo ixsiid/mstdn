@@ -1,24 +1,28 @@
-import { url } from './instance.mjs';
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
-/**
- * @typedef Media
- * @property {number} id           ID of the attachment
- * @property {string} type         One of: "image", "video", "gifv", "unknown"
- * @property {string} url	     no  URL of the locally hosted version of the image
- * @property {?string} remote_url  For remote images, the remote URL of the original image
- * @property {string} preview_url  URL of the preview image
- * @property {?string} text_url    Shorter URL for the image, for insertion into text (only present on local images)
- * @property {?*} meta             See attachment metadata below
- * @property {?string} description A description of the image for the visually impaired (maximum 420 characters), or null if none provided
- */
+import instance from './instance.mjs';
+const { url } = instance;
 
 /**
  * 
- * @param {*} event 
+ * @param {IntegratioEvent} event
+ * @param {Auth} auth 
  * @param {number} id 
  * @returns {Media}
  */
-export default (event, auth, id) => {
+export default async (event, auth, id) => {
+	const client = new S3Client({});
+
+	for (const part of event.parsed_body) {
+		const filename = part.header['Content-Disposition'].split('; ').find(x => x.startsWith('filename=')).substring(9).replaceAll('"', '');
+		const command = new PutObjectCommand({
+			Bucket: '',
+			Key: filename,
+			Body: part.body,
+		});
+		await client.send(command);
+	}
+
 	if (id === undefined) {
 		return {
 			id: 1001,

@@ -13,6 +13,6 @@ export default event => {
 		vapid_key,
 		client_id,
 		website: event.body.website ?? null,
-		client_secret: null,
+		client_secret: '',
 	};
 };

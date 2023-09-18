@@ -47,7 +47,7 @@ jobs:
           sed -i "s@%DATE%@`date -u +"%Y-%m-%dT%H:%M:%SZ"`@g"       ./api.json
 
           sed -i "s@%REGION%@${{ secrets.AWS_REGION }}@g"                ./api.json
-          sed -i "s@%ACCOUNT%@${{ secrets.AWS_ACCOUNT_ID }}@g"           ./api.json
+          sed -i "s@%ACCOUNT_ID%@${{ secrets.AWS_ACCOUNT_ID }}@g"        ./api.json
           sed -i "s@%AUTH_FUNCTION%@${{ env.AWS_AUTH_FUNCTION_NAME }}@g" ./api.json
           
           aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_AUTH_GATEWAY_API_ID }} --body file://api.json 

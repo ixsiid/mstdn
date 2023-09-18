@@ -1,5 +1,18 @@
 # mstdn
-Solo instance for mastodon by AWS lambda, DynamoDB and API Gateway
+AWSのIaaSを用いたサーバーレスで実現するマストドン互換インスタンスです。
+次のサービスを用います
+- API Gateway (v2, HTTP API)
+- Lambda
+- Dynamo DB
+- Cognito
+- S3
+- CloudFront
+
+また、CloudWatch, ACM, Route53, IAMなどの利用も想定しています。
+
+現在は、マストドンと同じREST APIを提供することで実現しています。
+単一のユーザーアカウントで動かすことを前提としており、また、多くのメソッドが未実装です。
+
 
 # セットアップ
 ## 前準備

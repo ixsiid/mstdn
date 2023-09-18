@@ -10,6 +10,9 @@ jobs:
       id-token: write
       contents: read
 
+    env:
+      AWS_AUTH_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-auth
+
     steps:
       - name: check branch is main
         run: |
@@ -42,13 +45,14 @@ jobs:
           sed -i "s@%INSTANCE_NAME%@${{ secrets.INSTANCE_NAME }}@g" ./api.json
           sed -i "s@%DOMAIN%@${{ secrets.DOMAIN }}@g"               ./api.json
           sed -i "s@%DATE%@`date -u +"%Y-%m-%dT%H:%M:%SZ"`@g"       ./api.json
+
+          sed -i "s@%REGION%@${{ secrets.AWS_REGION }}@g"                ./api.json
+          sed -i "s@%ACCOUNT%@${{ secrets.AWS_ACCOUNT_ID }}@g"           ./api.json
+          sed -i "s@%AUTH_FUNCTION%@${{ env.AWS_AUTH_FUNCTION_NAME }}@g" ./api.json
           
-          node ./api_gateway/convert_aws_api.mjs ./api.json ./aws-api.json
-          
-          aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_GATEWAY_API_ID }} --body file://aws-api.json >/dev/null
-        env:
-          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          AWS_COGNITO_CLIENT_ID: ${{ secrets.AWS_COGNITO_CLIENT_ID }}
-          AWS_COGNITO_USER_POOL_ID: ${{ secrets.AWS_COGNITO_USER_POOL_ID }}
+          aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_AUTH_GATEWAY_API_ID }} --body file://auth/api_gateway/api.json >/dev/null
+
+      - name: deploy lambda
+        run: |
+          cd auth/lambda && zip -r package.zip ./*
+          aws lambda update-function-code --function-name ${{ env.AWS_AUTH_FUNCTION_NAME }} --zip-file fileb://package.zip --publish >/dev/null

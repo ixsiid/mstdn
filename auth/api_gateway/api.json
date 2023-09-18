@@ -1,0 +1,72 @@
+{
+	"openapi": "3.0.1",
+	"info": {
+		"title": "%INSTANCE_NAME%-authorize-gateway",
+		"version": "%DATE%"
+	},
+	"servers": [
+		{
+			"url": "https://%DOMAIN%/oauth/{basePath}",
+			"description": "Solo mastodon instance",
+			"variables": { "basePath": { "default": "" } }
+		}
+	],
+	"components": {
+		"x-amazon-apigateway-integrations" : {
+			"lambda-integration": {
+				"payloadFormatVersion": "2.0",
+				"type": "aws_proxy",
+				"httpMethod": "POST",
+				"uri": "arn:aws:apigateway:%REGION%:lambda:path/2015-03-31/functions/arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%AUTH_FUNCTION_NAME%/invocations",
+				"connectionType": "INTERNET"
+			}
+		}
+	},
+	"x-amazon-apigateway-importexport-version": "1.0",
+	"paths": {
+		"/authorize": {
+			"get": {
+				"summary": "Provide login form",
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "text/html": { "type": "object" } }
+					}
+				}
+			}
+		},
+		"/login": {
+			"post": {
+				"summary": "Proceed login",
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { }
+					}
+				}
+			}
+		},
+		"/token": {
+			"post": {
+				"summary": "Provide token",
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/json": { "type": "object" } }
+					}
+				}
+			}
+		},
+		"/revoke": {
+			"post": {
+				"summary": "Revoke token",
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/json": { "type": "object" } }
+					}
+				}
+			}
+		}
+	}
+}

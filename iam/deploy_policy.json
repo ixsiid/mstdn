@@ -5,12 +5,18 @@
 		"Action": [
 			"lambda:UpdateFunctionCode"
 		],
-		"Resource": "arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%"
+		"Resource": [
+			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%",
+			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%AUTH_FUNCTION%"
+		]
 	}, {
 		"Effect": "Allow",
 		"Action": [
 		    "apigateway:PUT"
 		],
-		"Resource": "arn:aws:apigateway:%REGION%::/apis/%GATEWAY_API_ID%"
+		"Resource": [
+			"arn:aws:apigateway:%REGION%::/apis/%GATEWAY_API_ID%",
+			"arn:aws:apigateway:%REGION%::/apis/%GATEWAY_AUTH_API_ID%"
+		]
 	}]
  }

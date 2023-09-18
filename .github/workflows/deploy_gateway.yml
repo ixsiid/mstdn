@@ -39,13 +39,14 @@ jobs:
       - name: Update gateway
         run: |
           cp ./api_gateway/api.json ./api.json
-          sed -i "s@%REGION%@${{ secrets.AWS_REGION }}@g"             ./api.json
-          sed -i "s@%ACCOUNT_ID%@${{ secrets.AWS_ACCOUNT_ID }}@g"     ./api.json
-          sed -i "s@%FUNCTION%@${{ env.AWS_LAMBDA_FUNCTION_NAME }}@g" ./api.json
-          sed -i "s@%INSTANCE_NAME%@${{ secrets.INSTANCE_NAME }}@g"   ./api.json
-          sed -i "s@%DOMAIN%@${{ secrets.DOMAIN }}@g" ./api.json
-          node ./api_gateway/convert_aws_api.mjs ./api.json ./aws-api.json
+          sed -i "s@%INSTANCE_NAME%@${{ secrets.INSTANCE_NAME }}@g" ./api.json
+          sed -i "s@%DOMAIN%@${{ secrets.DOMAIN }}@g"               ./api.json
+          sed -i "s@%DATE%@`date -u +"%Y-%m-%dT%H:%M:%SZ"`@g"       ./api.json
           
           aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_GATEWAY_API_ID }} --body file://aws-api.json >/dev/null
         env:
           AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_COGNITO_CLIENT_ID: ${{ secrets.AWS_COGNITO_CLIENT_ID }}
+          AWS_COGNITO_USER_POOL_ID: ${{ secrets.AWS_COGNITO_USER_POOL_ID }}

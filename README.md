@@ -95,3 +95,7 @@ Solo instance for mastodon by AWS lambda, DynamoDB and API Gateway
 - AWS_ROLE_ARN
 - DOMAIN
 - INSTANCE_NAME
+
+
+- AWS_COGNITO_CLIENT_ID
+- AWS_COGNITO_USER_POOL_ID

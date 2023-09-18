@@ -1,24 +1,48 @@
-import { url } from './instance.mjs';
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import crypto from 'node:crypto';
+
+import config from '../data/config.mjs';
+const { region, s3bucket, domain } = config;
+import instance from '../data/instance.mjs';
+
+const media_types = ['image/jpeg'];
 
 /**
- * @typedef Media
- * @property {number} id           ID of the attachment
- * @property {string} type         One of: "image", "video", "gifv", "unknown"
- * @property {string} url	     no  URL of the locally hosted version of the image
- * @property {?string} remote_url  For remote images, the remote URL of the original image
- * @property {string} preview_url  URL of the preview image
- * @property {?string} text_url    Shorter URL for the image, for insertion into text (only present on local images)
- * @property {?*} meta             See attachment metadata below
- * @property {?string} description A description of the image for the visually impaired (maximum 420 characters), or null if none provided
- */
-
-/**
- * 
- * @param {*} event 
+ * @param {IntegratioEvent} event
+ * @param {Auth} auth 
  * @param {number} id 
  * @returns {Media}
  */
-export default (event, auth, id) => {
+export default async (event, auth, id) => {
+	console.debug('start v1/media method');
+	const client = new S3Client({ region });
+
+	for (const part of event.parsed_body) {
+		const type = part.header['Content-Type'];
+		if (!(media_types.includes(type))) continue;
+		const filename = part.header['Content-Disposition'].split('; ').find(x => x.startsWith('filename=')).substring(9).replaceAll('"', '');
+
+		const Key = 'media/' + crypto.randomUUID();
+		const command = new PutObjectCommand({
+			Bucket: s3bucket,
+			Key,
+			Body: part.body,
+			ContentType: type,
+		});
+		const res = await client.send(command);
+
+		console.debug(res);
+
+		// 1つだけ処理する
+		return {
+			id: '1001',
+			type,
+			url: `${domain}/${Key}`,
+			preview_url: `${domain}/${Key}`,
+			description: filename,
+		}
+	}
+
 	if (id === undefined) {
 		return {
 			id: 1001,

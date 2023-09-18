@@ -41,7 +41,7 @@ jobs:
 
       - name: Update gateway
         run: |
-          cp ./api_gateway/api.json ./api.json
+          cp ./auth/api_gateway/api.json ./api.json
           sed -i "s@%INSTANCE_NAME%@${{ secrets.INSTANCE_NAME }}@g" ./api.json
           sed -i "s@%DOMAIN%@${{ secrets.DOMAIN }}@g"               ./api.json
           sed -i "s@%DATE%@`date -u +"%Y-%m-%dT%H:%M:%SZ"`@g"       ./api.json

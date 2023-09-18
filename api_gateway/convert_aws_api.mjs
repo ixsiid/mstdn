@@ -22,7 +22,7 @@ fs.readFile(process.argv[2], 'utf-8')
 			}
 		};
 
-		api.components = ['x-amazon-apigateway-integrations'] = {
+		api.components['x-amazon-apigateway-integrations'] = {
 			'lambda-integration': {
 				payloadFormatVersion: '2.0',
 				type: 'aws_proxy',

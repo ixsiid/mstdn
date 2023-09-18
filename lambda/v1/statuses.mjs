@@ -8,11 +8,9 @@ import status_template from '../data/status.mjs';
 import to_status from '../lib/to_status.mjs';
 
 /**
- * 
- * @param {*} event 
- * @param {*} id 
- * @param {*} args 
- * @returns 
+ * @param {IntegrationEvent}
+ * @param {Auth}
+ * @returns {Response}
  */
 export default async (event, auth, id, args) => {
 	// 認証を求める。ユーザーは0固定

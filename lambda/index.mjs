@@ -2,6 +2,7 @@ export const handler = async (event, context) => {
 	console.debug(`[LAMBDA] ${event.rawPath}`);
 	console.debug(JSON.stringify(event));
 
+	/** @type {Auth} */
 	const auth = (() => {
 		if (!event.requestContext.authorizer) return undefined;
 		const authorizer = event.requestContext.authorizer;

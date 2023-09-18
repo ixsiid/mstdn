@@ -7,7 +7,7 @@ import account from '../data/account.mjs';
  * @returns {{id: number, type: string, created_at: string, account: Account, status: ?*}}
  */
 
-export default (event, id) => {
+export default (event, auth, id) => {
 	if (id === undefined) return [];
 
 	return {

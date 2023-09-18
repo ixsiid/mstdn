@@ -5,13 +5,11 @@ const { region, dynamodb_table_name } = config;
 
 import to_status from '../../lib/to_status.mjs';
 
-export default async (event, args) => {
+export default async (event, auth, args) => {
 	// アクセス先がpublicの時は認証不要
 	// それ以外は認証必要
-	if (event.requestContext.http.path.split('/').pop() !== 'public') {
-		if (event.requestContext.authorizer?.lambda?.user !== 0) {
-			return { statusCode: 401 };
-		}
+	if (event.requestContext.http.path.split('/').pop() !== 'public' && !auth) {
+		return { statusCode: 401 };
 	}
 
 	const option = { region };

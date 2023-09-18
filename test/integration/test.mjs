@@ -81,15 +81,17 @@ test('Integration', async t => {
 		// 非認証アクセス不可能
 		.then(() => handler(q.generate_event('/api/v1/timelines/direct', 'get')))
 		.then(res => t.test('/api/v1/timelines/direct without auth', () => assert.equal(res.statusCode, 401)))
-		// 認証失敗
-		.then(() => handler(q.generate_authorize_event('korehatadasikunaiakusesuto-kunndesu')))
-		.then(res => t.test('Authorization fail', () => assert(!res.isAuthorized)))
-		// 認証成功
-		.then(() => handler(q.generate_authorize_event(process.env.access_token)))
-		.then(res => t.test('Authorization success', () => {
-			assert(res.isAuthorized);
-			auth_context = res.context;
-		}))
+		// 認証データ作成
+		.then(() => {
+			auth_context = {
+				jwt: {
+					claims: {
+						username: "12345678-90ab-cdef-ghij-klmnopqrstuv",
+					},
+					scopes: null,
+				}
+			}
+		})
 		// 認証後のアクセス
 		.then(() => handler(q.generate_event('/api/v1/timelines/direct', 'get', auth_context)))
 		.then(res => t.test('/api/v1/timelines/direct with auth', () => {

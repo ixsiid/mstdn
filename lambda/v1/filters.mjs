@@ -1,4 +1,4 @@
-export default (event, id) => {
+export default (event, auth, id) => {
 	const filter = {
 		id: 1,
 		phrase: 'dummy',

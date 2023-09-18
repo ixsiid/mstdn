@@ -1,1 +1,1 @@
-export default (event, args) => [];
+export default (event, auth, args) => [];

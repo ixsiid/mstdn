@@ -5,7 +5,6 @@ export default {
 	username: process.env.username,
 	display_name: process.env.display_name,
 	email: process.env.email,
-	access_token: process.env.access_token,
 	url: `https://${process.env.domain}`,
 	client_id: process.env.client_id,
 };

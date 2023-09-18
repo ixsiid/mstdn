@@ -71,7 +71,7 @@ const generate_event = (path, method, auth_context, query = '', body = Buffer.fr
 		e.body = body.toString();
 	}
 
-	if (auth_context) e.requestContext.authorizer = { lambda: auth_context };
+	if (auth_context) e.requestContext.authorizer = auth_context;
 
 
 	return e;

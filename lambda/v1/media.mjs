@@ -22,7 +22,8 @@ export default async (event, auth, id) => {
 		if (!(media_types.includes(type))) continue;
 		const filename = part.header['Content-Disposition'].split('; ').find(x => x.startsWith('filename=')).substring(9).replaceAll('"', '');
 
-		const Key = 'media/' + crypto.randomUUID();
+		const uuid = crypto.randomUUID()
+		const Key = 'media/' + uuid;
 		const command = new PutObjectCommand({
 			Bucket: s3bucket,
 			Key,
@@ -35,10 +36,10 @@ export default async (event, auth, id) => {
 
 		// 1つだけ処理する
 		return {
-			id: '1001',
+			id: uuid,
 			type,
-			url: `${domain}/${Key}`,
-			preview_url: `${domain}/${Key}`,
+			url: `https://${domain}/${Key}`,
+			preview_url: `https://${domain}/${Key}`,
 			description: filename,
 		}
 	}

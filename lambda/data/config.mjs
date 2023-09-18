@@ -7,4 +7,5 @@ export default {
 	email: process.env.email,
 	url: `https://${process.env.domain}`,
 	client_id: process.env.client_id,
+	s3bucket: process.env.s3bucket,
 };

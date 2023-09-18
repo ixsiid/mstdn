@@ -13,13 +13,16 @@ import to_status from '../lib/to_status.mjs';
  * @returns {MethodResponse}
  */
 export default async (event, auth, id, args) => {
+	console.debug('start statuses method');
+	console.debug(event.parsed_body);
+
 	// 認証を求める。ユーザーは0固定
 	if (auth?.account_id !== 0) return { statusCode: 401 };
 
 	if (id === undefined) { // 新しい投稿
 		const method = event.requestContext.http.method;
 		if (method === 'POST') {
-			const post = event.body;
+			const post = event.parsed_body;
 			const status = JSON.parse(JSON.stringify(status_template));
 			// ダミーデータから、Dynamo DBには保存しないキーを一度削除する
 			delete status.id;

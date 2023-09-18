@@ -68,7 +68,7 @@ export const handler = async event => {
 		event.parsed_body = parse_body(event.body, event.headers, event.isBase64Encoded);
 		
 		// 互換性のため
-		event.body = event.parse_body;
+		event.body = event.parsed_body;
 	}
 
 	const req = path

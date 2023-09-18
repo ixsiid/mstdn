@@ -897,6 +897,22 @@
 					}
 				}
 			}
+		},
+		"/v2/media": {
+			"post": {
+				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v2/media",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }

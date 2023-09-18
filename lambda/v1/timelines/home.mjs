@@ -18,12 +18,32 @@ export default async (event, args) => {
 	if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
 	const dynamo = new DynamoDB(option);
 
+	let limit = 20;
+	const conditions = ['account_id = :zero'];
+	const condition_values = { ':zero': { N: '0' } };
+	if (event.queryStringParameters) {
+		const q = event.queryStringParameters;
+		if (q.limit) limit = parseInt(q.limit);
+		if (q.min_id) {
+			conditions.push('id > :min_id');
+			condition_values[':min_id'] = { N: '' + parseInt(q.min_id) };
+		}
+		if (q.max_id) {
+			conditions.push('id < :max_id');
+			condition_values[':max_id'] = { N: '' + parseInt(q.max_id) };
+		}
+		if (q.since_id) {
+			conditions.push('id > :since_id');
+			condition_values[':since_id'] = { N: '' + parseInt(q.since_id) };
+		}
+	}
+
 	const result = await dynamo.query({
 		TableName: dynamodb_table_name,
-		Limit: 20,
+		Limit: limit,
 		ScanIndexForward: false,
-		ExpressionAttributeValues: { ':zero': { N: '0' } },
-		KeyConditionExpression: 'account_id = :zero',
+		ExpressionAttributeValues: condition_values,
+		KeyConditionExpression: conditions.join(' and '),
 	}).catch(err => {
 		console.debug('DynamoDB error');
 		console.debug(err);

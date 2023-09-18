@@ -47,7 +47,10 @@ const AuthenticationResultCache = {};
 
 export const handler = async event => {
 	console.debug(`[LAMBDA] ${event.rawPath}`);
+	console.debug(JSON.stringify(event));
+
 	const api_method = event.rawPath.split('?')[0];
+
 	// /oauth/authorize だけGETメソッドなため先に処理してしまう。
 	if (api_method === '/oauth/authorize') {
 		return {
@@ -100,38 +103,71 @@ export const handler = async event => {
 				AuthenticationResultCache[id] = res.AuthenticationResult;
 				return id;
 			});
+		const queries = [
+			['code', code],
+			...decodeURIComponent(body.state).split(',').map(x => x.split(':')),
+		];
+		const query_string = 'code=' + code + (body.state ? '&state=' + body.state : '');
+		console.debug(query_string);
 		return {
 			statusCode: 302,
 			headers: {
-				location: decodeURIComponent(body.redirect_uri) + '?code=' + code,
+				location: decodeURIComponent(body.redirect_uri) + '?' + query_string,
 			},
 		};
 	}
 
 	if (api_method === '/oauth/token') {
-		if (body.code in AuthenticationResultCache) {
-			const t = AuthenticationResultCache[body.code];
-			const r = {
-				scope: 'read write push',
-				created_at: new Date().getTime(),
-				access_token: t.AccessToken,
-				id_token: t.IdToken,
-				refresh_token: t.RefreshToken,
-				expires_in: t.ExpiresIn,
-				token_type: t.TokenType,
-			};
-			console.debug(JSON.stringify(r));
+		if (body.grant_type === 'client_credentials') {
+			delete body.grant_type;
+			delete body.client_secret;
 			return {
 				statusCode: 200,
 				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify(r),
-			};
-		} else {
-			console.debug('401: unauthorized');
-			console.debug(JSON.stringify(AuthenticationResultCache));
-			console.debug(body.code);
-			return { statusCode: 401 };
+				body: JSON.stringify({ ...body, access_token: 'dummy_token' }),
+			}
 		}
+
+		if (body.grant_type === 'refresh_token') {
+			return {
+				statusCode: 500
+			};
+		}
+
+		if (body.grant_type === 'authorization_code') {
+			if (body.code in AuthenticationResultCache) {
+				const t = AuthenticationResultCache[body.code];
+				const r = {
+					scope: 'read write push',
+					created_at: new Date().getTime(),
+					access_token: t.AccessToken,
+					refresh_token: t.RefreshToken,
+					expires_in: t.ExpiresIn,
+					token_type: t.TokenType,
+				};
+				console.debug(JSON.stringify(r));
+				return {
+					statusCode: 200,
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify(r),
+				};
+			}
+
+			return {
+				statusCode: 401,
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ error: 'Not permitted' }),
+			};
+		}
+
+		console.debug('401: unauthorized');
+		console.debug(JSON.stringify(AuthenticationResultCache));
+		console.debug(body.code);
+		return {
+			statusCode: 401,
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ error: 'Unknown grant type' }),
+		};
 	}
 
 

@@ -1,0 +1,29 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [{
+		"Effect": "Allow",
+		"Action": [
+			"logs:CreateLogGroup"
+		],
+		"Resource": [
+			"arn:aws:logs:%REGION%:%ACCOUNT_ID%:*"
+		]
+	}, {
+		"Effect": "Allow",
+		"Action": [
+			"logs:CreateLogStream",
+			"logs:PutLogEvents"
+		],
+		"Resource": [
+			"arn:aws:logs:%REGION%:%ACCOUNT_ID%:log-group:/aws/lambda/%AUTH_FUNCTION%:*"
+		]
+	}, {
+		"Effect": "Allow",
+		"Action": [
+			"cognito-idp:AdminInitiateAuth"
+		],
+		"Resource": [
+			"arn:aws:cognito-idp:%REGION%:%ACCOUNT_ID%:userpool/%COGNITO_USER_POOL_ID%"
+		]
+	}]
+}

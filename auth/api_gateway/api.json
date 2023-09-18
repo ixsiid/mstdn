@@ -17,7 +17,7 @@
 				"payloadFormatVersion": "2.0",
 				"type": "aws_proxy",
 				"httpMethod": "POST",
-				"uri": "arn:aws:apigateway:%REGION%:lambda:path/2015-03-31/functions/arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%AUTH_FUNCTION_NAME%/invocations",
+				"uri": "arn:aws:apigateway:%REGION%:lambda:path/2015-03-31/functions/arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%AUTH_FUNCTION%/invocations",
 				"connectionType": "INTERNET"
 			}
 		}

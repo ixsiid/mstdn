@@ -10,7 +10,7 @@ import to_status from '../lib/to_status.mjs';
 /**
  * @param {IntegrationEvent}
  * @param {Auth}
- * @returns {Response}
+ * @returns {MethodResponse}
  */
 export default async (event, auth, id, args) => {
 	// 認証を求める。ユーザーは0固定

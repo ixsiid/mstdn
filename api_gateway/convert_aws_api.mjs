@@ -12,6 +12,7 @@ fs.readFile(process.argv[2], 'utf-8')
 		api['x-amazon-apigateway-importexport-version'] = '1.0';
 
 		api.components.securitySchemes['jwt-authorizer'] = {
+			...api.components.securitySchemes['jwt-authorizer'],
 			'x-amazon-apigateway-authorizer': {
 				identitySource: '$request.header.Authorization',
 				jwtConfiguration: {

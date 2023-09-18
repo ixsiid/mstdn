@@ -9,28 +9,36 @@ import fs from 'node:fs/promises';
 fs.readFile(process.argv[2], 'utf-8')
 	.then(t => JSON.parse(t))
 	.then((api) => {
-		const security = [{ [Object.keys(api.components.securitySchemes)[0]]: [] }];
+		api['x-amazon-apigateway-importexport-version'] = '1.0';
 
-		const authorization_required_paths = [
-			'/v1/timelines/home:get',
-			'/v1/timelines/direct:get',
-			'/v1/timelines/list/{list_id+}:get',
-			'/v1/timelines/tag/{hashtag+}:get',
-			'/v1/statuses:post',
-			'/v1/accounts/verify_credentials:get',
-			'/v1/accounts/{id+}:get',
-			'/v1/accounts/{id+}:post',
-		];
+		api.components.securitySchemes['jwt-authorizer'] = {
+			'x-amazon-apigateway-authorizer': {
+				identitySource: '$request.header.Authorization',
+				jwtConfiguration: {
+					audience: [process.env.AWS_COGNITO_CLIENT_ID],
+					issuer: `https://cognito-idp.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_COGNITO_USER_POOL_ID}`,
+				},
+				type: "jwt",
+			}
+		};
+
+		api.components = ['x-amazon-apigateway-integrations'] = {
+			'lambda-integration': {
+				payloadFormatVersion: '2.0',
+				type: 'aws_proxy',
+				httpMethod: 'POST',
+				uri: `arn:aws:apigateway:${process.env.AWS_REGION}:lambda:path/2015-03-31/functions/arn:aws:lambda:${process.env.AWS_REGION}:${process.env.AWS_ACCOUNT_ID}:function:${process.env.AWS_LAMBDA_FUNCTION_NAME}/invocations`,
+				connectionType: 'INTERNET'
+			}
+		};
+
 		const integration = { $ref: '#/components/x-amazon-apigateway-integrations/lambda-integration' };
-
-		api.info.version = new Date().toISOString();
 
 		for (const k of Object.keys(api.paths)) {
 			['get', 'post', 'put', 'patch', 'delete', 'any']
 				.filter(method => method in api.paths[k])
 				.forEach(method => {
 					api.paths[k][method]['x-amazon-apigateway-integration'] = integration;
-					if (authorization_required_paths.includes(`${k}:${method}`)) api.paths[k][method].security = security;
 				});
 		}
 

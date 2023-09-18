@@ -1,7 +1,8 @@
 {
 	"openapi": "3.0.1",
 	"info": {
-		"title": "%INSTANCE_NAME%-gateway"
+		"title": "%INSTANCE_NAME%-gateway",
+		"version": "%DATE%"
 	},
 	"servers": [
 		{
@@ -16,35 +17,17 @@
 	],
 	"components": {
 		"securitySchemes": {
-			"simple-bearer-authorizer": {
-				"type": "apiKey",
-				"name": "Authorization",
-				"in": "header",
-				"x-amazon-apigateway-authorizer": {
-					"identitySource": "$request.header.Authorization",
-					"authorizerUri": "arn:aws:apigateway:%REGION%:lambda:path/2015-03-31/functions/arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%/invocations",
-					"authorizerPayloadFormatVersion": "2.0",
-					"authorizerResultTtlInSeconds": 3600,
-					"type": "request",
-					"enableSimpleResponses": true
-				}
-			}
-		},
-		"x-amazon-apigateway-integrations": {
-			"lambda-integration": {
-				"payloadFormatVersion": "2.0",
-				"type": "aws_proxy",
-				"httpMethod": "POST",
-				"uri": "arn:aws:apigateway:%REGION%:lambda:path/2015-03-31/functions/arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%/invocations",
-				"connectionType": "INTERNET"
+			"jwt-authorizer": {
+				"type": "oauth2",
+				"flows": {}
 			}
 		}
 	},
-	"x-amazon-apigateway-importexport-version": "1.0",
 	"paths": {
 		"/v1/accounts/{id+}": {
 			"get": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET '/api/v1/accounts/{id+}'",
@@ -58,6 +41,7 @@
 			},
 			"post": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST '/api/v1/accounts/{id+}'",
@@ -129,6 +113,7 @@
 		"/v1/accounts/verify_credentials": {
 			"get": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/accounts/verify_credentials",
@@ -676,6 +661,7 @@
 		"/v1/statuses": {
 			"post": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/statuses",
@@ -784,6 +770,7 @@
 		"/v1/timelines/direct": {
 			"get": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/timelines/direct",
@@ -799,6 +786,7 @@
 		"/v1/timelines/home": {
 			"get": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/timelines/home",
@@ -814,6 +802,7 @@
 		"/v1/timelines/list/{list_id+}": {
 			"get": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET '/api/v1/timelines/list/{list_id+}'",
@@ -855,6 +844,7 @@
 		"/v1/timelines/tag/{hashtag+}": {
 			"get": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET '/api/v1/timelines/tag/{hashtag+}'",

@@ -16,7 +16,7 @@ export default async (event, auth, id) => {
 	console.debug('start v1/media method');
 	const client = new S3Client({ region });
 
-	if (!auth?.account_id) {
+	if (auth?.account_id !== 0) {
 		return { statusCode: 401 };
 	}
 

@@ -1,55 +1,5 @@
-const parse_body = (body, headers, isBase64Encoded) => {
-	const buffer = isBase64Encoded ? Buffer.from(body, 'base64') : undefined;
-	const type = headers['content-type'].split(';')[0];
-	console.debug(`type: ${type} [${buffer?.length}]`);
-	switch (type) {
-		case 'application/json':
-			const json = JSON.parse(buffer?.toString() ?? body);
-			console.debug(JSON.stringify(json, null, 2));
-			return json;
-		case 'application/x-www-form-urlencoded':
-			const form = Object.fromEntries(
-				(buffer?.toString() ?? body)
-					.split('&')
-					.map(x => x.split('=').map(x => decodeURIComponent(x)))
-			);
-			console.debug(JSON.stringify(form));
-			return form;
-		case 'multipart/form-data':
-			const boundary = Buffer.from('\r\n--' + headers['content-type'].split('boundary=').pop());
-			const buffer_parts = [];
-			let i = boundary.length;
-			while (true) {
-				const sep = buffer.indexOf(boundary, i);
-				if (sep < 0) break;
-				buffer_parts.push(buffer.subarray(i, sep - i));
-				i += sep + boundary.length + 2; // boudary後続の\r\n
-			}
-
-			const parts = buffer_parts.map(b => {
-				const s = b.indexOf(Buffer.from('\r\n\r\n'));
-				const header = Object.fromEntries(
-					b.subarray(0, s)
-						.toString()
-						.split('\r\n')
-						.map(x => x.split(': '))
-				);
-
-				const body = b.subarray(s + 4);
-
-				return {
-					header,
-					body,
-				};
-			});
-			console.debug(`${parts.map(x => `${JSON.stringify(x.header)};\nbody length: ${x.body.length}`)}`);
-			return parts;
-		default:
-			const text = buffer?.toString() ?? body;
-			console.debug(text.substring(0, 32));
-			return text;
-	}
-};
+import parse_body from "./lib/parse_body.mjs";
+import parse_path from "./lib/parse_path.mjs";
 
 export const handler = async event => {
 	console.debug(`[LAMBDA] ${event.rawPath}`);
@@ -67,37 +17,27 @@ export const handler = async event => {
 			};
 		}
 	})();
+	console.debug(`Auth: ${JSON.stringify(auth, null, 2)}`);
 
-	const method = event.requestContext.http.method;
-	const path = event.requestContext.http.path;
+	const { method, path, keys } = parse_path(event);
+	// 互換性のため
+	event.httpMethod = method.toUpperCase();
 
-	if (method === 'POST' && event.body) {
+	if (method === 'post' && event.body) {
 		event.parsed_body = parse_body(event.body, event.headers, event.isBase64Encoded);
-		
+
 		// 互換性のため
 		event.body = event.parsed_body;
 	}
 
-	const req = path
-		.replace(/\{[a-zA-Z0-9]+\+\}/, '')
-		.split('/')
-		.filter(x => x);
-	const query = event.rawPath.split('/').filter(x => x).slice(req.length);
-
-	// ステージ名を取り除く
-	req.shift();
-	query.shift();
-
-	// if (req.shift() !== 'api') return { statusCode: 404 };
-
 	return await (async () => { })()
-		.then(() => import(`./${req.join('/')}.mjs`))
+		.then(() => import(`.${path}.mjs`))
 		.catch(err => {
 			console.error(err);
 			throw { statusCode: 501 };
 		})
 		.then(module => module.default)
-		.then(func => func(event, auth, ...query))
+		.then(func => func(event, auth, ...keys))
 		.then(result => {
 			if (typeof (result?.statusCode) === 'number') return result;
 

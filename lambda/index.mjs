@@ -1,7 +1,7 @@
 const parse_body = (body, headers, isBase64Encoded) => {
 	const buffer = isBase64Encoded ? Buffer.from(body, 'base64') : undefined;
 	const type = headers['content-type'].split(';')[0];
-	console.debug(`type: ${type} [${buffer.length}]`);
+	console.debug(`type: ${type} [${buffer?.length}]`);
 	switch (type) {
 		case 'application/json':
 			const json = JSON.parse(buffer?.toString() ?? body);

@@ -25,10 +25,10 @@ const account = {
 	followers_count: 0, following_count: 0, statuses_count: 0,
 	note: "It is my account for solo instance.",
 	url: "https://fugafuga.hogehoge.com",
-	avatar: "https://fugafuga.hogehoge.com/avatar.png",
-	avatar_static: "https://fugafuga.hogehoge.com/avatar.gif",
-	header: "https://fugafuga.hogehoge.com/header.png",
-	header_static: "https://fugafuga.hogehoge.com/header.gif",
+	avatar: "https://fugafuga.hogehoge.com/avatar/icon.png",
+	avatar_static: "https://fugafuga.hogehoge.com/avatar/icon.gif",
+	header: "https://fugafuga.hogehoge.com/avatar/header.png",
+	header_static: "https://fugafuga.hogehoge.com/avatar/header.gif",
 	emojis: [], fields: [], bot: false
 };
 const ret = [{

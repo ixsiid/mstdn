@@ -3,9 +3,8 @@ import crypto from 'node:crypto';
 
 import config from '../data/config.mjs';
 const { region, s3bucket, domain } = config;
-import instance from '../data/instance.mjs';
 
-const media_types = ['image/jpeg'];
+const media_types = ['image', 'audio', 'video'];
 
 /**
  * @param {IntegratioEvent} event
@@ -17,9 +16,13 @@ export default async (event, auth, id) => {
 	console.debug('start v1/media method');
 	const client = new S3Client({ region });
 
+	if (!auth?.account_id) {
+		return { statusCode: 401 };
+	}
+
 	for (const part of event.parsed_body) {
 		const type = part.header['Content-Type'];
-		if (!(media_types.includes(type))) continue;
+		if (!(media_types.includes(type.split('/')[0]))) continue;
 		const filename = part.header['Content-Disposition'].split('; ').find(x => x.startsWith('filename=')).substring(9).replaceAll('"', '');
 
 		const uuid = crypto.randomUUID()
@@ -36,29 +39,21 @@ export default async (event, auth, id) => {
 
 		// 1つだけ処理する
 		return {
-			id: uuid,
-			type,
-			url: `https://${domain}/${Key}`,
-			preview_url: `https://${domain}/${Key}`,
-			description: filename,
-		}
-	}
-
-	if (id === undefined) {
-		return {
-			id: 1001,
-			type: 'unknown',
-			url: `${url}/media/1001`,
-			preview_url: `${url}/media/1001.thumb`,
-			description: 'It is dummy response, because attachment media is not improvement.'
+			statusCode: 200,
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				id: uuid,
+				type,
+				url: `https://${domain}/${Key}`,
+				preview_url: `https://${domain}/${Key}`,
+				description: filename,
+			}),
 		};
 	}
 
 	return {
-		id: 1001,
-		type: 'unknown',
-		url: `${url}/media/1001`,
-		preview_url: `${url}/media/1001.thumb`,
-		description: 'It is dummy response, because attachment media is not improvement.'
-	};
+		statusCode: 501,
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({ error: 'There is no acceptable media.' }),
+	}
 };

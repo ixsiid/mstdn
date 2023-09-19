@@ -20,6 +20,11 @@ export default async (event, auth, id) => {
 		return { statusCode: 401 };
 	}
 
+	const method = event.requestContext.http.method;
+	if (method === 'PUT' && id !== undefined) {
+		return { statusCode: 501 };
+	}
+
 	for (const part of event.parsed_body) {
 		const type = part.header['Content-Type'];
 		if (!(media_types.includes(type.split('/')[0]))) continue;

@@ -450,6 +450,7 @@
 		"/v1/media": {
 			"post": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/media",
@@ -462,12 +463,13 @@
 				}
 			}
 		},
-		"/v1/media/{id+}": {
+		"/v1/media/{id}": {
 			"put": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
-						"description": "Default response for PUT '/api/v1/media/{id+}'",
+						"description": "Default response for PUT '/api/v1/media/{id}'",
 						"content": {
 							"application/json": {
 								"type": "object"
@@ -478,7 +480,7 @@
 			},
 			"parameters": [
 				{
-					"name": "{id+}",
+					"name": "{id}",
 					"in": "path",
 					"description": "Generated path parameter for {id+}",
 					"required": true,

@@ -24,18 +24,40 @@ const login_form = `<!DOCTYPE html>
 		}, { once: true })
 	</script>
 	<style>
+		#welcome {
+			width: 100%;
+			padding: 2%;
+			margin: 0;
+			font-size: 1.5em;
+			text-align: center;
+		}
 		label {
+			display: inline-block;
+			margin: .3em 0;
+			padding: 2%;
+			width: 30%;
+		}
+		input[type="email"], input[type="password"] {
+			display: inline-block;
+			width: 60%;
+			margin: .3em 0;
+			padding: 2%;
+		}
+		input[type="submit"] {
 			display: block;
+			margin: 2em 1em auto auto;
+			padding: 0.5em 1.0em;
 		}
 	</style>
 </head>
 
 <body>
+	<p id="welcome">Welcom to mstdn.halzion.net</p>
 	<form id="login_form" action="/oauth/login" method="post" formenctype="application/x-www-form-urlencoded">
-		<label>Mail Address<input type="email" name="email" /></label>
-		<label>Password<input type="password" name="password" /></label>
+		<label for="email">Mail</label><input id="email" type="email" name="email" />
+		<label for="password">Password</label><input id="password" type="password" name="password" />
 		<input type="hidden" name="pool_id" value="${process.env.pool_id}" />
-		<label><input type="submit" id="login" value="Log in" /></label>
+		<input type="submit" id="login" value="Log in" />
 	</form>
 </body>
 

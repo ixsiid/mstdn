@@ -140,6 +140,10 @@ test('Integration', async t => {
 		// インスタンス取得
 		.then(() => handler(q.generate_event('/api/v2/search', 'get')))
 		.then(res => t.test('/api/v2/search:get', () => assert.equal(res.statusCode, 200)))
+		// メディア
+		// Postデータ、Putデータを用意する
+		// .then(() => handler(q.generate_event('/api/v1/media', 'post', auth_context, '', Buffer.from())))
+		// .then(() => handler(q.generate_event('/api/v1/media/${id}', 'put', auth_context, '', Buffer.from())))
 		.catch(err => {
 			console.error(err);
 			throw err;

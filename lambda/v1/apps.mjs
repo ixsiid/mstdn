@@ -9,9 +9,13 @@ const { client_id } = config;
 export default event => {
 	// アプリ固有にClient ID / Secretを作らずに既に作ってある単一のものを利用する
 	return {
-		name: event.body.client_name,
-		client_id,
-		website: event.body.website ?? null,
-		client_secret: 'dummy',
+		statusCode: 200,
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({
+			name: event.body.client_name,
+			client_id,
+			website: event.body.website ?? undefined,
+			client_secret: 'dummy',
+		}),
 	};
 };

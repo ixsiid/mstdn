@@ -1,15 +1,20 @@
 const parse_body = (body, headers, isBase64Encoded) => {
 	const buffer = isBase64Encoded ? Buffer.from(body, 'base64') : undefined;
 	const type = headers['content-type'].split(';')[0];
+	console.debug(`type: ${type} [${buffer.length}]`);
 	switch (type) {
 		case 'application/json':
-			return JSON.parse(buffer?.toString() ?? body);
+			const json = JSON.parse(buffer?.toString() ?? body);
+			console.debug(JSON.stringify(json, null, 2));
+			return json;
 		case 'application/x-www-form-urlencoded':
-			return Object.fromEntries(
+			const form = Object.fromEntries(
 				(buffer?.toString() ?? body)
 					.split('&')
 					.map(x => x.split('=').map(x => decodeURIComponent(x)))
 			);
+			console.debug(JSON.stringify(form));
+			return form;
 		case 'multipart/form-data':
 			const boundary = Buffer.from('\r\n--' + headers['content-type'].split('boundary=').pop());
 			const buffer_parts = [];
@@ -37,10 +42,12 @@ const parse_body = (body, headers, isBase64Encoded) => {
 					body,
 				};
 			});
-			console.debug(`${parts.map(x => `${JSON.stringify(x.header)}\n:::\n${x.body.length}`)}`);
+			console.debug(`${parts.map(x => `${JSON.stringify(x.header)};\nbody length: ${x.body.length}`)}`);
 			return parts;
 		default:
-			return buffer?.toString() ?? body;
+			const text = buffer?.toString() ?? body;
+			console.debug(text.substring(0, 32));
+			return text;
 	}
 };
 

@@ -1,10 +1,18 @@
 /**
  * @typedef IntegrationEvent
+ * @prop {string} routeKey
+ * @prop {string} rawPath
  * @prop {object} requestContext
  * @prop {string} rawPath
  * @prop {boolean} isBase64Encoded
  * @prop {Headers} heders
  * @prop {"GET"|"POST"|"PUT"|"PATCH"|"DELETE"} httpMethod
+ */
+
+/**
+ * @typedef PathInfo
+ * @prop {string} path
+ * @prop {Array<string>} keys
  */
 
 /**

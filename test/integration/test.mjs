@@ -70,17 +70,17 @@ test('Integration', async t => {
 		})
 		.then(res => console.log('Prepared local db, starting test ...'))
 		// 非実装APIへのアクセス
-		.then(() => handler(q.generate_event('/api/v1/reports', 'get')))
-		.then(res => t.test('/api/v1/reports:get, It is not implemented api', () => assert.equal(res.statusCode, 501)))
+		.then(() => handler(q.generate_event('/v1/reports', 'get')))
+		.then(res => t.test('/v1/reports:get, It is not implemented api', () => assert.equal(res.statusCode, 501)))
 		// 非認証アクセス可能
-		.then(() => handler(q.generate_event('/api/v1/timelines/public', 'get')))
-		.then(res => t.test('/api/v1/timelines/public:get', () => {
+		.then(() => handler(q.generate_event('/v1/timelines/public', 'get')))
+		.then(res => t.test('/v1/timelines/public:get', () => {
 			assert.equal(res.statusCode, 200);
 			assert.deepEqual(JSON.parse(res.body), ret);
 		}))
 		// 非認証アクセス不可能
-		.then(() => handler(q.generate_event('/api/v1/timelines/direct', 'get')))
-		.then(res => t.test('/api/v1/timelines/direct without auth', () => assert.equal(res.statusCode, 401)))
+		.then(() => handler(q.generate_event('/v1/timelines/direct', 'get')))
+		.then(res => t.test('/v1/timelines/direct without auth', () => assert.equal(res.statusCode, 401)))
 		// 認証データ作成
 		.then(() => {
 			auth_context = {
@@ -93,19 +93,19 @@ test('Integration', async t => {
 			}
 		})
 		// 認証後のアクセス
-		.then(() => handler(q.generate_event('/api/v1/timelines/direct', 'get', auth_context)))
-		.then(res => t.test('/api/v1/timelines/direct with auth', () => {
+		.then(() => handler(q.generate_event('/v1/timelines/direct', 'get', auth_context)))
+		.then(res => t.test('/v1/timelines/direct with auth', () => {
 			assert.equal(res.statusCode, 200);
 			assert.deepEqual(JSON.parse(res.body), ret);
 		}))
 		// ポスト ボディがおかしいのは、受け付けない
-		.then(() => handler(q.generate_event('/api/v1/statuses', 'post', auth_context, '', Buffer.from(JSON.stringify({ aaa: 'hogehoge' })))))
-		.then(res => t.test('/api/v1/statuses:post with invalid body', () => assert.equal(res.statusCode, 422)))
+		.then(() => handler(q.generate_event('/v1/statuses', 'post', auth_context, '', Buffer.from(JSON.stringify({ aaa: 'hogehoge' })))))
+		.then(res => t.test('/v1/statuses:post with invalid body', () => assert.equal(res.statusCode, 422)))
 		// ポスト 正常
-		.then(() => handler(q.generate_event('/api/v1/statuses', 'post', auth_context, '', Buffer.from(JSON.stringify({ status: 'hogehoge' })))))
-		.then(res => t.test('/api/v1/statuses:post with valid body', () => assert.equal(res.statusCode, 200)))
-		.then(() => handler(q.generate_event('/api/v1/timelines/public', 'get')))
-		.then(res => t.test('/api/v1/timelines/public:get with new post', () => {
+		.then(() => handler(q.generate_event('/v1/statuses', 'post', auth_context, '', Buffer.from(JSON.stringify({ status: 'hogehoge' })))))
+		.then(res => t.test('/v1/statuses:post with valid body', () => assert.equal(res.statusCode, 200)))
+		.then(() => handler(q.generate_event('/v1/timelines/public', 'get')))
+		.then(res => t.test('/v1/timelines/public:get with new post', () => {
 			assert.equal(res.statusCode, 200);
 			const new_post = JSON.parse(JSON.stringify(ret[0]));
 			new_post.content = 'hogehoge';
@@ -125,21 +125,22 @@ test('Integration', async t => {
 			assert.deepEqual(timelines, compare);
 		}))
 		// アカウント取得
-		/**
-		 * ToDo: generate_event で path をAPIパスである /hogehoge/{id+}/fugafuga のような形に変える
-		// .then(() => handler(q.generate_event('/api/v1/accounts/1', 'get')))
-		// .then(res => t.test('/api/v1/accounts:get without auth', () => assert.equal(res.statusCode, 401)))
-		// .then(() => handler(q.generate_event('/api/v1/accounts/1', 'get', auth_context)))
-		// .then(res => t.test('/api/v1/accounts:get for not found account', () => assert.equal(res.statusCode, 404)))
-		.then(() => handler(q.generate_event('/api/v1/accounts/0', 'get', auth_context)))
-		.then(res => t.test('/api/v1/accounts/0/block:get', () => {
+		.then(() => handler(q.generate_event('/v1/accounts/{id+=1}', 'get')))
+		.then(res => t.test('/v1/accounts/1:get without auth', () => assert.equal(res.statusCode, 401)))
+		.then(() => handler(q.generate_event('/v1/accounts/{id+=1}', 'get', auth_context)))
+		.then(res => t.test('/v1/accounts/1:get for not found account', () => assert.equal(res.statusCode, 404)))
+		.then(() => handler(q.generate_event('/v1/accounts/{id+=0}', 'get', auth_context)))
+		.then(res => t.test('/v1/accounts/0:get', () => {
 			assert.equal(res.statusCode, 200);
 			assert.deepEqual(JSON.parse(res.body), account);
 		}))
-		*/
 		// インスタンス取得
-		.then(() => handler(q.generate_event('/api/v2/search', 'get')))
-		.then(res => t.test('/api/v2/search:get', () => assert.equal(res.statusCode, 200)))
+		.then(() => handler(q.generate_event('/v2/search', 'get')))
+		.then(res => t.test('/v2/search:get', () => assert.equal(res.statusCode, 200)))
+		// メディア
+		// Postデータ、Putデータを用意する
+		// .then(() => handler(q.generate_event('/v1/media', 'post', auth_context, '', Buffer.from())))
+		// .then(() => handler(q.generate_event('/v1/media/${id}', 'put', auth_context, '', Buffer.from())))
 		.catch(err => {
 			console.error(err);
 			throw err;
@@ -163,7 +164,7 @@ test('Integration', async t => {
 			'accounts/search',
 			'accounts/relationships',
 		]
-			.map(x => '/api/v1/' + x)
+			.map(x => '/v1/' + x)
 			.map(p => handler(q.generate_event(p, 'get'))
 				.then(res => t.test(p + ':get', () => assert.equal(res.statusCode, 200))))
 	);
@@ -174,7 +175,7 @@ test('Integration', async t => {
 			'push/subscription',
 			'accounts/update_credentials',
 		]
-			.map(x => '/api/v1/' + x)
+			.map(x => '/v1/' + x)
 			.map(p => handler(q.generate_event(p, 'get'))
 				.then(res => t.test(p + ':get', () => assert.equal(res.statusCode, 401))))
 	);

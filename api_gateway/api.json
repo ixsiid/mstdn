@@ -594,6 +594,7 @@
 		"/v1/push/subscription": {
 			"get": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/push/subscription",
@@ -607,6 +608,7 @@
 			},
 			"post": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/push/subscription",
@@ -620,6 +622,21 @@
 			},
 			"put": {
 				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
+				"responses": {
+					"default": {
+						"description": "Default response for PUT /api/v1/push/subscription",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"summary": "",
+				"security" : [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for PUT /api/v1/push/subscription",

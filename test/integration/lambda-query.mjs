@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
 
-const stage = 'default';
+const stage = 'api';
 
 const event = {
 	"version": "2.0",
@@ -47,11 +47,18 @@ const event = {
  * @returns {LambdaEvent}
  */
 const generate_event = (path, method, auth_context, query = '', body = Buffer.from([])) => {
-	if (path.startsWith('/api')) path = path.substring(4);
+	const _key = path.split('/').map(x => {
+		const m = x.match(/^\{(.*?)=(.*?)\}/);
+		return m ? '{' + m[1] + '}' : x;
+	}).join('/');
+	const _path = path.split('/').map(x => {
+		const m = x.match(/^\{(.*?)=(.*?)\}/);
+		return m ? m[2] : x;
+	}).join('/')
 
 	const e = JSON.parse(JSON.stringify(event));
-	e.routeKey = `${method.toUpperCase()} ${path}`;
-	e.rawPath = `/${stage}${path}`;
+	e.routeKey = `${method.toUpperCase()} ${_key}`;
+	e.rawPath = `/${stage}${_path}`;
 	e.rawQueryString = query;
 
 	e.headers.host = process.env.domain;

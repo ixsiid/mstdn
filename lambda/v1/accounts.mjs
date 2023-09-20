@@ -1,8 +1,10 @@
 import account from '../data/account.mjs';
 import relationship from '../data/relationship.mjs';
 
-module.exports = (event, auth, id, command) => {
+export default (event, auth, id, command) => {
+	id = parseInt(id);
 	if (!auth) return { statusCode: 401 };
+	if (id !== 0) return {statusCode: 404 };
 	if (id !== auth.account_id) return { statusCode: 401 };
 
 	if (command) {

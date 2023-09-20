@@ -27,7 +27,7 @@
 		"/v1/accounts/{id+}": {
 			"get": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET '/api/v1/accounts/{id+}'",
@@ -41,7 +41,7 @@
 			},
 			"post": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST '/api/v1/accounts/{id+}'",
@@ -113,7 +113,7 @@
 		"/v1/accounts/verify_credentials": {
 			"get": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/accounts/verify_credentials",
@@ -450,7 +450,7 @@
 		"/v1/media": {
 			"post": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/media",
@@ -466,7 +466,7 @@
 		"/v1/media/{id}": {
 			"put": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for PUT '/api/v1/media/{id}'",
@@ -508,7 +508,7 @@
 		"/v1/notifications": {
 			"get": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/notifications",
@@ -524,7 +524,7 @@
 		"/v1/notifications/clear": {
 			"post": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/notifications/clear",
@@ -540,7 +540,7 @@
 		"/v1/notifications/{id}/dismiss": {
 			"post": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/notifications/dismiss",
@@ -567,7 +567,7 @@
 		"/v1/notifications/{id+}": {
 			"get": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET '/api/v1/notifications/{id+}'",
@@ -594,6 +594,7 @@
 		"/v1/push/subscription": {
 			"get": {
 				"summary": "",
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/push/subscription",
@@ -607,6 +608,7 @@
 			},
 			"post": {
 				"summary": "",
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/push/subscription",
@@ -620,9 +622,24 @@
 			},
 			"put": {
 				"summary": "",
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for PUT /api/v1/push/subscription",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"summary": "",
+				"security": [{"jwt-authorizer":[]}],
+				"responses": {
+					"default": {
+						"description": "Default response for DELETE /api/v1/push/subscription",
 						"content": {
 							"application/json": {
 								"type": "object"
@@ -678,7 +695,7 @@
 		"/v1/statuses": {
 			"post": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for POST /api/v1/statuses",
@@ -787,7 +804,7 @@
 		"/v1/timelines/direct": {
 			"get": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/timelines/direct",
@@ -803,7 +820,7 @@
 		"/v1/timelines/home": {
 			"get": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v1/timelines/home",
@@ -819,7 +836,7 @@
 		"/v1/timelines/list/{list_id+}": {
 			"get": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET '/api/v1/timelines/list/{list_id+}'",
@@ -861,7 +878,7 @@
 		"/v1/timelines/tag/{hashtag+}": {
 			"get": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET '/api/v1/timelines/tag/{hashtag+}'",
@@ -903,7 +920,7 @@
 		"/v2/media": {
 			"post": {
 				"summary": "",
-				"security" : [{"jwt-authorizer":[]}],
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
 						"description": "Default response for GET /api/v2/media",

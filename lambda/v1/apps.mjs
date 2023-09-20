@@ -1,5 +1,5 @@
 import config from "../data/config.mjs";
-const { client_id } = config;
+const { client_id, vapid_key } = config;
 
 /**
  * @param {IntegrationEvent} event
@@ -16,6 +16,7 @@ export default event => {
 			client_id,
 			website: event.body.website ?? undefined,
 			client_secret: 'dummy',
+			vapid_key,
 		}),
 	};
 };

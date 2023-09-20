@@ -7,6 +7,7 @@ AWSのIaaSを用いたサーバーレスで実現するマストドン互換イ�
 - Cognito
 - S3
 - CloudFront
+- SNS
 
 また、CloudWatch, ACM, Route53, IAMなどの利用も想定しています。
 
@@ -113,3 +114,8 @@ AWSのIaaSを用いたサーバーレスで実現するマストドン互換イ�
 - AWS_AUTH_GATEWAY_API_ID
 - AWS_COGNITO_CLIENT_ID
 - AWS_COGNITO_USER_POOL_ID
+
+
+## Push通知
+Amazon SNS
+- solo-mstdn-push

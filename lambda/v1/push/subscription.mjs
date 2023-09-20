@@ -13,7 +13,7 @@ export default (event, auth) => {
 			heders: { type: 'application/json' },
 			body: JSON.stringify({
 				id: auth.account_id,
-				endpoint: `https://${domain}/listener`,
+				endpoint: `https://${domain}/api/v1/push/listener`,
 				alerts: {
 					follow: false,
 					favourite: false,

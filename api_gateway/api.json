@@ -650,19 +650,13 @@
 			}
 		},
 		"/v1/push/listener": {
-			"any": {
-				"summary": "一時おき",
-				"responses": {
-					"default": {
-						"description": "Default response for ANY /api/v1/push/listener",
-						"content": {
-							"application/json": {
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
+			"get": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
+			"post": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
+			"put": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
+			"patch": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
+			"delete": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
+			"head": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
+			"options": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}}
 		},
 		"/v1/reports": {
 			"get": {

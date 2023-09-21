@@ -8,6 +8,7 @@ const { domain, vapid_key } = config;
  */
 export default (event, auth) => {
 	if (event.httpMethod === 'GET') {
+		return { statusCode: 404 };
 		return {
 			statusCode: 200,
 			heders: { type: 'application/json' },

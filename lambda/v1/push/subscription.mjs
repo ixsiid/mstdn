@@ -1,6 +1,8 @@
 import config from '../../data/config.mjs';
 const { domain, vapid_key } = config;
 
+let p = { statusCode: 404 };
+
 /**
  * @param {IntegrationEvent} event
  * @param {Auth} auth
@@ -8,7 +10,7 @@ const { domain, vapid_key } = config;
  */
 export default (event, auth) => {
 	if (event.httpMethod === 'GET') {
-		return { statusCode: 404 };
+		return p;
 		return {
 			statusCode: 200,
 			heders: { type: 'application/json' },
@@ -26,7 +28,20 @@ export default (event, auth) => {
 			})
 		};
 	}
-	if (event.httpMethod === 'POST') { }
+	if (event.httpMethod === 'POST') {
+		p = {
+			statusCode: 200,
+			headers: { type: 'application/json' },
+			body: JSON.stringify({
+				id: auth.account_id,
+				endpoint: event.parsed_body.endpoint,
+				alerts: { ...event.parsed_body.data.alerts },
+				server_key: vapid_key,
+			}),
+		};
+
+		return p;
+	}
 	if (event.httpMethod === 'PUT') { }
 	return { statusCode: 404 };
 };

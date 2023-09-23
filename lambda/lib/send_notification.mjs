@@ -53,9 +53,11 @@ const generate_mastodon_notification = (type, text, title) => {
  */
 export const send_notification = (account_id, type, text) => {
 	const options = {
-		publicKey: vapid_key,
-		privateKey: vapid_private_key,
-		subject: 'Mastdn on halzion.net',
+		vapidDetails: {
+			publicKey: vapid_key,
+			privateKey: vapid_private_key,
+			subject: 'Mastdn on halzion.net',
+		},
 		contentEncoding: SupportedContentEncodings.AES_128_GCM,
 	};
 	return get_subscription(account_id)

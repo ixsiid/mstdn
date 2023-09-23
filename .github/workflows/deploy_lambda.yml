@@ -30,7 +30,18 @@ jobs:
       - name: get caller identity is allowed to run on role.
         run: aws sts get-caller-identity
 
+      # Mergeまたはリリース時に自動Deployするときに有効化する
+      # - name: Check changed
+      #   id: changed
+      #   uses: dorny/paths-filter@v2
+      #   with:
+      #     filters: |
+      #       module:
+      #         - 'lambda/package.json'
+      #         - 'lambda/package-lock.json'
+
       - name: deploy modules
+      #   if: steps.changed.outputs.module == 'true'
         run: |
           mkdir ./nodejs
           cp ./lambda/package.json ./nodejs/package.json

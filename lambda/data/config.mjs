@@ -8,7 +8,7 @@ export default {
 	client_id: process.env.client_id,
 	display_name: process.env.display_name,
 	domain,
-	dynamodb_table_name: process.env.dynamodb_table_name,
+	dynamodb_statuses: process.env.dynamodb_statuses,
 	dynamodb_subscriptions: process.env.dynamodb_subscriptions,
 	email: process.env.email,
 	region: process.env.region,

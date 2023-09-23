@@ -45,7 +45,7 @@ test('Integration', async t => {
 
 	// テスト用Dynamo DB localテーブル準備。初回テスト時はテーブルがないため、例外を無視する
 	await Promise.all(
-		[process.env.dynamodb_table_name, process.env.dynamodb_subscriptions]
+		[process.env.dynamodb_statuses, process.env.dynamodb_subscriptions]
 			.map(TableName => dynamo.deleteTable({ TableName }))
 	).catch(() => { }).finally(() => { });
 
@@ -58,7 +58,7 @@ test('Integration', async t => {
 		.then(([table_schema, first_item]) => {
 			return Promise.all([dynamo.createTable({
 				...table_schema,
-				TableName: process.env.dynamodb_table_name,
+				TableName: process.env.dynamodb_statuses,
 				ProvisionedThroughput: {
 					ReadCapacityUnits: 2,
 					WriteCapacityUnits: 2,
@@ -68,7 +68,7 @@ test('Integration', async t => {
 		.then(([res, first_item]) => {
 			return dynamo.putItem({
 				Item: first_item,
-				TableName: process.env.dynamodb_table_name,
+				TableName: process.env.dynamodb_statuses,
 			});
 		})
 		.then(res => console.log('Prepared statuses tables'));

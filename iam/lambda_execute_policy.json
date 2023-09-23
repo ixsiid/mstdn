@@ -16,7 +16,8 @@
 			"s3:PutObject"
 		],
 		"Resource": [
-			"arn:aws:dynamodb:%REGION%:%ACCOUNT_ID%:table/%TABLE%",
+			"arn:aws:dynamodb:%REGION%:%ACCOUNT_ID%:table/%STATUSES_TABLE%",
+			"arn:aws:dynamodb:%REGION%:%ACCOUNT_ID%:table/%SUBSCRIPTIONS_TABLE%",
 			"arn:aws:logs:%REGION%:%ACCOUNT_ID%:*",
 			"arn:aws:s3:::%S3_BUCKET%/*"
 		]

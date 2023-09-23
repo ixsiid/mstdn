@@ -2,7 +2,7 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
 import config from '../data/config.mjs';
-const { region, dynamodb_table_name, domain } = config;
+const { region, dynamodb_statuses, domain } = config;
 
 import status_template from '../data/status.mjs';
 import to_status from '../lib/to_status.mjs';
@@ -72,7 +72,7 @@ export default async (event, auth, id, args) => {
 			if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
 			const dynamo = new DynamoDB(option);
 			await dynamo.scan({
-				TableName: dynamodb_table_name,
+				TableName: dynamodb_statuses,
 				KeyConditionExpression: 'id > 0',
 				ProjectionExpression: 'id',
 			}).then(data => {
@@ -87,7 +87,7 @@ export default async (event, auth, id, args) => {
 			const created_at = new Date().getTime();
 
 			return dynamo.putItem({
-				TableName: dynamodb_table_name,
+				TableName: dynamodb_statuses,
 				Item: marshall({
 					id,
 					created_at,

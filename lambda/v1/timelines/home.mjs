@@ -1,7 +1,7 @@
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import config from '../../data/config.mjs';
-const { region, dynamodb_table_name } = config;
+const { region, dynamodb_statuses } = config;
 
 import to_status from '../../lib/to_status.mjs';
 
@@ -37,7 +37,7 @@ export default async (event, auth, args) => {
 	}
 
 	const result = await dynamo.query({
-		TableName: dynamodb_table_name,
+		TableName: dynamodb_statuses,
 		Limit: limit,
 		ScanIndexForward: false,
 		ExpressionAttributeValues: condition_values,

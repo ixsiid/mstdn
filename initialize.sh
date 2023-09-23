@@ -11,13 +11,15 @@ export AWS_LAMBDA_EXECUTE_POLICY_NAME=${INSTANCE_NAME}-lambda-policy
 export AWS_LAMBDA_EXECUTE_ROLE_NAME=${INSTANCE_NAME}-lambda-role
 export AWS_DEPLOY_POLICY_NAME=${INSTANCE_NAME}-deploy-policy
 export AWS_DEPLOY_ROLE_NAME=${INSTANCE_NAME}-deploy-role
-export AWS_DYNAMODB_TABLE_NAME=${INSTANCE_NAME}-statuses
+export AWS_DYNAMODB_STATUSES_TABLE=${INSTANCE_NAME}-statuses
+export AWS_DYNAMODB_SUBSCRIPTIONS_TABLE=${INSTANCE_NAME}-statuses
 
 # prepare create role
 cp ./iam/lambda_execute_policy.json ./lambda_execute_policy.json
-sed -i "s@%REGION%@${AWS_REGION}@g"             ./lambda_execute_policy.json
-sed -i "s@%ACCOUNT_ID%@${AWS_ACCOUNT_ID}@g"     ./lambda_execute_policy.json
-sed -i "s@%TABLE%@${AWS_DYNAMODB_TABLE_NAME}@g" ./lambda_execute_policy.json
+sed -i "s@%REGION%@${AWS_REGION}@g"                      ./lambda_execute_policy.json
+sed -i "s@%ACCOUNT_ID%@${AWS_ACCOUNT_ID}@g"              ./lambda_execute_policy.json
+sed -i "s@%TABLE%@${AWS_DYNAMODB_STATUSES_TABLE}@g"      ./lambda_execute_policy.json
+sed -i "s@%TABLE%@${AWS_DYNAMODB_SUBSCRIPTIONS_TABLE}@g" ./lambda_execute_policy.json
 
 cp ./iam/lambda_execute_role.json ./lambda_execute_role.json
 
@@ -40,7 +42,7 @@ aws iam attach-role-policy \
 
 # Dynamo DBの作成
 aws dynamodb create-table \
-  --table-name ${AWS_DYNAMODB_TABLE_NAME} \
+  --table-name ${AWS_DYNAMODB_STATUSES_TABLE} \
   --cli-input-json file://dynamodb/schema.json \
   --billing-mode PROVISIONED \
   --provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2 \
@@ -49,7 +51,7 @@ aws dynamodb create-table \
 sleep 60s
 
 aws dynamodb put-item \
-  --table-name ${AWS_DYNAMODB_TABLE_NAME} \
+  --table-name ${AWS_DYNAMODB_STATUSES_TABLE} \
   --item file://dynamodb/first-item.json \
   > put-first-item.json
 
@@ -84,7 +86,7 @@ aws lambda create-function \
   --handler "index.handler" \
   --description "${INSTANCE_NAME}-api-processor" \
   --timeout 10 \
-  --environment "Variables={username=${USERNAME},display_name=${DISPLAY_NAME},email=${EMAIL},access_token=${INSTANCE_ACCESS_TOKEN},domain=${DOMAIN},region=${AWS_REGION},dynamodb_table_name=${AWS_DYNAMODB_TABLE_NAME}}" \
+  --environment "Variables={username=${USERNAME},display_name=${DISPLAY_NAME},email=${EMAIL},access_token=${INSTANCE_ACCESS_TOKEN},domain=${DOMAIN},region=${AWS_REGION},DYNAMODB_STATUSES_TABLE=${AWS_DYNAMODB_STATUSES_TABLE}}" \
   > create-function.json
 
 aws lambda add-permission \

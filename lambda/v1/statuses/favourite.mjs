@@ -2,7 +2,7 @@ import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 import config from '../../data/config.mjs';
-const { region, dynamodb_table_name } = config;
+const { region, dynamodb_statuses } = config;
 
 import to_status from "../../lib/to_status.mjs";
 import { NotificationTypes, send_notification } from "../../lib/send_notification.mjs";
@@ -22,7 +22,7 @@ export default (event, auth, id) => {
 	const condition_values = { ':zero': 0, ':id': parseInt(id) };
 
 	return dynamo.query({
-		TableName: dynamodb_table_name,
+		TableName: dynamodb_statuses,
 		Limit: 1,
 		ScanIndexForward: false,
 		ExpressionAttributeValues: marshall(condition_values),

@@ -142,6 +142,14 @@ test('Integration', async t => {
 			}));
 			assert.deepEqual(timelines, compare);
 		}))
+		// ファボ
+		.then(() => handler(q.generate_event('/v1/statuses/{id=1}/favourite', 'post', auth_context)))
+		.then(res => t.test('/v1/statuses/1/favourite:post', () => {
+			assert.equal(res.statusCode, 200);
+			const body = JSON.parse(res.body);
+			assert.equal(body.id, 1);
+			assert.equal(body.favourited, true);
+		}))
 		// アカウント取得
 		.then(() => handler(q.generate_event('/v1/accounts/{id+=1}', 'get')))
 		.then(res => t.test('/v1/accounts/1:get without auth', () => assert.equal(res.statusCode, 401)))

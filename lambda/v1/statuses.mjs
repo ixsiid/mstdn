@@ -98,8 +98,8 @@ export default async (event, auth, id, args) => {
 				return data;
 			}).then(() => {
 				// 動作確認用に、ポストしたらFavo通知を出す
-				send_notification(auth.account_id, NotificationTypes.FAVOURITE, 'Favo ' + post.status);
-			}).then(() => {
+				return send_notification(auth.account_id, NotificationTypes.FAVOURITE, 'Favo ' + post.status);
+			}).then(r => {
 				return {
 					statusCode: 200,
 					headers: { 'content-type': 'application/json' },

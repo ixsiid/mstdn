@@ -6,6 +6,7 @@ const { region, dynamodb_table_name, domain } = config;
 
 import status_template from '../data/status.mjs';
 import to_status from '../lib/to_status.mjs';
+import { send_notification, NotificationTypes } from '../lib/send_notification.mjs';
 
 /**
  * @param {IntegrationEvent}
@@ -84,7 +85,7 @@ export default async (event, auth, id, args) => {
 			if (id < 0) return { error: 'database access error' };
 			const created_at = new Date().getTime();
 
-			await dynamo.putItem({
+			return dynamo.putItem({
 				TableName: dynamodb_table_name,
 				Item: marshall({
 					id,
@@ -95,12 +96,19 @@ export default async (event, auth, id, args) => {
 			}).then(data => {
 				console.debug(data);
 				return data;
+			}).then(() => {
+				// 動作確認用に、ポストしたらFavo通知を出す
+				send_notification(auth.account_id, NotificationTypes.FAVOURITE, 'Favo ' + post.status);
+			}).then(() => {
+				return {
+					statusCode: 200,
+					headers: { 'content-type': 'application/json' },
+					body: JSON.stringify(to_status({ ...status, id, created_at })),
+				};
 			}).catch(err => {
 				console.debug(err);
-				return err;
+				return { statusCode: 501 };
 			});
-
-			return to_status({ ...status, id, created_at });
 		}
 	}
 

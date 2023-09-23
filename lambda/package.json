@@ -1,0 +1,5 @@
+{
+	"dependencies": {
+		"web-push-min": "github:ixsiid/web-push-min"
+	}
+}

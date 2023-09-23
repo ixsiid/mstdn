@@ -649,15 +649,6 @@
 				}
 			}
 		},
-		"/v1/push/listener": {
-			"get": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
-			"post": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
-			"put": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
-			"patch": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
-			"delete": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
-			"head": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}},
-			"options": { "summary": "一時おき", "responses": { "default": { "content": { "application/json": { "type": "object" }}}}}
-		},
 		"/v1/reports": {
 			"get": {
 				"summary": "",

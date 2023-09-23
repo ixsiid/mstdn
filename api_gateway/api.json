@@ -708,13 +708,38 @@
 				}
 			}
 		},
-		"/v1/statuses/{id}/favourite": {
-			"post": {
+		"/v1/statuses/{id}": {
+			"delete": {
 				"summary": "",
-				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
-						"description": "Default response for DELETE '/api/v1/statuses/{id}/favourite'",
+						"description": "Default response for DELETE '/api/v1/statuses/{id}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET '/api/v1/statuses/{id}'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST '/api/v1/statuses/{id}'",
 						"content": {
 							"application/json": {
 								"type": "object"
@@ -735,38 +760,13 @@
 				}
 			]
 		},
-		"/v1/statuses/{id+}": {
-			"delete": {
-				"summary": "",
-				"responses": {
-					"default": {
-						"description": "Default response for DELETE '/api/v1/statuses/{id+}'",
-						"content": {
-							"application/json": {
-								"type": "object"
-							}
-						}
-					}
-				}
-			},
-			"get": {
-				"summary": "",
-				"responses": {
-					"default": {
-						"description": "Default response for GET '/api/v1/statuses/{id+}'",
-						"content": {
-							"application/json": {
-								"type": "object"
-							}
-						}
-					}
-				}
-			},
+		"/v1/statuses/{id}/favourite": {
 			"post": {
 				"summary": "",
+				"security": [{"jwt-authorizer":[]}],
 				"responses": {
 					"default": {
-						"description": "Default response for POST '/api/v1/statuses/{id+}'",
+						"description": "Default response for DELETE '/api/v1/statuses/{id}/favourite'",
 						"content": {
 							"application/json": {
 								"type": "object"
@@ -777,9 +777,9 @@
 			},
 			"parameters": [
 				{
-					"name": "{id+}",
+					"name": "{id}",
 					"in": "path",
-					"description": "Generated path parameter for {id+}",
+					"description": "Generated path parameter for {id}",
 					"required": true,
 					"schema": {
 						"type": "string"

@@ -52,9 +52,10 @@ export default async (event, auth, id, args) => {
 			status.content = post.status;
 			if (post.in_reply_to_id) status.in_reply_to_id = post.in_reply_to_id;
 			if (post.media_ids) {
+				// Media attachmentsデータはv1/media でアップロード時に作ってやらないと苦しい
 				status.media_attachments = post.media_ids.map(id => ({
 					id,
-					type: 'image/jpeg',
+					type: 'image',
 					url: `https://${domain}/media/${id}`,
 					preview_url: `https://${domain}/media/${id}`,
 					remote_url: null,

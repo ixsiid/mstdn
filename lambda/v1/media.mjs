@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import config from '../data/config.mjs';
 const { region, s3bucket, domain } = config;
 
-const media_types = ['image', 'audio', 'video'];
+const media_types = ['image', 'audio', 'video']; // 'unknown', 'gifv'
 
 /**
  * @param {IntegratioEvent} event

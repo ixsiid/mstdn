@@ -46,7 +46,9 @@ export default (event, auth, id) => {
 			}))[0];
 	}).then(body => {
 		// 動作確認用に、ポストしたらFavo通知を出す
-		return send_notification(body.account.id, NotificationTypes.FAVOURITE, 'ファボされました。' + (body.spoiler_text || body.status))
+		return send_notification(body.account.id,
+			NotificationTypes.FAVOURITE,
+			'ファボされました。' + (body.spoiler_text || body.content))
 			.then(() => body);
 	}).then(body => {
 		return {

@@ -39,8 +39,11 @@ jobs:
           npm ci
           cd ../
           zip -r nodejs.zip ./nodejs
-          echo 'Not implements deploy layers'
-          # aws lambda hogehogehogehoge
+          aws lambda publish-layer-version --layer-name ${{ env.AWS_LAMBDA_LAYER_NAME }} --zip-file fileb://nodejs.zip > publish-layer-version.json
+          aws lambda update-function-configuration --function-name ${{ env.AWS_LAMBDA_FUNCTION_NAME }} --layers "`cat publish-layer-version.json | jq  -r '.LayerVersionArn'`" > update-function-configuration.json
+        env:
+          AWS_LAMBDA_LAYER_NAME: ${{ secrets.INSTANCE_NAME }}-node-modules
+          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda
 
       - name: deploy lambda
         run: |

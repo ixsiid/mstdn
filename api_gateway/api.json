@@ -708,6 +708,33 @@
 				}
 			}
 		},
+		"/v1/statuses/{id}/favourite": {
+			"post": {
+				"summary": "",
+				"security": [{"jwt-authorizer":[]}],
+				"responses": {
+					"default": {
+						"description": "Default response for DELETE '/api/v1/statuses/{id}/favourite'",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id}",
+					"in": "path",
+					"description": "Generated path parameter for {id}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			]
+		},
 		"/v1/statuses/{id+}": {
 			"delete": {
 				"summary": "",
@@ -722,17 +749,6 @@
 					}
 				}
 			},
-			"parameters": [
-				{
-					"name": "{id+}",
-					"in": "path",
-					"description": "Generated path parameter for {id+}",
-					"required": true,
-					"schema": {
-						"type": "string"
-					}
-				}
-			],
 			"get": {
 				"summary": "",
 				"responses": {
@@ -758,7 +774,18 @@
 						}
 					}
 				}
-			}
+			},
+			"parameters": [
+				{
+					"name": "{id+}",
+					"in": "path",
+					"description": "Generated path parameter for {id+}",
+					"required": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			]
 		},
 		"/v1/suggestions": {
 			"get": {

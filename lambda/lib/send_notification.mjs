@@ -1,5 +1,6 @@
 import { domain, vapid_key, vapid_private_key } from "../data/config.mjs";
 import { webPush } from 'web-push-min';
+import { SupportedContentEncodings } from "web-push-min/src/web-push-constants.mjs";
 import get_subscription from "./get_subscription.mjs";
 
 /** @typedef {string} NotificationType */
@@ -55,6 +56,7 @@ export const send_notification = (account_id, type, text) => {
 		publicKey: vapid_key,
 		privateKey: vapid_private_key,
 		subject: 'Mastdn on halzion.net',
+		contentEncoding: SupportedContentEncodings.AES_128_GCM,
 	};
 	return get_subscription(account_id)
 		.then(subscription => {
@@ -66,7 +68,7 @@ export const send_notification = (account_id, type, text) => {
 			console.debug(options);
 			return webPush.sendNotification(
 				subscription,
-				JSON.stringify(paylod),
+				JSON.stringify(payload),
 				options);
 		})
 		.then(() => true)

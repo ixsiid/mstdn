@@ -57,12 +57,23 @@ export const send_notification = (account_id, type, text) => {
 		subject: 'Mastdn on halzion.net',
 	};
 	return get_subscription(account_id)
-		.then(subscription => webPush.sendNotification(
-			subscription,
-			JSON.stringify(generate_mastodon_notification(type, text)),
-			options))
+		.then(subscription => {
+			const payload = generate_mastodon_notification(type, text);
+
+			console.debug(webPush);
+			console.debug(subscription);
+			console.debug(payload);
+			console.debug(options);
+			return webPush.sendNotification(
+				subscription,
+				JSON.stringify(paylod),
+				options);
+		})
 		.then(() => true)
-		.catch(err => false);
+		.catch(err => {
+			console.error(err);
+			return false;
+		});
 };
 
 export default {

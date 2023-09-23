@@ -30,9 +30,21 @@ jobs:
       - name: get caller identity is allowed to run on role.
         run: aws sts get-caller-identity
 
+      - name: deploy modules
+        run: |
+          mkdir ./nodejs
+          cp ./lambda/package.json ./nodejs/package.json
+          cp ./lambda/package-lock.json ./nodejs/package-lock.json
+          cd nodejs
+          npm ci
+          cd ../
+          zip -r nodejs.zip ./nodejs
+          echo 'Not implements deploy layers'
+          # aws lambda hogehogehogehoge
+
       - name: deploy lambda
         run: |
-          cd lambda && zip -r package.zip ./*
+          cd lambda && zip -r package.zip ./* -x node_modules
           aws lambda update-function-code --function-name ${{ env.AWS_LAMBDA_FUNCTION_NAME }} --zip-file fileb://package.zip --publish >/dev/null
         env:
           AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda

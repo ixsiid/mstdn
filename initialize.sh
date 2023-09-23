@@ -6,6 +6,8 @@
 source ./.env
 
 export AWS_LAMBDA_FUNCTION_NAME=${INSTANCE_NAME}-lambda
+export AWS_LAMBDA_AUTH_FUNCTION_NAME=${INSTANCE_NAME}-auth
+export AWS_LAMBDA_LAYER_NAME=${INSTANCE_NAME}-node-modules
 export AWS_API_GATEWAY_NAME=${INSTANCE_NAME}-gateway
 export AWS_LAMBDA_EXECUTE_POLICY_NAME=${INSTANCE_NAME}-lambda-policy
 export AWS_LAMBDA_EXECUTE_ROLE_NAME=${INSTANCE_NAME}-lambda-role
@@ -101,10 +103,12 @@ aws lambda add-permission \
 # これは最後
 # preparation for deploy
 cp ./iam/deploy_policy.json ./deploy_policy.json
-sed -i "s@%REGION%@${AWS_REGION}@g"                 ./deploy_policy.json
-sed -i "s@%ACCOUNT_ID%@${AWS_ACCOUNT_ID}@g"         ./deploy_policy.json
-sed -i "s@%GATEWAY_API_ID%@${AWS_GATEWAY_API_ID}@g" ./deploy_policy.json
-sed -i "s@%FUNCTION%@${AWS_LAMBDA_FUNCTION_NAME}@g" ./deploy_policy.json
+sed -i "s@%REGION%@${AWS_REGION}@g"                           ./deploy_policy.json
+sed -i "s@%ACCOUNT_ID%@${AWS_ACCOUNT_ID}@g"                   ./deploy_policy.json
+sed -i "s@%GATEWAY_API_ID%@${AWS_GATEWAY_API_ID}@g"           ./deploy_policy.json
+sed -i "s@%FUNCTION%@${AWS_LAMBDA_FUNCTION_NAME}@g"           ./deploy_policy.json
+sed -i "s@%AUTH_FUNCTION%@${AWS_LAMBDA_AUTH_FUNCTION_NAME}@g" ./deploy_policy.json
+sed -i "s@%FUNCTION_LAYER%@${AWS_LAMBDA_LAYER_NAME}@g"        ./deploy_policy.json
 
 cp ./iam/deploy_role.json ./deploy_role.json
 sed -i "s@%ACCOUNT_ID%@${AWS_ACCOUNT_ID}@g" ./deploy_role.json

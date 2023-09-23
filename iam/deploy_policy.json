@@ -3,11 +3,20 @@
 	"Statement": [{
 		"Effect": "Allow",
 		"Action": [
-			"lambda:UpdateFunctionCode"
+			"lambda:UpdateFunctionCode",
+			"lambda:UpdateFunctionConfiguration"
 		],
 		"Resource": [
 			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%",
 			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%AUTH_FUNCTION%"
+		]
+	}, {
+		"Effect": "Allow",
+		"Action": [
+			"lambda:PublishLayerVersion"
+		],
+		"Resource": [
+			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:layer:%FUNCTION_LAYER%"
 		]
 	}, {
 		"Effect": "Allow",

@@ -63,3 +63,21 @@
  * @prop {string} description
  * @prop {string} blurhash
  */
+
+/**
+ * @typedef MastodonNotificationMessage
+ * @prop {"favourite"|"mention"|"follow"|"reblog"|"follow_request"|"unfollow"|"status"} notification_type
+ * @prop {string} icon URI encoded, e.g. encodeURIComponent('https://hogehoge.com')
+ * @prop {string} title
+ * @prop {string} body
+ * @prop {"en"|"ja"} preferred_locale
+ * @prop {number} notification_id
+ */
+
+/**
+ * @typedef Subscription
+ * @prop {string} endpoint
+ * @prop {object} keys
+ * @prop {string} keys.auth
+ * @prop {string} keys.p256dh
+ */

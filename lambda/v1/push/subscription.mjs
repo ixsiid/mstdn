@@ -1,8 +1,10 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
-import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 
 import config from '../../data/config.mjs';
 const { region, vapid_key, dynamodb_subscriptions } = config;
+
+import get_subscription from '../../lib/get_subscription.mjs';
 
 /**
  * @param {IntegrationEvent} event
@@ -18,45 +20,27 @@ export default async (event, auth) => {
 	const dynamo = new DynamoDB(option);
 
 	if (event.httpMethod === 'GET') {
-		const conditions = ['account_id = :account_id'];
-		const condition_values = { ':account_id': auth.account_id };
-
-		return dynamo.query({
-			TableName: dynamodb_subscriptions,
-			Limit: 1,
-			ScanIndexForward: false,
-			ExpressionAttributeValues: marshall(condition_values),
-			KeyConditionExpression: conditions.join(' and '),
-		}).catch(err => {
-			throw 'DynamoDB error: ' + err;
-		}).then(res => {
-			console.debug('DynamoDB response');
-			console.debug(res.Items[0]);
-			console.debug(JSON.stringify(unmarshall(res.Items[0])))
-
-			const subscription = unmarshall(res.Items.pop()).subscription;
-			console.debug(subscription);
-			return subscription;
-		}).then(subscription => ({
-			statusCode: 200,
-			heders: { type: 'application/json' },
-			body: JSON.stringify({
-				id: auth.account_id,
-				endpoint: subscription.endpoint,
-				server_key: vapid_key,
-				// アラートは設定していないためすべてtrueで返す
-				alerts: {
-					favourite: true,
-					follow: true,
-					mention: true,
-					poll: true,
-					reblog: true
-				}
-			}),
-		})).catch(err => {
-			console.error(err);
-			return { statusCode: 404 };
-		});
+		return get_subscription(auth.account_id)
+			.then(subscription => ({
+				statusCode: 200,
+				heders: { type: 'application/json' },
+				body: JSON.stringify({
+					id: auth.account_id,
+					endpoint: subscription.endpoint,
+					server_key: vapid_key,
+					// アラートは設定していないためすべてtrueで返す
+					alerts: {
+						favourite: true,
+						follow: true,
+						mention: true,
+						poll: true,
+						reblog: true
+					}
+				}),
+			})).catch(err => {
+				console.error(err);
+				return { statusCode: 404 };
+			});
 	}
 
 	if (event.httpMethod === 'POST') {

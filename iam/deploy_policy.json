@@ -13,7 +13,8 @@
 	}, {
 		"Effect": "Allow",
 		"Action": [
-			"lambda:PublishLayerVersion"
+			"lambda:PublishLayerVersion",
+			"lambda:GetLayerVersion"
 		],
 		"Resource": [
 			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:layer:%FUNCTION_LAYER%"

@@ -40,7 +40,9 @@ jobs:
       #         - 'lambda/package.json'
       #         - 'lambda/package-lock.json'
 
+      # ポリシーが引っかかって失敗する。一旦スキップしてパッケージのアップデートがあった時に再設定する
       - name: deploy modules
+        if: ${{ false }}
       #   if: steps.changed.outputs.module == 'true'
         run: |
           mkdir ./nodejs

@@ -43,14 +43,17 @@ test('Integration', async t => {
 	// テスト用認証情報
 	let auth_context = {};
 
-	// テスト用Dynamo DB localテーブル準備
-	await dynamo.deleteTable({ TableName: process.env.dynamodb_table_name })
-		.catch(() => { })
-		.finally(() => { })
-		.then(() => Promise.all([
-			fs.readFile('./dynamodb/schema.json'),
-			fs.readFile('./dynamodb/first-item.json'),
-		]))
+	// テスト用Dynamo DB localテーブル準備。初回テスト時はテーブルがないため、例外を無視する
+	await Promise.all(
+		[process.env.dynamodb_table_name, process.env.dynamodb_subscriptions]
+			.map(TableName => dynamo.deleteTable({ TableName }))
+	).catch(() => { }).finally(() => { });
+
+	// statusesテーブル作成
+	await Promise.all([
+		fs.readFile('./dynamodb/schema.json'),
+		fs.readFile('./dynamodb/first-item.json'),
+	])
 		.then(buffers => buffers.map(x => JSON.parse(x.toString())))
 		.then(([table_schema, first_item]) => {
 			return Promise.all([dynamo.createTable({
@@ -68,7 +71,22 @@ test('Integration', async t => {
 				TableName: process.env.dynamodb_table_name,
 			});
 		})
-		.then(res => console.log('Prepared local db, starting test ...'))
+		.then(res => console.log('Prepared statuses tables'));
+
+	// subscriptionsテーブル作成
+	await fs.readFile('./dynamodb/subscriptions-schema.json')
+		.then(buffer => JSON.parse(buffer.toString()))
+		.then(table_schema => dynamo.createTable({
+			...table_schema,
+			TableName: process.env.dynamodb_subscriptions,
+			ProvisionedThroughput: {
+				ReadCapacityUnits: 2,
+				WriteCapacityUnits: 2,
+			}
+		}))
+		.then(res => console.log('Prepared subscriptions table'));
+
+	await (async () => { console.log('starting test') })()
 		// 非実装APIへのアクセス
 		.then(() => handler(q.generate_event('/v1/reports', 'get')))
 		.then(res => t.test('/v1/reports:get, It is not implemented api', () => assert.equal(res.statusCode, 501)))
@@ -141,6 +159,54 @@ test('Integration', async t => {
 		// Postデータ、Putデータを用意する
 		// .then(() => handler(q.generate_event('/v1/media', 'post', auth_context, '', Buffer.from())))
 		// .then(() => handler(q.generate_event('/v1/media/${id}', 'put', auth_context, '', Buffer.from())))
+		// Subscription
+		// 最初は登録がない
+		.then(() => {
+			const subscription_body = {
+				data: {
+					alerts: {
+						favourite: true,
+						follow: true,
+						mention: true,
+						poll: true,
+						reblog: true
+					}
+				},
+				policy: 'all',
+				subscription: {
+					endpoint: 'https://hogehoge.com/fugafuga',
+					keys: {
+						auth: 'AUTH_KEY',
+						p256dh: 'PRIVATE KEY',
+					}
+				}
+			};
+
+			return (async () => { })()
+				.then(() => handler(q.generate_event('/v1/push/subscription', 'get', auth_context)))
+				.then(res => t.test('/v1/push/subscription:get', () => assert.equal(res.statusCode, 404)))
+				.then(() => handler(q.generate_event('/v1/push/subscription', 'post', auth_context, '', Buffer.from(JSON.stringify(subscription_body)))))
+				.then(res => t.test('/v1/push/subscription:post', () => {
+					assert.equal(res.statusCode, 200);
+					assert.deepEqual(JSON.parse(res.body), {
+						id: 0,
+						endpoint: subscription_body.subscription.endpoint,
+						alerts: subscription_body.data.alerts,
+						server_key: process.env.vapid_key,
+					});
+				}))
+				.then(() => handler(q.generate_event('/v1/push/subscription', 'get', auth_context)))
+				.then(res => t.test('/v1/push/subscription:get', () => {
+					assert.equal(res.statusCode, 200);
+					assert.deepEqual(JSON.parse(res.body), {
+						id: 0,
+						endpoint: subscription_body.subscription.endpoint,
+						alerts: subscription_body.data.alerts,
+						server_key: process.env.vapid_key,
+					});
+				}))
+		})
+		// Not implements: post -> get
 		.catch(err => {
 			console.error(err);
 			throw err;
@@ -172,7 +238,6 @@ test('Integration', async t => {
 	// method === get, statusCode === 401だけチェック
 	await Promise.all(
 		[
-			'push/subscription',
 			'accounts/update_credentials',
 		]
 			.map(x => '/v1/' + x)

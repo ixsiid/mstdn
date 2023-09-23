@@ -3,11 +3,13 @@ export default {
 	display_name: process.env.display_name,
 	domain: process.env.domain,
 	dynamodb_table_name: process.env.dynamodb_table_name,
+	dynamodb_subscriptions: process.env.dynamodb_subscriptions,
 	email: process.env.email,
 	region: process.env.region,
 	s3bucket: process.env.s3bucket,
 	username: process.env.username,
 	vapid_key: process.env.vapid_key,
+	vapid_private_key: process.env.vapid_private_key,
 	
 	url: `https://${process.env.domain}`,
 };

@@ -1,5 +1,5 @@
 import { domain, vapid_key, vapid_private_key } from "../data/config.mjs";
-import { webPush } from 'web-push-min';
+import { webPush } from '../node_modules/web-push-min/src/index.mjs';
 import get_subscription from "./get_subscription.mjs";
 
 /** @typedef {string} NotificationType */
@@ -55,7 +55,7 @@ export const send_notification = (account_id, type, text) => {
 		publicKey: vapid_key,
 		privateKey: vapid_private_key,
 		subject: 'Mastdn on halzion.net',
-	}
+	};
 	return get_subscription(account_id)
 		.then(subscription => webPush.sendNotification(
 			subscription,

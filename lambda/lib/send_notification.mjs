@@ -1,5 +1,5 @@
 import { domain, vapid_key, vapid_private_key } from "../data/config.mjs";
-import { webPush } from '../node_modules/web-push-min/src/index.mjs';
+import { webPush } from 'web-push-min';
 import get_subscription from "./get_subscription.mjs";
 
 /** @typedef {string} NotificationType */

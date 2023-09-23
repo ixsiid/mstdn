@@ -3,6 +3,9 @@ import { webPush } from 'web-push-min';
 import { SupportedContentEncodings } from "web-push-min/src/web-push-constants.mjs";
 import get_subscription from "./get_subscription.mjs";
 
+import config from "../data/config.mjs";
+const { email } = config;
+
 /** @typedef {string} NotificationType */
 
 /** @enum {NotificationType} */
@@ -56,7 +59,7 @@ export const send_notification = (account_id, type, text) => {
 		vapidDetails: {
 			publicKey: vapid_key,
 			privateKey: vapid_private_key,
-			subject: 'Mastdn on halzion.net',
+			subject: 'mailto:' + email,
 		},
 		contentEncoding: SupportedContentEncodings.AES_128_GCM,
 	};

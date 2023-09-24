@@ -1,6 +1,6 @@
 import { CognitoIdentityProviderClient, CreateUserPoolClientCommand } from '@aws-sdk/client-cognito-identity-provider';
 
-import { domain, vapid_key, user_pool_id } from "../data/config.mjs";
+import { domain, vapid_key, user_pool_id, client_id } from "../data/config.mjs";
 
 /**
  * @param {IntegrationEvent} event
@@ -22,11 +22,11 @@ export default event => {
 	const input = {
 		UserPoolId: user_pool_id,
 		ClientName: q.client_name + '_' + new Date().getTime(),
-		GenerateSecret: true,
+		GenerateSecret: false,
 		RefreshTokenValidity: 30,
 		AccessTokenValidity: 1,
 		IdTokenValidity: 1,
-		TolenValidityUnits: {
+		TokenValidityUnits: {
 			AccessToken: 'days',
 			IdToken: 'days',
 			RefreshToken: 'days',
@@ -35,7 +35,7 @@ export default event => {
 		WriteAttributes: [],
 		ExplicitAuthFlows: ['ALLOW_REFRESH_TOKEN_AUTH', 'ALLOW_ADMIN_USER_PASSWORD_AUTH'],
 		SupportedIdentityProviders: ['COGNITO'],
-		CallbackURLs: [q.redirect_uris.split(',')],
+		CallbackURLs: q.redirect_uris.split(','),
 		AllowedOAuthFlows: ['code'],
 		AllowedOAuthScopes,
 		AllowedOAuthFlowsUserPoolClient: true,
@@ -45,14 +45,17 @@ export default event => {
 	};
 
 	const command = new CreateUserPoolClientCommand(input);
-	return client.send(command)
+//	return client.send(command)
+	return (async () => {})()
 		.then(res => ({
 			statusCode: 200,
 			headers: { 'content-type': 'application/json' },
 			body: JSON.stringify({
-				name: res.UserPoolClient.ClientName,
-				client_id: res.UserPoolClient.ClientId,
-				client_secret: res.UserPoolClient.ClientSecret,
+				// name: res.UserPoolClient.ClientName,
+				// client_id: res.UserPoolClient.ClientId,
+				name: q.client_name,
+				client_id,
+				client_secret: 'not generated', //res.UserPoolClient.ClientSecret,
 				website: event.body.website ?? undefined,
 				vapid_key,
 			}),

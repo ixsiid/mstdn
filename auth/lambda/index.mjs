@@ -119,24 +119,23 @@ export const handler = async event => {
 		};
 		console.debug(JSON.stringify(input));
 		const command = new AdminInitiateAuthCommand(input);
-		const code = await client.send(command)
+		return client.send(command)
 			.then(res => {
 				const id = res.$metadata.requestId;
 				AuthenticationResultCache[id] = res.AuthenticationResult;
 				return id;
-			});
-		const queries = [
-			['code', code],
-			...decodeURIComponent(body.state).split(',').map(x => x.split(':')),
-		];
-		const query_string = 'code=' + code + (body.state ? '&state=' + body.state : '');
-		console.debug(query_string);
-		return {
-			statusCode: 302,
-			headers: {
-				location: decodeURIComponent(body.redirect_uri) + '?' + query_string,
-			},
-		};
+			})
+			.then(code => {
+				const query_string = 'code=' + code + (body.state ? '&state=' + body.state : '');
+				console.debug(query_string);
+				return query_string;
+			})
+			.then(query_string => ({
+				statusCode: 302,
+				headers: {
+					location: decodeURIComponent(body.redirect_uri) + '?' + query_string,
+				},
+			}));
 	}
 
 	if (api_method === '/oauth/token') {

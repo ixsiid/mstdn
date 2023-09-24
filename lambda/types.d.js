@@ -81,3 +81,10 @@
  * @prop {string} keys.auth
  * @prop {string} keys.p256dh
  */
+
+/**
+ * @typedef V1AppsBody
+ * @prop {string} client_name
+ * @prop {string} redirect_uris Joinned by ','
+ * @prop {string} scopes Joinned by '+' or ' '
+ */

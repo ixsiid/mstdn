@@ -119,3 +119,10 @@ AWSのIaaSを用いたサーバーレスで実現するマストドン互換イ�
 ## Push通知
 Amazon SNS
 - solo-mstdn-push
+
+
+## Problem
+### AuthファンクションにCognitoでホストされたUIが使えない
+CognitoでホストされたUIでは、適切なスコープが要求されないと認可を行わない
+カスタムスコープは identifier/scope_name という形になり、マストドンクライアントが要求する `[read, write, push]` といったスコープを指定することができない
+

@@ -23,7 +23,7 @@ export const handler = async event => {
 	// 互換性のため
 	event.httpMethod = method.toUpperCase();
 
-	if (method === 'post' && event.body) {
+	if (['post', 'put'].includes(method) && event.body) {
 		event.parsed_body = parse_body(event.body, event.headers, event.isBase64Encoded);
 
 		// 互換性のため

@@ -19,7 +19,7 @@ export default async (event, auth) => {
 	if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
 	const dynamo = new DynamoDB(option);
 
-	if (event.httpMethod === 'GET') {
+	if (event.httpMethod === 'GET' || event.httpMethod === 'PUT') {
 		return get_subscription(auth.account_id)
 			.then(subscription => ({
 				statusCode: 200,
@@ -74,6 +74,5 @@ export default async (event, auth) => {
 		});
 	}
 
-	if (event.httpMethod === 'PUT') { }
 	return { statusCode: 404 };
 };

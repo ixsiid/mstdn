@@ -1,11 +1,11 @@
 export const domain = process.env.domain;
+export const user_pool_id = process.env.user_pool_id;
 export const vapid_key = process.env.vapid_key;
 export const vapid_private_key = process.env.vapid_private_key;
 
 export const url = 'https://' + domain;
 
 export default {
-	client_id: process.env.client_id,
 	display_name: process.env.display_name,
 	domain,
 	dynamodb_statuses: process.env.dynamodb_statuses,

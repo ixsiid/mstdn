@@ -8,7 +8,8 @@
 		],
 		"Resource": [
 			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%FUNCTION%",
-			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%AUTH_FUNCTION%"
+			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%AUTH_FUNCTION%",
+			"arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%ACTIVITYPUB_FUNCTION%"
 		]
 	}, {
 		"Effect": "Allow",
@@ -26,7 +27,8 @@
 		],
 		"Resource": [
 			"arn:aws:apigateway:%REGION%::/apis/%GATEWAY_API_ID%",
-			"arn:aws:apigateway:%REGION%::/apis/%GATEWAY_AUTH_API_ID%"
+			"arn:aws:apigateway:%REGION%::/apis/%GATEWAY_AUTH_API_ID%",
+			"arn:aws:apigateway:%REGION%::/apis/%GATEWAY_ACTIVITYPUB_API_ID%"
 		]
 	}]
  }

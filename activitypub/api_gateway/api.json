@@ -1,0 +1,112 @@
+{
+	"openapi": "3.0.1",
+	"info": {
+		"title": "%INSTANCE_NAME%-activitypub-gateway",
+		"version": "%DATE%"
+	},
+	"servers": [
+		{
+			"url": "https://%DOMAIN%/users/{basePath}",
+			"description": "Solo mastodon instance",
+			"variables": { "basePath": { "default": "" } }
+		}
+	],
+	"components": {
+		"x-amazon-apigateway-integrations" : {
+			"lambda-integration": {
+				"payloadFormatVersion": "2.0",
+				"type": "aws_proxy",
+				"httpMethod": "POST",
+				"uri": "arn:aws:apigateway:%REGION%:lambda:path/2015-03-31/functions/arn:aws:lambda:%REGION%:%ACCOUNT_ID%:function:%ACTIVITYPUB_FUNCTION%/invocations",
+				"connectionType": "INTERNET"
+			}
+		}
+	},
+	"x-amazon-apigateway-importexport-version": "1.0",
+	"paths": {
+		"/{id}/inbox": {
+			"post": {
+				"summary": "Inbox",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"": { "type": "object" } }
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id}",
+					"in": "path",
+					"description": "User name",
+					"required": true,
+					"schema": { "type": "string" }
+				}
+			]
+		},
+		"/{id}/outbox": {
+			"post": {
+				"summary": "Outbox",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"": { "type": "object" } }
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id}",
+					"in": "path",
+					"description": "User name",
+					"required": true,
+					"schema": { "type": "string" }
+				}
+			]
+		},
+		"/{id}/key": {
+			"post": {
+				"summary": "Main public key",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/json": { "type": "object" } }
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id}",
+					"in": "path",
+					"description": "User name",
+					"required": true,
+					"schema": { "type": "string" }
+				}
+			]
+		},
+		"/{id}/info": {
+			"get": {
+				"summary": "User infomation",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/activity+json": { "type": "object" } }
+					}
+				}
+			},
+			"parameters": [
+				{
+					"name": "{id}",
+					"in": "path",
+					"description": "User name",
+					"required": true,
+					"schema": { "type": "string" }
+				}
+			]
+		}
+	}
+}

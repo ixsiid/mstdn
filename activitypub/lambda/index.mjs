@@ -4,6 +4,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import gl from './lib/gl_event_parser.mjs';
 
 const type_ld_json = 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"';
+const type_act_json = 'application/activity+json';
 
 export const handler = async event => {
 	console.debug(`[LAMBDA] ${event.rawPath}`);
@@ -11,19 +12,6 @@ export const handler = async event => {
 
 
 	const { method, path, keys, body } = gl.parse(event);
-
-	/** @type {Auth} */
-	const auth = (() => {
-		if (!event.requestContext.authorizer) return undefined;
-		const authorizer = event.requestContext.authorizer;
-		if ('jwt' in authorizer) {
-			return {
-				username: authorizer.jwt.claims?.username,
-				account_id: 0, // It's constant value for "Solo"
-				scopes: ['read', 'write', 'push'], // authorizer.jwt.scopes
-			};
-		}
-	})();
 
 	console.debug({
 		method,
@@ -48,15 +36,17 @@ export const handler = async event => {
 		*/
 		return {
 			statusCode: 200,
-			headers: { 'content-type': 'application/activity+json' },
+			headers: { 'content-type': type_act_json },
 			body: JSON.stringify({
-				'@context': 'https://www.w3.org/ns/activitystreams',
+				'@context': [
+					'https://www.w3.org/ns/activitystreams',
+				],
 				type: 'Person',
-				id: url,
+				id: url + '/info',
 				name: user.name,
 				preferredUsername: user.preferredUsername,
 				summary: user.summary,
-				url,
+				url: url + '/info',
 				inbox: url + '/inbox',
 				outbox: url + '/outbox',
 				icon: {
@@ -89,18 +79,23 @@ export const handler = async event => {
 			case 'Follow':
 			case 'Unfollow':
 			case 'FollowRequest':
-				return fetch(body.id, { headers: { Accept: type_ld_json } })
+				// 本来は先に webfinger を叩く
+				return fetch(body.actor, { headers: { Accept: type_ld_json } })
 					.then(res => res.json())
-					.then(json => ({
-						account_id: auth.account_id,
-						created_at: new Date().getTime(),
-						actor: body.actor,
-						type: 'follow', // follow か follower
-						is_valid: type !== 'Unfollow',
-						inbox: json.inbox,
-						outbox: json.outbox,
-					}))
+					.then(json => {
+						console.debug(JSON.stringify(json, null, 2));
+						return {
+							account_id: 0, // object からローカルアカウントを特定する必要がある
+							created_at: new Date().getTime(),
+							actor: body.actor,
+							type: 'follow', // follow か follower
+							is_valid: type !== 'Unfollow',
+							inbox: json.inbox,
+							outbox: json.outbox,
+						};
+					})
 					.then(item => {
+						console.debug(JSON.stringify(item, null, 2));
 						const region = process.env.region;
 						const follow_table_name = process.env.follows_table_name;
 

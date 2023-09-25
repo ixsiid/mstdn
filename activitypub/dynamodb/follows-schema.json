@@ -1,0 +1,22 @@
+{
+	"AttributeDefinitions": [
+		{
+			"AttributeName": "account_id",
+			"AttributeType": "N"
+		},
+		{
+			"AttributeName": "created_at",
+			"AttributeType": "N"
+		}
+	],
+	"KeySchema": [
+		{
+			"AttributeName": "account_id",
+			"KeyType": "HASH"
+		},
+		{
+			"AttributeName": "created_at",
+			"KeyType": "RANGE"
+		}
+	]
+}

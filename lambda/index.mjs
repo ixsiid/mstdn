@@ -17,7 +17,7 @@ export const handler = async event => {
 			};
 		}
 	})();
-	console.debug(`Auth: ${JSON.stringify(auth, null, 2)}`);
+	console.debug(`Auth: ${JSON.stringify({origin: event.requestContext.authorizer, parse:auth}, null, 2)}`);
 
 	const { method, path, keys } = parse_path(event);
 	// 互換性のため

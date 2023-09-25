@@ -1,0 +1,23 @@
+{
+	"account_id": {
+		"N": 0
+	},
+	"created_at": {
+		"N": 0
+	},
+	"actor": {
+		"S": ""
+	},
+	"type": {
+		"S": "follow|follower"
+	},
+	"is_valid": {
+		"BOOL": true
+	},
+	"inbox": {
+		"S": ""
+	},
+	"outbox": {
+		"S": ""
+	}
+}

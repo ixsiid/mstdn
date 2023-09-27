@@ -3,6 +3,8 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 
 import gl from './lib/gl_event_parser.mjs';
 
+const { public_key, private_key } = process.env;
+
 const type_ld_json = 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"';
 const type_act_json = 'application/activity+json';
 
@@ -20,10 +22,11 @@ export const handler = async event => {
 		body,
 	});
 
-	if (path === '/info') {
-		const url = process.env.url + '/users/' + keys[0];
-		const user = JSON.parse(process.env.users)[keys[0]];
+	const url = process.env.url + '/users/' + keys[0];
+	const me = url + '/info';
+	const user = JSON.parse(process.env.users)[keys[0]];
 
+	if (path === '/info') {
 		/**
 		const users = {
 			ixsiid: {
@@ -40,6 +43,7 @@ export const handler = async event => {
 			body: JSON.stringify({
 				'@context': [
 					'https://www.w3.org/ns/activitystreams',
+					'https://w3id.org/security/v1',
 				],
 				type: 'Person',
 				id: url + '/info',
@@ -54,12 +58,35 @@ export const handler = async event => {
 					mediaType: 'image/png',
 					url: process.env.url + '/avatar/icon.png',
 				},
+				publicKey: {
+					id: url + '/key',
+					owner: me,
+					publicKeyPem: public_key,
+					type: 'key',
+				},
+			}),
+		};
+	}
+
+	if (path === '/key') {
+		return {
+			statusCode: 200,
+			headers: { 'content-type': type_ld_json },
+			body: JSON.stringify({
+				'@context': 'https://w3id.org/security/v1',
+				publicKey: {
+					id: url + '/key',
+					owner: me,
+					publicKeyPem: public_key,
+					type: 'key',
+				},
 			}),
 		};
 	}
 
 
 	if (path === '/inbox') {
+		if (body.object !== me) return { statusCode: 404 }
 		// inbox: follow
 		/**
 		 * {
@@ -95,6 +122,23 @@ export const handler = async event => {
 						};
 					})
 					.then(item => {
+						return fetch(item.inbox, {
+							method: 'post',
+							headers: {
+								'content-type': type_ld_json,
+								'Accept': type_act_json,
+							},
+							body: JSON.stringify({
+								'@context': 'https://www.w3.org/ns/activitystreams',
+								type: 'Accept',
+								actor: me,
+								object: body,
+							}),
+						}).then(res => {
+							if (!res.ok) throw res.text();
+						}).then(() => item)
+					})
+					.then(item => {
 						console.debug(JSON.stringify(item, null, 2));
 						const region = process.env.region;
 						const follow_table_name = process.env.follows_table_name;
@@ -108,7 +152,7 @@ export const handler = async event => {
 							Item: marshall(item),
 						});
 					})
-					.then(() => ({ statusCode: 200 }))
+					.then(() => ({ statusCode: 202 }))
 					.catch(err => {
 						console.error(err);
 						return { statusCode: 405 };

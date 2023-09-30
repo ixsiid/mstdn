@@ -68,14 +68,15 @@ const parse_body = (body, content_type, isBase64Encoded) => {
  * @returns {{method: "get"|"post"|"put"|"head"|"delete"|"patch"|"option", path: string, keys: Array<string>, body: object}}
  */
 export const parse = event => {
-	const [method, __key] = event.routeKey.split(' ');
+	const [_method, __key] = event.routeKey.split(' ');
+	const method = _method.toLowerCase();
 	const key = __key.split('/').filter(x => x);
 	const path = event.rawPath.split('/').filter(x => x);
 	// ステージ名を除去
 	path.shift();
 
 	const p = [];
-	const k = [];
+	const keys = [];
 
 	for (let i = 0; i < path.length; i++) {
 		if (path[i] === key[i]) {
@@ -84,12 +85,12 @@ export const parse = event => {
 		}
 		// プラス付きパラメーターの場合、後続をすべてキーにする
 		if (key[i].match(/^\{[a-zA-Z\-_0-9]+\+\}$/)) {
-			k.push(...path.slice(i));
+			keys.push(...path.slice(i));
 			break;
 		}
 		// プラスが付かないパラメーターの場合、単一のキーとする
 		if (key[i].match(/^\{[a-zA-Z\-_0-9]+\}$/)) {
-			k.push(path[i]);
+			keys.push(path[i]);
 			continue;
 		}
 		throw `Unknown key: ${key[i]}, ${path[i]}`;
@@ -100,9 +101,9 @@ export const parse = event => {
 		undefined;
 
 	return {
-		method: method.toLowerCase(),
+		method,
 		path: '/' + p.join('/'),
-		keys: k,
+		keys,
 		body,
 	};
 };

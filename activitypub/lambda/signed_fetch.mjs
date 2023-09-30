@@ -115,10 +115,8 @@ export const signed_fetch = async (url, options, sign_options) => {
 
 	const algorithms = {
 		standard: 'hs2019',
-		mastodon: 'RSA-SHA256',
+		mastodon: 'rsa-sha256',
 	};
-
-	console.log(signee);
 
 	headers.Host = host;
 	headers.Date = now.toUTCString();
@@ -195,17 +193,11 @@ export const verify_event = async (event) => {
 			})
 	).then(d => d.join('\n'));
 
-	console.debug('Algorithm: ' + algorithm);
-	console.debug('KeyId: ' + key_id);
-
 	return fetch(key_id, { headers: { 'Accept': 'application/activity+json' } })
 		.then(res => res.json())
 		.then(activity => {
 			/** @type {string} */
 			const public_key = activity.publicKey.publicKeyPem;
-			console.log('-----------');
-			console.log(data);
-			console.log('-----------');
 			return crypto.verify(
 				algorithm,
 				Buffer.from(data),

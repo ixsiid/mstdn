@@ -28,7 +28,7 @@ export const handler = async event => {
 	const me = url + '/info';
 	const user = JSON.parse(process.env.users)[keys[0]];
 
-	if (path === '/info') {
+	if (path === '/info' || path === '/key') {
 		/**
 		const users = {
 			ixsiid: {
@@ -137,7 +137,7 @@ export const handler = async event => {
 								object: body,
 							}),
 						}, {
-							key_id: `${url}/key`,
+							key_id: `${url}/info`,
 							private_key,
 							mode: 'mastodon',
 							additional_headers: ['Content-Type'],

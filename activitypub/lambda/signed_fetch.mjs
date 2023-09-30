@@ -49,12 +49,13 @@ export const fetch_by_https = (url, options = { method: 'get'}) => new Promise((
  * fetch with Http signature
  * @param {string} url 
  * @param {object} options
- * @param {string} options.method
+ * @param {"get"|"post"} options.method
  * @param {Object<string, string>} options.headers 
  * @param {string} options.body
  * @param {object} sign_options
  * @param {string} sign_options.key_id
- * @param {string} private_key
+ * @param {string} sign_options.private_key
+ * @param {"standard"|"mastodon"} sign_options.mode
  * @returns {Promise<Response>}
  */
 export const signed_fetch = (url, options, sign_options) => {
@@ -96,4 +97,10 @@ export const signed_fetch = (url, options, sign_options) => {
 		].join(' '),
 		'signature=' + signature,
 	].join(', ');
+
+	return fetch_by_https(url, options);
+};
+
+export const verify = (signature, public_key) => {
+
 };

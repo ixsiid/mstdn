@@ -10,7 +10,7 @@ import https from 'node:https';
  * @param {string} options.body
  * @returns {Promise<Response>}
  */
-export const fetch_by_https = (url, options = { method: 'get'}) => new Promise((resolve, reject) => {
+export const fetch_by_https = (url, options = { method: 'get' }) => new Promise((resolve, reject) => {
 	const _url = new URL(url);
 	const _options = {
 		method: options.method ?? "get",
@@ -101,6 +101,63 @@ export const signed_fetch = (url, options, sign_options) => {
 	return fetch_by_https(url, options);
 };
 
-export const verify = (signature, public_key) => {
+/**
+ * Http Signatureを検証します
+ * @param {IntegrationEvent} event lambda関数 eventオブジェクト
+ * @returns {Promise<boolean>}
+ */
+export const verify_event = async (event) => {
+	// ToDo Mastdon形式になっているので標準と切り替えられるようにする
+	/** @type {Array<string>} */
+	const signature_header = event.headers.signature;
 
+	/** @type {Array<Array<string>>} */
+	const s = signature_header.split(',').map(x => x.match(/^(.*?)\="(.*?)"$/));
+	const algorithm = s.find(x => x[1] === 'algorithm')[2].toUpperCase();
+	const key_id = s.find(x => x[1] === 'keyId')[2];
+	const signature = s.find(x => x[1] === 'signature')[2];
+
+	const data = await Promise.all(
+		s.find(x => x[1] === 'headers')[2]
+			.split(' ')
+			.map(async header => {
+				if (header === '(request-target)') {
+					return `(request-target): ${event.requestContext.http.method.toLowerCase()} ${event.requestContext.http.path}`;
+				}
+
+				if (header === 'digest') {
+					// Digest Hashの検証を行う
+					await crypto.subtle.digest('SHA-256', Buffer.from(event.body))
+						.then(b => Buffer.from(b).toString("base64"))
+						.then(hash => 'SHA-256=' + hash)
+						.then(digest => {
+							if (digest !== event.headers.digest) {
+								throw 'Digest of Body is unmatch with in signature';
+							}
+						})
+					// 署名検証用dataは後続処理と共通化できる
+				}
+
+				return `${header}: ${event.headers[header]}`;
+			})
+	).then(d => d.join('\n'));
+
+	console.debug('Algorithm: ' + algorithm);
+	console.debug('KeyId: ' + key_id);
+
+	return fetch(key_id, { headers: { 'Accept': 'application/activity+json' } })
+		.then(res => res.json())
+		.then(activity => {
+			/** @type {string} */
+			const public_key = activity.publicKey.publicKeyPem;
+			return crypto.verify(
+				algorithm,
+				Buffer.from(data),
+				public_key,
+				Buffer.from(signature, 'base64'));
+		})
+		.then(verified => {
+			if (!verified) throw 'Signatures do not match.';
+			return true;
+		})
 };

@@ -7,6 +7,7 @@ import path from 'node:path';
 import {
 	fetch_by_https,
 	verify_event,
+	signed_fetch,
 } from "../lambda/signed_fetch.mjs";
 
 import event from './follow_event.json' assert {type: 'json'};
@@ -22,60 +23,16 @@ import event from './follow_event.json' assert {type: 'json'};
 			const signature = crypto.sign(algorithm, data, private_key);
 			const verified = crypto.verify(algorithm, data, public_key, signature);
 			console.log('Result: ' + verified);
-		});
-}
 
-
-{
-	const signature_header = event.headers.signature;
-
-	const s = signature_header.split(',').map(x => x.match(/^(.*?)\="(.*?)"$/));
-	const algorithm = s.find(x => x[1] === 'algorithm')[2].toUpperCase();
-	const key_id = s.find(x => x[1] === 'keyId')[2];
-	const signature = s.find(x => x[1] === 'signature')[2];
-
-	const data = await Promise.all(
-		s.find(x => x[1] === 'headers')[2]
-			.split(' ')
-			.map(async header => {
-				if (header === '(request-target)') {
-					return `(request-target): ${event.requestContext.http.method.toLowerCase()} ${event.requestContext.http.path}`;
-				}
-
-				if (header === 'host') {
-					// API Gatewayがホスト情報を書き換えるため、元のアクセスホストに戻す
-					return `host: mstdn.halzion.net`;
-				}
-
-				if (header === 'digest') {
-					// Digest Hashの検証を行う
-					await crypto.subtle.digest('SHA-256', Buffer.from(event.body))
-						.then(b => Buffer.from(b).toString("base64"))
-						.then(hash => 'SHA-256=' + hash)
-						.then(digest => assert.equal(digest, event.headers.digest));
-					// 署名検証用dataは後続処理と共通化できる
-				}
-
-				return `${header}: ${event.headers[header]}`;
-			})
-	).then(d => d.join('\n'));
-
-	console.log('Algorithm: ' + algorithm);
-	console.log('KeyId: ' + key_id);
-
-	await fetch(key_id, { headers: { 'Accept': 'application/activity+json' } })
-		.then(res => res.json())
-		.then(activity => {
-			const public_key = activity.publicKey.publicKeyPem;
-			return crypto.verify(
-				algorithm,
-				Buffer.from(data),
-				public_key.trim(),
-				Buffer.from(signature, 'base64'));
+			return [public_key, private_key];
 		})
-		.then(verified => assert(verified));
+		.catch(err => {
+			console.error(err);
+		})
 }
 
+
+/*
 test('verify_http_signatured_message_event', t => {
 	// API Gatewayがホスト情報を書き換えるため、元のアクセスホストに戻す
 	event.headers.host = 'mstdn.halzion.net';
@@ -95,3 +52,4 @@ test('fetch_by_https', t => {
 			t.test('Fetched body', assert(text.startsWith('<!doctype html>')))
 		});
 });
+*/

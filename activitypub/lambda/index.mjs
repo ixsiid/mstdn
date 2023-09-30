@@ -3,7 +3,8 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 
 import gl from './lib/gl_event_parser.mjs';
 
-const { public_key, private_key } = process.env;
+const [public_key, private_key] = [process.env.public_key, process.env.private_key]
+	.map(x => x.replace(/\\n/g, '\n'));
 
 const type_ld_json = 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"';
 const type_act_json = 'application/activity+json';

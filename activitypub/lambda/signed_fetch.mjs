@@ -51,60 +51,113 @@ export const fetch_by_https = (url, options = { method: 'get' }) => new Promise(
  * @param {object} options
  * @param {"get"|"post"} options.method
  * @param {Object<string, string>} options.headers 
- * @param {string} options.body
+ * @param {?string} options.body
  * @param {object} sign_options
  * @param {string} sign_options.key_id
  * @param {string} sign_options.private_key
  * @param {"standard"|"mastodon"} sign_options.mode
+ * @param {Array<string>} [sign_options.additional_headers] 省略した場合全てのHeaderを含めます。HeaderはCase sensitiveで指定する必要があります。
+ * @param {boolean} [sign_options.remove_created_key=false]
+ * @param {string} [sign_options.key_for_body_digest_hash] "Digest", "Content-Digest"
  * @returns {Promise<Response>}
  */
-export const signed_fetch = (url, options, sign_options) => {
+export const signed_fetch = async (url, options, sign_options) => {
 	const { method, headers, body } = options;
-	const { key_id, private_key } = sign_options;
+	const { key_id, private_key, mode } = sign_options;
+
+	if (mode !== 'mastodon') throw 'Not implements';
 
 	const _url = url.substring(url.indexOf(':') + 1).split('/').filter(x => x.length > 0);
 	const host = _url.shift();
+	const path = '/' + _url.join('/');
 
 	const now = new Date();
 	const now_time = Math.floor(now.getTime() / 1000);
 
-	const digest = 'SHA-256=' + crypto.subtle.digest('SHA-256', Buffer.from(body));
-	const header_keys = Object.keys(options.headers).sort();
+	const header_keys = Object.keys(headers).sort();
+
+	const additional_headers = sign_options.additional_headers ?? header_keys;
 
 	const signee = [
-		`(request-target): ${(method ?? 'get').toLowerCase()}`,
+		`(request-target): ${(method ?? 'get').toLowerCase()} ${path}`,
 		`(created): ${now_time} ${_url.join('/')}`,
 		`host: ${host}`,
-		`date: ${now.toUTCString()}`,
-		`digest: ${digest}`,
-		...(header_keys.map(k => `${k.toLowerCase()}: ${options.headers[k]}`))
-	].join('\n');
+		`date: ${now.toUTCString()}`
+	];
+	if (sign_options.remove_created_key) signee.splice(1, 1);
 
+	if (sign_options.key_for_body_digest_hash) {
+		const mode = sign_options.key_for_body_digest_hash;
+		switch (mode) {
+			case "Digest":
+				headers.Digest = await crypto.subtle.digest('SHA-256', Buffer.from(body))
+					.then(b => Buffer.from(b).toString("base64"))
+					.then(hash => 'SHA-256=' + hash);
+				additional_headers.push('Digest');
+				break;
+			case "Content-Digest":
+				headers['Content-Digest'] = await crypto.subtle.digest('SHA-256', Buffer.from(body))
+					.then(b => Buffer.from(b).toString("base64"))
+					.then(hash => 'sha-256=:' + hash + ':');
+				additional_headers.push('Content-Digest');
+				break;
+			default:
+				throw 'Unknown digest hash mode: ' + mode;
+		}
+	}
 
-	const signer = crypto.createSign('RSA-SHA256');
-	signer.update(signee);
-	const signature = signer.sign(private_key, 'base64');
+	signee.push(...additional_headers.filter((x, i, a) => a.indexOf(x) === i)
+		.map(k => `${k.toLowerCase()}: ${options.headers[k]}`));
 
+	const data = signee.join('\n');
+
+	const signature = crypto.sign('RSA-SHA256', Buffer.from(data), private_key);
+
+	const algorithms = {
+		standard: 'hs2019',
+		mastodon: 'RSA-SHA256',
+	};
+
+	console.log(signee);
+
+	headers.Host = host;
 	headers.Date = now.toUTCString();
 	headers.Signature = [
 		`keyId="${key_id}"`,
-		'algorithm="hs2019"',
-		`created=${now_time}`,
-		`expires=${now_time}`,
-		[
-			'headers="(request-target) (created) host date digest',
-			...header_keys.map(x => x.toLowerCase())
-		].join(' '),
-		'signature=' + signature,
-	].join(', ');
+		`algorithm="${algorithms[mode]}"`,
+		// `created=${now_time}`,
+		// `expires=${now_time + 300}`,
+		`headers="${signee.map(x => x.split(':')[0]).join(' ')}"`,
+		`signature="${Buffer.from(signature).toString('base64')}"`,
+	].join(',');
+
+	/* Self check
+	return verify_event({
+		...options,
+		requestContext: { http: { method, path } },
+		headers: {
+			...Object.fromEntries(Object.entries(options.headers).map(([k, v]) => [k.toLowerCase(), v])),
+			host,
+		},
+	});
+	/**/
 
 	return fetch_by_https(url, options);
 };
 
 /**
- * Http Signatureを検証します
+ * Http Signatureを検証します。
+ * eventタイプオブジェクトは、Lambda関数の引数を想定していますが、
+ * headers内のhostが、awsドメインになるため、
+ * 実際にリクエストされるドメインに書き換えた上で呼びだします。
  * @param {IntegrationEvent} event lambda関数 eventオブジェクト
  * @returns {Promise<boolean>}
+ * 
+ * @example <caption>カスタムドメイン利用</caption>
+ * event.headers.host = 'your.domain.com';
+ * verify_event(event)
+ *     .then(success => console.log('検証できました。'))
+ *     .catch(err => console.log('検証できませんでした。' + err));
  */
 export const verify_event = async (event) => {
 	// ToDo Mastdon形式になっているので標準と切り替えられるようにする
@@ -150,6 +203,9 @@ export const verify_event = async (event) => {
 		.then(activity => {
 			/** @type {string} */
 			const public_key = activity.publicKey.publicKeyPem;
+			console.log('-----------');
+			console.log(data);
+			console.log('-----------');
 			return crypto.verify(
 				algorithm,
 				Buffer.from(data),

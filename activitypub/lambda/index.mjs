@@ -27,7 +27,7 @@ export const handler = async event => {
 		body,
 	});
 
-	const url = process.env.url + '/users/' + keys[0];
+	const url = 'https://' + process.env.domain + '/users/' + keys[0];
 	const me = url + '/info';
 	const user = JSON.parse(process.env.users)[keys[0]];
 

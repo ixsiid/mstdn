@@ -129,7 +129,7 @@ export const handler = async event => {
 							account_id: 0, // object からローカルアカウントを特定する必要がある
 							actor: body.actor,
 							last_modified: new Date().getTime(),
-							type: 'follow', // follow か follower
+							follow_type: 'follow', // follow か follower
 							is_valid: type !== 'Unfollow',
 							inbox: json.inbox,
 							outbox: json.outbox,

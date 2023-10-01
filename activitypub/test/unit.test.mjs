@@ -4,8 +4,10 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+const script_directory = path.dirname(process.argv[1]);
+
 import dotenv from 'dotenv';
-dotenv.config({ path: './test/.env' });
+dotenv.config({ path: path.join(script_directory, '.env') });
 
 import {
 	fetch_by_https,
@@ -20,7 +22,7 @@ import event from './follow_event.json' assert {type: 'json'};
 	const algorithm = 'RSA-SHA256';
 
 	Promise.all(['./public.test.key', './private.test.key']
-		.map(x => fs.readFile(path.join('test', x))))
+		.map(x => fs.readFile(path.join(script_directory, x))))
 		.then(x => x.map(k => k.toString()))
 		.then(([public_key, private_key]) => {
 			const data = Buffer.from('Hello, world');
@@ -36,7 +38,7 @@ import event from './follow_event.json' assert {type: 'json'};
 }
 
 test('Http signature', t => {
-	return fs.readFile('../secret/priv.key')
+	return fs.readFile(path.join(script_directory, '..', '..', 'secret', 'priv.key'))
 		.then(private_key => {
 			return signed_fetch('https://hogehoge.fugafuga/users/user/inbox', {
 				method: 'post',

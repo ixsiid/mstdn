@@ -138,7 +138,7 @@ export const signed_fetch = async (url, options, sign_options, self_verification
 	const sign_algorithm = ({
 		'hs2019': 'RSA-SHA256',
 		'rsa-sha256': 'RSA-SHA256',
-	})(algorithm);
+	})[algorithm];
 	if (!sign_algorithm) throw 'Unknwon sign algorithm';
 
 	const signature = crypto.sign(sign_algorithm, Buffer.from(data), private_key);

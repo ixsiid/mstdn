@@ -4,10 +4,14 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import dotenv from 'dotenv';
+dotenv.config({ path: './test/.env' });
+
 import {
 	fetch_by_https,
 	verify_event,
 	signed_fetch,
+	generate_sign_preset,
 } from "../lambda/signed_fetch.mjs";
 
 import event from './follow_event.json' assert {type: 'json'};
@@ -31,8 +35,32 @@ import event from './follow_event.json' assert {type: 'json'};
 		})
 }
 
+test('Http signature', t => {
+	return fs.readFile('../secret/priv.key')
+		.then(private_key => {
+			return signed_fetch('https://hogehoge.fugafuga/users/user/inbox', {
+				method: 'post',
+				headers: {
+					Accept: 'application/activity+json',
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
 
-/*
+				}),
+			}, generate_sign_preset(
+				`https://${process.env.domain}/users/${Object.keys(JSON.parse(process.env.users))[0]}/info`,
+				private_key,
+				'mastodon'
+			), true);
+		})
+		.then(verified => t.test('signed_fetch', () => assert(verified)))
+		.catch(err => {
+			console.error(err);
+			throw err;
+		});
+});
+
+
 test('verify_http_signatured_message_event', t => {
 	// API Gatewayがホスト情報を書き換えるため、元のアクセスホストに戻す
 	event.headers.host = 'mstdn.halzion.net';
@@ -52,4 +80,3 @@ test('fetch_by_https', t => {
 			t.test('Fetched body', assert(text.startsWith('<!doctype html>')))
 		});
 });
-*/

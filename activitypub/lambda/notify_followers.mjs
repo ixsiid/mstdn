@@ -23,9 +23,13 @@ export const notify_followers = (records) => {
 	let limit = 20;
 	const conditions = [
 		'account_id = :zero',
-		'is_valid = true',
-		'type = "follow"'];
-	const condition_values = { ':zero': { N: '0' } };
+		'is_valid = :true',
+		'follow_type = :follow'];
+	const condition_values = {
+		':zero': { N: '0' },
+		':follow': { S: 'follow' },
+		':true': { BOOL: true },
+	};
 
 	const {
 		owner

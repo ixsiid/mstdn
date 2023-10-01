@@ -61,7 +61,7 @@
  * @prop {string} actor
  * @prop {boolean} is_valid
  * @prop {number} last_modified
- * @prop {"follow"|"follower"} type
+ * @prop {"follow"|"follower"} follow_type
  * @prop {string} inbox
  * @prop {string} outbox
  */

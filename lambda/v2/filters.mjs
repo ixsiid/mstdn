@@ -6,23 +6,22 @@
 export default (event, auth, id) => {
 	const filter = {
 		id: 1,
-		phrase: 'dummy',
-		context: ['home'],
-		irreversible: false,
-		whole_word: false,
+		title: 'Dummy filter',
+		context: ['public'],
 		expires_at: null,
+		filter_action: 'hide',
+		keywords: [],
+		statuses: [],
 	};
 
 	if (id === undefined) {
 		return ({
 			GET: [],
-			POST: filter
+			POST: filter,
+			PUT: filter,
+			DELETE: {},
 		})[event.requestContext.http.method];
 	}
 
-	return ({
-		GET: filter,
-		PUT: filter,
-		DELETE: {},
-	})[event.requestContext.http.method];
+	return { statusCode: 405 };
 };

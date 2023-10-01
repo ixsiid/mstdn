@@ -929,6 +929,60 @@
 				}
 			]
 		},
+		"/v2/filters": {
+			"get": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for GET /api/v1/filters",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/filters",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/filters",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"summary": "",
+				"responses": {
+					"default": {
+						"description": "Default response for POST /api/v1/filters",
+						"content": {
+							"application/json": {
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/v2/search": {
 			"get": {
 				"summary": "",

@@ -7,7 +7,7 @@ import {
 	generate_sign_preset
 } from './lib/signed_fetch.mjs';
 
-import { notify_followers } from './notify_follower.mjs';
+import { notify_followers } from './notify_followers.mjs';
 
 import {
 	public_key, private_key,

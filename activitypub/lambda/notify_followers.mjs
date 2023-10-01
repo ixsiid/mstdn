@@ -7,6 +7,7 @@ import {
 	region,
 	dynamodb_endpoint,
 	get_user_info,
+	domain,
 } from './lib/env.mjs';
 
 /**
@@ -57,7 +58,10 @@ export const notify_followers = (records) => {
 		throw err;
 	}).then(res => {
 		console.debug('DynamoDB response');
-		return res.Items.map(x => unmarshall(x));
+
+		/** @type {Array<Follower>} */
+		const followers = res.Items.map(x => unmarshall(x));
+		return followers;
 	}).catch(err => {
 		console.debug('DynamoDB response parse error');
 		console.debug(err);

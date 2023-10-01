@@ -65,7 +65,7 @@ const parse_body = (body, content_type, isBase64Encoded) => {
  * @param {object} event.headers
  * @param {object} event.body
  * @param {boolean} event.isBase64Encoded
- * @returns {{method: "get"|"post"|"put"|"head"|"delete"|"patch"|"option", path: string, keys: Array<string>, body: object}}
+ * @returns {{method: "get"|"post"|"put"|"head"|"delete"|"patch"|"option", path: string, keys: Array<string>, body: Activity}}
  */
 export const parse = event => {
 	const [_method, __key] = event.routeKey.split(' ');

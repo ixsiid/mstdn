@@ -17,7 +17,6 @@ export const handler = async event => {
 	console.debug(`[LAMBDA] ${event.rawPath}`);
 	console.debug(JSON.stringify(event));
 
-
 	const { method, path, keys, body } = gl.parse(event);
 
 	console.debug({
@@ -91,7 +90,7 @@ export const handler = async event => {
 
 
 	if (path === '/inbox') {
-		if (body.object !== me) return { statusCode: 404 }
+		if (body.object !== me && body.object?.object !== me) return { statusCode: 404 };
 		// inbox: follow
 		/**
 		 * {
@@ -105,7 +104,13 @@ export const handler = async event => {
 
 		// table-scheme
 		const undo = body.type === 'Undo';
-		const type = undo ? 'a'/** ToDo dynamodb から body.idを検索してtypeを調べる */ : body.type;
+		/** @type {Object<string, ActivityType} */
+		const type_to_undo = {
+			'Follow': 'Unfollow',
+			'FollowRequest': 'Unfollow',
+			'Unfollow': 'Follow',
+		};
+		const type = undo ? type_to_undo[body.object.type] : body.type;
 
 		switch (type) {
 			case 'Follow':

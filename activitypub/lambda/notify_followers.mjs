@@ -36,12 +36,21 @@ export const notify_followers = (records) => {
 		const p = unmarshall(r.dynamodb.NewImage);
 		return {
 			'@context': 'https://www.w3.org/ns/activitystreams',
-			type: 'Note',
+			type: 'Create',
 			id: 'https://' + domain + '/statuses/' + p.id,
-			attributedTo: owner,
-			content: p.raw.content,
+			actor: owner,
+			object: {
+				id: 'https://' + domain + '/statuses/' + p.id,
+				type: 'Note',
+				attributedTo: owner,
+				content: p.raw.content,
+				published: new Date(p.created_at).toISOString(),
+				to: [],
+				cc: ['https://www.w3.org/ns/activitystreams#Public'],
+			},
 			published: new Date(p.created_at).toISOString(),
 			to: [],
+			cc: ['https://www.w3.org/ns/activitystreams#Public'],
 		};
 	});
 
@@ -65,10 +74,9 @@ export const notify_followers = (records) => {
 		throw err;
 	}).then(follower => {
 		const matrix = follower.map(({ actor, inbox }) => activities.map(_activity => {
-			const activity = {
-				..._activity,
-				to: [actor],
-			}
+			const activity = { ..._activity };
+			activity.to = [actor];
+			activity.object.to = [actor];
 			return { inbox, activity };
 		})).flat();
 

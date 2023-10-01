@@ -45,10 +45,10 @@ export default async (event, auth, args) => {
 		KeyConditionExpression: conditions.join(' and '),
 	}).catch(err => {
 		console.debug('DynamoDB error');
-		console.debug(err);
-		return undefined;
+		throw err;
 	}).then(res => {
 		console.debug('DynamoDB response');
+		console.debug('Length: ' + res.Items.length);
 		console.debug(res.Items[0]);
 		console.debug(JSON.stringify(unmarshall(res.Items[0])))
 		return res.Items
@@ -60,13 +60,14 @@ export default async (event, auth, args) => {
 			}));
 	}).catch(err => {
 		console.debug('DynamoDB response parse error');
-		console.debug(err);
-		return undefined;
+		console.debug(conditions);
+		console.debug(condition_values);
+		throw err;
 	}).then(result => {
 		console.debug(result);
 		// 404の方がいい？
 		if (result.length <= 0) return { statusCode: 200, headers: { type: 'application/json' }, body: '[]' };
-		
+
 		const max_id = result[0].id;
 		const min_id = result[result.length - 1].id;
 

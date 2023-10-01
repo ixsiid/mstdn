@@ -7,8 +7,15 @@ import {
 	generate_sign_preset
 } from './lib/signed_fetch.mjs';
 
-const [public_key, private_key] = [process.env.public_key, process.env.private_key]
-	.map(x => x.replace(/\\n/g, '\n'));
+import { notify_followers } from './notify_follower.mjs';
+
+import {
+	public_key, private_key,
+	region,
+	follow_table_name,
+	dynamodb_endpoint,
+	get_user_info,
+} from './lib/env.mjs';
 
 const type_ld_json = 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"';
 const type_act_json = 'application/activity+json';
@@ -16,6 +23,11 @@ const type_act_json = 'application/activity+json';
 export const handler = async event => {
 	console.debug(`[LAMBDA] ${event.rawPath}`);
 	console.debug(JSON.stringify(event));
+
+	if ('Records' in event) {
+		return notify_followers(event.Records)
+			.catch(err => false);
+	}
 
 	const { method, path, keys, body } = gl.parse(event);
 
@@ -26,21 +38,15 @@ export const handler = async event => {
 		body,
 	});
 
-	const url = 'https://' + process.env.domain + '/users/' + keys[0];
-	const me = url + '/info';
-	const user = JSON.parse(process.env.users)[keys[0]];
+
+	const {
+		base_url,
+		owner,
+		userinfo,
+		key_id,
+	} = get_user_info(keys[0]);
 
 	if (path === '/info' || path === '/key') {
-		/**
-		const users = {
-			ixsiid: {
-				name: 'IXSIID',
-				preferredUsername: 'ixsiid',
-				summary: 'It is I',
-			}
-		}
-		process.env.users = '{"ixsiid":{"name":"IXSIID","preferredUsername":"ixsiid","summary":"It is I"}}';
-		*/
 		return {
 			statusCode: 200,
 			headers: { 'content-type': type_act_json },
@@ -50,21 +56,21 @@ export const handler = async event => {
 					'https://w3id.org/security/v1',
 				],
 				type: 'Person',
-				id: url + '/info',
-				name: user.name,
-				preferredUsername: user.preferredUsername,
-				summary: user.summary,
-				url: url + '/info',
-				inbox: url + '/inbox',
-				outbox: url + '/outbox',
+				id: base_url + '/info',
+				name: userinfo.name,
+				preferredUsername: userinfo.preferredUsername,
+				summary: userinfo.summary,
+				url: base_url + '/info',
+				inbox: base_url + '/inbox',
+				outbox: base_url + '/outbox',
 				icon: {
 					type: 'Image',
 					mediaType: 'image/png',
-					url: process.env.url + '/avatar/icon.png',
+					url: base_url + '/avatar/icon.png',
 				},
 				publicKey: {
-					id: url + '/key',
-					owner: me,
+					id: base_url + '/key',
+					owner,
 					publicKeyPem: public_key,
 					type: 'key',
 				},
@@ -79,8 +85,8 @@ export const handler = async event => {
 			body: JSON.stringify({
 				'@context': 'https://w3id.org/security/v1',
 				publicKey: {
-					id: url + '/key',
-					owner: me,
+					id: base_url + '/key',
+					owner,
 					publicKeyPem: public_key,
 					type: 'key',
 				},
@@ -90,7 +96,7 @@ export const handler = async event => {
 
 
 	if (path === '/inbox') {
-		if (body.object !== me && body.object?.object !== me) return { statusCode: 404 };
+		if (body.object !== owner && body.object?.object !== owner) return { statusCode: 404 };
 		// inbox: follow
 		/**
 		 * {
@@ -141,24 +147,20 @@ export const handler = async event => {
 							body: JSON.stringify({
 								'@context': 'https://www.w3.org/ns/activitystreams',
 								type: 'Accept',
-								actor: me,
+								actor: owner,
 								object: body,
 							}),
-						}, generate_sign_preset(
-							`${url}/info`,
-							private_key,
-							'mastodon'
-						)).then(res => {
+						}, generate_sign_preset(key_id, private_key, 'mastodon')
+						).then(res => {
 							if (!res.ok) throw res.text();
 						}).then(() => item)
 					})
 					.then(item => {
 						console.debug(JSON.stringify(item, null, 2));
-						const region = process.env.region;
-						const follow_table_name = process.env.follows_table_name;
 
+						/** @type {import('@aws-sdk/client-dynamodb').DynamoDBClientConfig} */
 						const option = { region };
-						if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
+						if (dynamodb_endpoint) option.endpoint = dynamodb_endpoint;
 						const dynamo = new DynamoDB(option);
 
 						return dynamo.putItem({

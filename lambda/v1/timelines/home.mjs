@@ -49,8 +49,6 @@ export default async (event, auth, args) => {
 	}).then(res => {
 		console.debug('DynamoDB response');
 		console.debug('Length: ' + res.Items.length);
-		console.debug(res.Items[0]);
-		console.debug(JSON.stringify(unmarshall(res.Items[0])))
 		return res.Items
 			.map(x => unmarshall(x))
 			.map(x => to_status({
@@ -64,9 +62,7 @@ export default async (event, auth, args) => {
 		console.debug(condition_values);
 		throw err;
 	}).then(result => {
-		console.debug(result);
-		// 404の方がいい？
-		if (result.length <= 0) return { statusCode: 200, headers: { type: 'application/json' }, body: '[]' };
+		if (result.length === 0) return { statusCode: 200, headers: { type: 'application/json' }, body: '[]' };
 
 		const max_id = result[0].id;
 		const min_id = result[result.length - 1].id;
@@ -75,6 +71,7 @@ export default async (event, auth, args) => {
 			statusCode: 200,
 			headers: {
 				'Content-Type': 'application/json',
+				// Subway Tooterは、Linkヘッダから差分アクセスする
 				'Link': [
 					`<https://${domain}/api/v1/timelines/${kind}?max_id=${min_id}&only_media=false>; rel="next"`,
 					`<https://${domain}/api/v1/timelines/${kind}?min_id=${max_id}&only_media=false>; rel="prev"`,

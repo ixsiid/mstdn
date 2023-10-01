@@ -66,25 +66,17 @@ export default async (event, auth, id, args) => {
 			status.spoiler_text = post.spoiler_text || '';
 			status.visibility = post.visibility || 'public';
 
-			let id = -1;
 
 			const option = { region };
 			if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
 			const dynamo = new DynamoDB(option);
-			await dynamo.scan({
-				TableName: dynamodb_statuses,
-				KeyConditionExpression: 'id > 0',
-				ProjectionExpression: 'id',
-			}).then(data => {
-				console.debug(data);
-				id = data.Count;
-			}).catch(err => {
-				console.debug(err);
-			});
-			console.debug(`ID: ${id}`);
 
-			if (id < 0) return { error: 'database access error' };
+
 			const created_at = new Date().getTime();
+			// scanで最大値をとっていたのを一旦やめる
+			// getTimeは重複する可能性があるが、現状1アカウントのためほぼない。
+			// 恒久対策は別途検討する
+			const id = new Date().getTime();
 
 			return dynamo.putItem({
 				TableName: dynamodb_statuses,

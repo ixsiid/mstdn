@@ -86,6 +86,8 @@ test('Integration', async t => {
 		}))
 		.then(res => console.log('Prepared subscriptions table'));
 
+	let new_id = -1;
+
 	await (async () => { console.log('starting test') })()
 		// 非実装APIへのアクセス
 		.then(() => handler(q.generate_event('/v1/reports', 'get')))
@@ -125,10 +127,12 @@ test('Integration', async t => {
 		.then(() => handler(q.generate_event('/v1/timelines/public', 'get')))
 		.then(res => t.test('/v1/timelines/public:get with new post', () => {
 			assert.equal(res.statusCode, 200);
+
+			new_id = JSON.parse(res.body)[0].id;
 			const new_post = JSON.parse(JSON.stringify(ret[0]));
 			new_post.content = 'hogehoge';
-			new_post.id = 1;
-			new_post.uri = new_post.uri.replace(/[0-9]+$/, new_post.id);
+			new_post.id = new_id;
+			new_post.uri = new_post.uri.replace(/[0-9]+$/, new_id);
 			ret.unshift(new_post);
 
 			// タイムスタンプはチェックしない
@@ -140,14 +144,15 @@ test('Integration', async t => {
 				...x,
 				created_at: '',
 			}));
+
 			assert.deepEqual(timelines, compare);
 		}))
 		// ファボ
-		.then(() => handler(q.generate_event('/v1/statuses/{id=1}/favourite', 'post', auth_context)))
-		.then(res => t.test('/v1/statuses/1/favourite:post', () => {
+		.then(() => handler(q.generate_event(`/v1/statuses/{id=${new_id}}/favourite`, 'post', auth_context)))
+		.then(res => t.test(`/v1/statuses/${new_id}/favourite:post`, () => {
 			assert.equal(res.statusCode, 200);
 			const body = JSON.parse(res.body);
-			assert.equal(body.id, 1);
+			assert.equal(body.id, new_id);
 			assert.equal(body.favourited, true);
 		}))
 		// アカウント取得

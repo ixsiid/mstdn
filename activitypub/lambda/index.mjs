@@ -2,7 +2,10 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
 import gl from './lib/gl_event_parser.mjs';
-import { signed_fetch } from './signed_fetch.mjs';
+import {
+	signed_fetch,
+	generate_sign_preset
+} from './signed_fetch.mjs';
 
 const [public_key, private_key] = [process.env.public_key, process.env.private_key]
 	.map(x => x.replace(/\\n/g, '\n'));
@@ -136,14 +139,11 @@ export const handler = async event => {
 								actor: me,
 								object: body,
 							}),
-						}, {
-							key_id: `${url}/info`,
+						}, generate_sign_preset(
+							`${url}/info`,
 							private_key,
-							mode: 'mastodon',
-							additional_headers: ['Content-Type'],
-							remove_created_key: true,
-							key_for_body_digest_hash: 'Digest',
-						}).then(res => {
+							'mastodon'
+						)).then(res => {
 							if (!res.ok) throw res.text();
 						}).then(() => item)
 					})

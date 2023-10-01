@@ -1,5 +1,36 @@
-import crypto from 'node:crypto';
+import crypto, { Sign } from 'node:crypto';
 import https from 'node:https';
+
+/**
+ * @typedef SignOption
+ * @prop {string} key_id
+ * @prop {Buffer|string} private_key
+ * @prop {"hs2019"|"rsa-sha256"} algorithm
+ * @prop {Array<string>} [additional_headers] 省略した場合全てのHeaderを含めます。HeaderはCase sensitiveで指定する必要があります。
+ * @prop {boolean} [remove_created_key]
+ * @prop {string} [key_for_body_digest_hash] "Digest", "Content-Digest"
+ */
+
+/**
+ * Generate SignOption for some services
+ * @param {string} key_id 
+ * @param {Buffer|string} private_key 
+ * @param {string} preset_name 
+ */
+export const generate_sign_preset = (key_id, private_key, preset_name) => {
+	switch (preset_name) {
+		case 'mastodon':
+			return {
+				key_id,
+				private_key,
+				algorithm: 'rsa-sha256',
+				additional_headers: ['Content-Type'],
+				remove_created_key: true,
+				key_for_body_digest_hash: 'Digest',
+			}
+	};
+	throw 'Unknown preset';
+};
 
 /**
  * fetchではDateヘッダーが使えないため同等機能をhttpsで実現する
@@ -52,20 +83,13 @@ export const fetch_by_https = (url, options = { method: 'get' }) => new Promise(
  * @param {"get"|"post"} options.method
  * @param {Object<string, string>} options.headers 
  * @param {?string} options.body
- * @param {object} sign_options
- * @param {string} sign_options.key_id
- * @param {string} sign_options.private_key
- * @param {"standard"|"mastodon"} sign_options.mode
- * @param {Array<string>} [sign_options.additional_headers] 省略した場合全てのHeaderを含めます。HeaderはCase sensitiveで指定する必要があります。
- * @param {boolean} [sign_options.remove_created_key=false]
- * @param {string} [sign_options.key_for_body_digest_hash] "Digest", "Content-Digest"
+ * @param {SignOption} sign_options
+ * @param {?boolean} self_verification Debug用、実際にFetchを行わず、verify_eventを呼び出して自己検証を行う
  * @returns {Promise<Response>}
  */
-export const signed_fetch = async (url, options, sign_options) => {
+export const signed_fetch = async (url, options, sign_options, self_verification) => {
 	const { method, headers, body } = options;
-	const { key_id, private_key, mode } = sign_options;
-
-	if (mode !== 'mastodon') throw 'Not implements';
+	const { key_id, private_key, algorithm } = sign_options;
 
 	const _url = url.substring(url.indexOf(':') + 1).split('/').filter(x => x.length > 0);
 	const host = _url.shift();
@@ -87,8 +111,8 @@ export const signed_fetch = async (url, options, sign_options) => {
 	if (sign_options.remove_created_key) signee.splice(1, 1);
 
 	if (sign_options.key_for_body_digest_hash) {
-		const mode = sign_options.key_for_body_digest_hash;
-		switch (mode) {
+		const body_sign_mode = sign_options.key_for_body_digest_hash;
+		switch (body_sign_mode) {
 			case "Digest":
 				headers.Digest = await crypto.subtle.digest('SHA-256', Buffer.from(body))
 					.then(b => Buffer.from(b).toString("base64"))
@@ -102,7 +126,7 @@ export const signed_fetch = async (url, options, sign_options) => {
 				additional_headers.push('Content-Digest');
 				break;
 			default:
-				throw 'Unknown digest hash mode: ' + mode;
+				throw 'Unknown digest hash mode: ' + body_sign_mode;
 		}
 	}
 
@@ -111,34 +135,36 @@ export const signed_fetch = async (url, options, sign_options) => {
 
 	const data = signee.join('\n');
 
-	const signature = crypto.sign('RSA-SHA256', Buffer.from(data), private_key);
+	const sign_algorithm = ({
+		'hs2019': 'RSA-SHA256',
+		'rsa-sha256': 'RSA-SHA256',
+	})(algorithm);
+	if (!sign_algorithm) throw 'Unknwon sign algorithm';
 
-	const algorithms = {
-		standard: 'hs2019',
-		mastodon: 'rsa-sha256',
-	};
+	const signature = crypto.sign(sign_algorithm, Buffer.from(data), private_key);
 
 	headers.Host = host;
 	headers.Date = now.toUTCString();
 	headers.Signature = [
 		`keyId="${key_id}"`,
-		`algorithm="${algorithms[mode]}"`,
+		`algorithm="${algorithm}"`,
 		// `created=${now_time}`,
 		// `expires=${now_time + 300}`,
 		`headers="${signee.map(x => x.split(':')[0]).join(' ')}"`,
 		`signature="${Buffer.from(signature).toString('base64')}"`,
 	].join(',');
 
-	/* Self check
-	return verify_event({
-		...options,
-		requestContext: { http: { method, path } },
-		headers: {
-			...Object.fromEntries(Object.entries(options.headers).map(([k, v]) => [k.toLowerCase(), v])),
-			host,
-		},
-	});
-	/**/
+	if (self_verification) {
+		// Lambdaイベント用に合わせたフォーマットをする
+		return verify_event({
+			...options,
+			requestContext: { http: { method, path } },
+			headers: {
+				...Object.fromEntries(Object.entries(options.headers).map(([k, v]) => [k.toLowerCase(), v])),
+				host,
+			},
+		});
+	}
 
 	return fetch_by_https(url, options);
 };

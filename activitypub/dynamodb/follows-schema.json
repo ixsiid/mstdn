@@ -5,8 +5,8 @@
 			"AttributeType": "N"
 		},
 		{
-			"AttributeName": "created_at",
-			"AttributeType": "N"
+			"AttributeName": "actor",
+			"AttributeType": "S"
 		}
 	],
 	"KeySchema": [
@@ -15,7 +15,7 @@
 			"KeyType": "HASH"
 		},
 		{
-			"AttributeName": "created_at",
+			"AttributeName": "actor",
 			"KeyType": "RANGE"
 		}
 	]

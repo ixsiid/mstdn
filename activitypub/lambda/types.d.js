@@ -1,18 +1,26 @@
+// UnfollowとFollorRequestは誤解していた。
+// Todo: Unfollowはindex.mjs内で制御に使っているためそこも一緒に修正して消す
 /**
- * @typedef {"Follow"|"Unfollow"|"FollowRequest"|"Undo"} ActivityType
+ * @typedef {"Accept"|"Add"|"Announce"|"Arrive"|"Bock"|"Create"|"Delete"|"Dislike"|"Flag"|"Follow"|"Ignore"|"Invite"|"Join"|"Leave"|"Like"|"Listen"|"Move"|"Offer"|"Question"|"Reject"|"Read"|"Remove"|"TentativeReject"|"TentativeAccept"|"Travel"|"Undo"|"Update"|"View"|"Unfollow"|"FollowRequest"} ActivityType
  */
 
 /**
  * @typedef {object|string} ActivityObject
  */
 
+
+// @contextプロパティを表記する方法がないため、これだけ TypeScript Like
 /**
- * @typedef Activity
- * @prop {string|Array<string>} "@context"
- * @prop {string} id
- * @prop {ActivityType} type
- * @prop {string} actor
- * @prop {ActivityObject} object
+ * @typedef {{
+ *   "@context": string|Array<string>,
+ *   id: string,
+ *   type: ActivityType,
+ *   actor: string,
+ *   object: ActivityObject,
+ *   attributedTo: ?string,
+ *   published: ?string,
+ *   to: ?Array<string>,
+ * }} Activity
  */
 
 /**
@@ -23,7 +31,7 @@
  */
 
 /**
- * @typedef Record
+ * @typedef DynamoDBRecord
  * @prop {string} eventID
  * @prop {RecordEventName} eventName
  * @prop {string} eventVersion
@@ -45,4 +53,9 @@
  * @prop {string} name
  * @prop {string} preferredUsername
  * @prop {string} summary
+ */
+
+
+/**
+ * 
  */

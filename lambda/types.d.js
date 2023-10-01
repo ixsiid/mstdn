@@ -88,3 +88,22 @@
  * @prop {string} redirect_uris Joinned by ','
  * @prop {string} scopes Joinned by '+' or ' '
  */
+
+/**
+ * @typedef Status
+ * @prop {number} account_id
+ * @prop {number} id
+ * @prop {number} created_at
+ * @prop {object} raw
+ * @prop {Array<string>} raw.emojis
+ * @prop {numbrer} raw.reblogs_count
+ * @prop {"public"|"private"} raw.visibility
+ * @prop {Array<string>} media_attachments
+ * @prop {Array<string>} mentions
+ * @prop {number} favourites_count
+ * @prop {string} spoiler_text
+ * @prop {number} replies_count
+ * @prop {boolean} sensitive
+ * @prop {string} content
+ * @prop {Array<string>} tags
+ */

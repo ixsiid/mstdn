@@ -8,7 +8,8 @@ import to_status from '../../lib/to_status.mjs';
 export default async (event, auth, args) => {
 	// アクセス先がpublicの時は認証不要
 	// それ以外は認証必要
-	if (event.requestContext.http.path.split('/').pop() !== 'public' && !auth) {
+	const kind = event.requestContext.http.path.split('/').pop();
+	if (kind !== 'public' && !auth) {
 		return { statusCode: 401 };
 	}
 
@@ -36,7 +37,7 @@ export default async (event, auth, args) => {
 		}
 	}
 
-	const result = await dynamo.query({
+	return dynamo.query({
 		TableName: dynamodb_statuses,
 		Limit: limit,
 		ScanIndexForward: false,
@@ -61,9 +62,21 @@ export default async (event, auth, args) => {
 		console.debug('DynamoDB response parse error');
 		console.debug(err);
 		return undefined;
+	}).then(result => {
+		console.debug(result);
+		const max_id = result[0].id;
+		const min_id = result[result.length - 1].id;
+
+		return {
+			statusCode: 200,
+			headers: {
+				'Content-Type': 'application/json',
+				'Link': [
+					`<https://${domain}/api/v1/timelines/${kind}?max_id=${max_id}&only_media=false>; rel="next"`,
+					`<https://${domain}/api/v1/timelines/${kind}?min_id=${min_id}&only_media=false>; rel="prev"`,
+				].join(', '),
+			},
+			body: JSON.stringify(result)
+		};
 	});
-
-	console.debug(result);
-
-	return result ?? { statusCode: 505, error: 'database access error' };
 };

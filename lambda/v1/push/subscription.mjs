@@ -23,7 +23,7 @@ export default async (event, auth) => {
 		return get_subscription(auth.account_id)
 			.then(subscription => ({
 				statusCode: 200,
-				heders: { type: 'application/json' },
+				headers: { type: 'application/json' },
 				body: JSON.stringify({
 					id: auth.account_id,
 					endpoint: subscription.endpoint,

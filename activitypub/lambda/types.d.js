@@ -55,7 +55,13 @@
  * @prop {string} summary
  */
 
-
 /**
- * 
+ * @typedef Follower
+ * @prop {number} account_id
+ * @prop {string} actor
+ * @prop {boolean} is_valid
+ * @prop {number} last_modified
+ * @prop {"follow"|"follower"} type
+ * @prop {string} inbox
+ * @prop {string} outbox
  */

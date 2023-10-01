@@ -15,6 +15,7 @@ import {
 	follow_table_name,
 	dynamodb_endpoint,
 	get_user_info,
+	domain,
 } from './lib/env.mjs';
 
 const type_ld_json = 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"';
@@ -25,8 +26,13 @@ export const handler = async event => {
 	console.debug(JSON.stringify(event));
 
 	if ('Records' in event) {
-		return notify_followers(event.Records)
-			.catch(err => false);
+		/** @type {Array<DynamoDBRecord>} */
+		const insert_records = event.Records.filter(x => x.eventName === 'INSERT');
+		const processing_result = insert_records.length === 0 ?
+			false :
+			notify_followers(insert_records)
+				.catch(err => false);
+		return processing_result;
 	}
 
 	const { method, path, keys, body } = gl.parse(event);
@@ -66,7 +72,7 @@ export const handler = async event => {
 				icon: {
 					type: 'Image',
 					mediaType: 'image/png',
-					url: base_url + '/avatar/icon.png',
+					url: 'https://' + domain + '/avatar/icon.png',
 				},
 				publicKey: {
 					id: base_url + '/key',

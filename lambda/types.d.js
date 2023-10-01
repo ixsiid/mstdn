@@ -98,12 +98,12 @@
  * @prop {Array<string>} raw.emojis
  * @prop {numbrer} raw.reblogs_count
  * @prop {"public"|"private"} raw.visibility
- * @prop {Array<string>} media_attachments
- * @prop {Array<string>} mentions
- * @prop {number} favourites_count
- * @prop {string} spoiler_text
- * @prop {number} replies_count
- * @prop {boolean} sensitive
- * @prop {string} content
- * @prop {Array<string>} tags
+ * @prop {Array<string>} raw.media_attachments
+ * @prop {Array<string>} raw.mentions
+ * @prop {number} raw.favourites_count
+ * @prop {string} raw.spoiler_text
+ * @prop {number} raw.replies_count
+ * @prop {boolean} raw.sensitive
+ * @prop {string} raw.content
+ * @prop {Array<string>} raw.tags
  */

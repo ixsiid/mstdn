@@ -8,6 +8,7 @@ import {
 	dynamodb_endpoint,
 	get_user_info,
 	domain,
+	private_key,
 } from './lib/env.mjs';
 
 /**
@@ -21,18 +22,12 @@ export const notify_followers = (records) => {
 	const dynamo = new DynamoDB(option);
 
 	let limit = 20;
-	const conditions = [
-		'account_id = :zero',
-		'is_valid = :true',
-		'follow_type = :follow'];
-	const condition_values = {
-		':zero': { N: '0' },
-		':follow': { S: 'follow' },
-		':true': { BOOL: true },
-	};
+	const conditions = ['account_id = :zero'];
+	const condition_values = { ':zero': { N: '0' } };
 
 	const {
-		owner
+		owner,
+		key_id,
 	} = get_user_info('ixsiid'); // ユーザーIDを特定する方法がない
 
 	/** @type {Array<Activity>} */
@@ -44,7 +39,7 @@ export const notify_followers = (records) => {
 			type: 'Note',
 			id: 'https://' + domain + '/statuses/' + p.id,
 			attributedTo: owner,
-			content: p.content,
+			content: p.raw.content,
 			published: new Date(p.created_at).toISOString(),
 			to: [],
 		};
@@ -61,11 +56,9 @@ export const notify_followers = (records) => {
 		console.debug(err);
 		throw err;
 	}).then(res => {
-		console.debug('DynamoDB response');
-
 		/** @type {Array<Follower>} */
 		const followers = res.Items.map(x => unmarshall(x));
-		return followers;
+		return followers.filter(x => x.is_valid && x.follow_type === 'follow');
 	}).catch(err => {
 		console.debug('DynamoDB response parse error');
 		console.debug(err);
@@ -88,6 +81,13 @@ export const notify_followers = (records) => {
 				},
 				body: JSON.stringify(activity),
 			}, generate_sign_preset(key_id, private_key, 'mastodon'))
+				.then(res => {
+					console.debug(res);
+					console.debug(JSON.stringify({ inbox, activity }));
+
+					if (res.ok) return res.ok;
+					throw 'Do not receive Note Activity to inbox: ';
+				})
 		));
 	}).then(x => x.reduce((a, b) => a & b));
 };

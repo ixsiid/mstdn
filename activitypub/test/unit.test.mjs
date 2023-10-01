@@ -14,7 +14,7 @@ import {
 	verify_event,
 	signed_fetch,
 	generate_sign_preset,
-} from "../lambda/signed_fetch.mjs";
+} from "../lambda/lib/signed_fetch.mjs";
 
 import event from './follow_event.json' assert {type: 'json'};
 

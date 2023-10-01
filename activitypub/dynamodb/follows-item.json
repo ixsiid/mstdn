@@ -2,11 +2,11 @@
 	"account_id": {
 		"N": 0
 	},
-	"created_at": {
-		"N": 0
-	},
 	"actor": {
 		"S": ""
+	},
+	"last_modified": {
+		"N": 0
 	},
 	"type": {
 		"S": "follow|follower"

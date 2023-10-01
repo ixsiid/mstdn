@@ -5,7 +5,7 @@ import gl from './lib/gl_event_parser.mjs';
 import {
 	signed_fetch,
 	generate_sign_preset
-} from './signed_fetch.mjs';
+} from './lib/signed_fetch.mjs';
 
 const [public_key, private_key] = [process.env.public_key, process.env.private_key]
 	.map(x => x.replace(/\\n/g, '\n'));
@@ -123,8 +123,8 @@ export const handler = async event => {
 						console.debug(JSON.stringify(json, null, 2));
 						return {
 							account_id: 0, // object からローカルアカウントを特定する必要がある
-							created_at: new Date().getTime(),
 							actor: body.actor,
+							last_modified: new Date().getTime(),
 							type: 'follow', // follow か follower
 							is_valid: type !== 'Unfollow',
 							inbox: json.inbox,

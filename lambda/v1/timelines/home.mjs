@@ -1,7 +1,7 @@
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import config from '../../data/config.mjs';
-const { region, dynamodb_statuses } = config;
+const { region, dynamodb_statuses, domain } = config;
 
 import to_status from '../../lib/to_status.mjs';
 
@@ -64,6 +64,9 @@ export default async (event, auth, args) => {
 		return undefined;
 	}).then(result => {
 		console.debug(result);
+		// 404の方がいい？
+		if (result.length <= 0) return { statusCode: 200, headers: { type: 'application/json' }, body: '[]' };
+		
 		const max_id = result[0].id;
 		const min_id = result[result.length - 1].id;
 
@@ -72,8 +75,8 @@ export default async (event, auth, args) => {
 			headers: {
 				'Content-Type': 'application/json',
 				'Link': [
-					`<https://${domain}/api/v1/timelines/${kind}?max_id=${max_id}&only_media=false>; rel="next"`,
-					`<https://${domain}/api/v1/timelines/${kind}?min_id=${min_id}&only_media=false>; rel="prev"`,
+					`<https://${domain}/api/v1/timelines/${kind}?max_id=${min_id}&only_media=false>; rel="next"`,
+					`<https://${domain}/api/v1/timelines/${kind}?min_id=${max_id}&only_media=false>; rel="prev"`,
 				].join(', '),
 			},
 			body: JSON.stringify(result)

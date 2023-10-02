@@ -65,5 +65,5 @@ jobs:
       - name: deploy lambda
         if: ${{ github.event.inputs.deploy_lambda != 'false' }}
         run: |
-          cd activitypub/lambda && zip -r package.zip ./*
+          cd activitypub/lambda && zip -r package.zip ./* -x node_modules
           aws lambda update-function-code --function-name ${{ env.AWS_ACTIVITYPUB_FUNCTION_NAME }} --zip-file fileb://package.zip --publish >/dev/null

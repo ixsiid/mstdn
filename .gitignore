@@ -134,8 +134,9 @@ dist
 /*.json
 !package.json
 !package-lock.json
-!/test/integration/.env
+!/api/test/integration/.env
 
 test/dynamodb_local_latest
 
 shared-local-instance.db
+dynamodb_local_latest

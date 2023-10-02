@@ -1,0 +1,102 @@
+name: Deploy REST API as Api Gateway and Lambda
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_lambda:
+        description: Deploy Lambda Function
+        type: boolean
+        default: true
+      deploy_gateway:
+        description: Reimport API Gateway
+        type: boolean
+        default: false
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: check branch is main
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "Branch is not main, exiting."
+            exit 1
+          fi
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+        
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: deploy-gateway-from-github-actions
+      
+      - name: get caller identity is allowed to run on role.
+        run: aws sts get-caller-identity
+
+      - name: Update gateway
+        if: ${{ github.event.inputs.deploy_gateway != 'false' }}
+        run: |
+          cp ./api/api_gateway/api.json ./api.json
+          sed -i "s@%INSTANCE_NAME%@${{ secrets.INSTANCE_NAME }}@g" ./api.json
+          sed -i "s@%DOMAIN%@${{ secrets.DOMAIN }}@g"               ./api.json
+          sed -i "s@%DATE%@`date -u +"%Y-%m-%dT%H:%M:%SZ"`@g"       ./api.json
+          
+          node ./api/api_gateway/convert_aws_api.mjs ./api.json ./aws-api.json
+          
+          aws apigatewayv2 reimport-api --api-id ${{ secrets.AWS_GATEWAY_API_ID }} --body file://aws-api.json >/dev/null
+        env:
+          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_COGNITO_CLIENT_ID: ${{ secrets.AWS_COGNITO_CLIENT_ID }}
+          AWS_COGNITO_USER_POOL_ID: ${{ secrets.AWS_COGNITO_USER_POOL_ID }}
+
+# モジュールをLayerとして登録する
+# モジュールに変更があったのかの判別
+# ワークフローのトリガーとして、Mergeまたはリリース時に自動Deployするときに有効化する
+#      - name: Check changed
+#        id: changed
+#        uses: dorny/paths-filter@v2
+#        with:
+#          filters: |
+#            module:
+#              - 'api/lambda/package.json'
+#              - 'api/lambda/package-lock.json'
+#
+# ポリシーが引っかかって失敗する。一旦スキップしてパッケージのアップデートがあった時に再設定する
+#      - name: deploy modules
+#        if: steps.changed.outputs.module == 'true'
+#        if: ${{ github.event.inputs.deploy_lambda != 'false' }}
+#        run: |
+#          mkdir ./nodejs
+#          cp ./api/lambda/package.json ./nodejs/package.json
+#          cp ./api/lambda/package-lock.json ./nodejs/package-lock.json
+#          cd nodejs
+#          npm ci
+#          cd ../
+#          zip -r nodejs.zip ./nodejs
+#          aws lambda publish-layer-version --layer-name ${{ env.AWS_LAMBDA_LAYER_NAME }} --zip-file fileb://nodejs.zip > publish-layer-version.json
+#          aws lambda update-function-configuration --function-name ${{ env.AWS_LAMBDA_FUNCTION_NAME }} --layers "`cat publish-layer-version.json | jq  -r '.LayerVersionArn'`" > update-function-configuration.json
+#        env:
+#          AWS_LAMBDA_LAYER_NAME: ${{ secrets.INSTANCE_NAME }}-node-modules
+#          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda
+
+      - name: deploy lambda
+        if: ${{ github.event.inputs.deploy_lambda != 'false' }}
+        run: |
+          cd api/lambda && zip -r package.zip ./* -x node_modules
+          aws lambda update-function-code --function-name ${{ env.AWS_LAMBDA_FUNCTION_NAME }} --zip-file fileb://package.zip --publish >/dev/null
+        env:
+          AWS_LAMBDA_FUNCTION_NAME: ${{ secrets.INSTANCE_NAME }}-lambda

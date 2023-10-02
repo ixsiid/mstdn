@@ -23,17 +23,24 @@ export default async (event, auth, args) => {
 	if (event.queryStringParameters) {
 		const q = event.queryStringParameters;
 		if (q.limit) limit = parseInt(q.limit);
-		if (q.min_id) {
-			conditions.push('id > :min_id');
-			condition_values[':min_id'] = { N: '' + parseInt(q.min_id) };
-		}
-		if (q.max_id) {
+
+		let min_id, max_id;
+		if (q.min_id) min_id = q.min_id;
+		if (q.max_id) max_id = q.max_id;
+		if (q.since_id) min_id = q.since_id; // min_idよりsince_idを優先
+
+		if (min_id !== undefined && max_id !== undefined) {
+			// DynamoDBの仕様として、大なりと小なりの2つの式で条件付けはできない
+			// KeyConditionExpressions must only contain one condition per key
+			conditions.push('id between :min_id and :max_id');
+			condition_values[':min_id'] = { N: parseInt(min_id) + 1 + '' };
+			condition_values[':max_id'] = { N: parseInt(max_id) - 1 + '' };
+		} else if (max_id !== undefined) {
 			conditions.push('id < :max_id');
-			condition_values[':max_id'] = { N: '' + parseInt(q.max_id) };
-		}
-		if (q.since_id) {
-			conditions.push('id > :since_id');
-			condition_values[':since_id'] = { N: '' + parseInt(q.since_id) };
+			condition_values[':max_id'] = { N: parseInt(max_id) + '' };
+		} else if (min_id !== undefined) {
+			conditions.push('id > :min_id');
+			condition_values[':min_id'] = { N: parseInt(min_id) + '' };
 		}
 	}
 
@@ -56,11 +63,6 @@ export default async (event, auth, args) => {
 				id: x.id,
 				created_at: new Date(x.created_at).toISOString(),
 			}));
-	}).catch(err => {
-		console.debug('DynamoDB response parse error');
-		console.debug(conditions);
-		console.debug(condition_values);
-		throw err;
 	}).then(result => {
 		if (result.length === 0) return { statusCode: 200, headers: { type: 'application/json' }, body: '[]' };
 
@@ -79,5 +81,14 @@ export default async (event, auth, args) => {
 			},
 			body: JSON.stringify(result)
 		};
-	});
+	}).catch(err => {
+		console.debug('DynamoDB response parse error');
+		console.debug(conditions);
+		console.debug(condition_values);
+		return {
+			statusCode: 501,
+			headers: { 'content-type': 'application/json' },
+			body: err,
+		};
+	})
 };

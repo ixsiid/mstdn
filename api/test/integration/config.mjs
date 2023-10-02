@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: './test/integration/.env', override: false });
+dotenv.config({ path: './api/test/integration/.env', override: false });
 
 // Dynamo DB localのエンドポイントが
 // ローカル実行時は http://localhost:8000

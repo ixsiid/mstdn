@@ -136,7 +136,5 @@ dist
 !package-lock.json
 !/api/test/integration/.env
 
-test/dynamodb_local_latest
-
 shared-local-instance.db
 dynamodb_local_latest

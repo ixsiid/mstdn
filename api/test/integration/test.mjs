@@ -56,20 +56,17 @@ test('Integration', async t => {
 	])
 		.then(buffers => buffers.map(x => JSON.parse(x.toString())))
 		.then(([table_schema, first_item]) => {
-			return Promise.all([dynamo.createTable({
+			return dynamo.createTable({
 				...table_schema,
 				TableName: process.env.dynamodb_statuses,
 				ProvisionedThroughput: {
 					ReadCapacityUnits: 2,
 					WriteCapacityUnits: 2,
 				}
-			}), first_item]);
-		})
-		.then(([res, first_item]) => {
-			return dynamo.putItem({
+			}).then(res => dynamo.putItem({
 				Item: first_item,
 				TableName: process.env.dynamodb_statuses,
-			});
+			}));
 		})
 		.then(res => console.log('Prepared statuses tables'));
 

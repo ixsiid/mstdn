@@ -45,12 +45,12 @@ export const notify_followers = (records) => {
 				attributedTo: owner,
 				content: p.raw.content,
 				published: new Date(p.created_at).toISOString(),
-				to: [],
-				cc: ['https://www.w3.org/ns/activitystreams#Public'],
+				to: ['https://www.w3.org/ns/activitystreams#Public'],
+				// cc: [],
 			},
 			published: new Date(p.created_at).toISOString(),
-			to: [],
-			cc: ['https://www.w3.org/ns/activitystreams#Public'],
+			to: ['https://www.w3.org/ns/activitystreams#Public'],
+			// cc: [],
 		};
 	});
 
@@ -75,8 +75,8 @@ export const notify_followers = (records) => {
 	}).then(follower => {
 		const matrix = follower.map(({ actor, inbox }) => activities.map(_activity => {
 			const activity = { ..._activity };
-			activity.to = [actor];
-			activity.object.to = [actor];
+			activity.cc = [actor];
+			activity.object.cc = [actor];
 			return { inbox, activity };
 		})).flat();
 

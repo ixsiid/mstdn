@@ -56,7 +56,6 @@ const login_form = `<!DOCTYPE html>
 	<form id="login_form" action="/oauth/login" method="post" formenctype="application/x-www-form-urlencoded">
 		<label for="email">Mail</label><input id="email" type="email" name="email" />
 		<label for="password">Password</label><input id="password" type="password" name="password" />
-		<input type="hidden" name="pool_id" value="${process.env.pool_id}" />
 		<input type="submit" id="login" value="Log in" />
 	</form>
 </body>
@@ -64,6 +63,12 @@ const login_form = `<!DOCTYPE html>
 </html>`;
 
 import { CognitoIdentityProviderClient, AdminInitiateAuthCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
+
+const { region, instance } = process.env;
+
+/** @type {string} */
+let user_pool_id;
 
 const AuthenticationResultCache = {};
 
@@ -107,11 +112,17 @@ export const handler = async event => {
 	console.debug(`[LAMBDA] postMessage: ${JSON.stringify(body, null, '\t')}`);
 
 	if (api_method === '/oauth/login') {
+		if (!user_pool_id) {
+			const ssm_client = new SSMClient({ region });
+			const command = new GetParameterCommand({ Name: instance + '.user_pool_id'});
+			user_pool_id = await ssm_client.send(command);
+		}
+
 		const client = new CognitoIdentityProviderClient({});
 		const input = {
 			AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
 			ClientId: body.client_id,
-			UserPoolId: body.pool_id,
+			UserPoolId: user_pool_id,
 			AuthParameters: {
 				USERNAME: body.email,
 				PASSWORD: body.password,

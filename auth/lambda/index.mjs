@@ -114,8 +114,9 @@ export const handler = async event => {
 	if (api_method === '/oauth/login') {
 		if (!user_pool_id) {
 			const ssm_client = new SSMClient({ region });
-			const command = new GetParameterCommand({ Name: instance + '.user_pool_id'});
-			user_pool_id = await ssm_client.send(command);
+			const command = new GetParameterCommand({ Name: instance + '.user_pool_id' });
+			user_pool_id = await ssm_client.send(command)
+				.then(res => res.Parameter?.Value);
 		}
 
 		const client = new CognitoIdentityProviderClient({});

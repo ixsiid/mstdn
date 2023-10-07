@@ -72,8 +72,8 @@ export const parse = event => {
 	const method = event.requestContext.http.method.toLowerCase();
 	const path = event.routeKey.split(' ')[1].split('/').filter(x => !x.match(/\{(.*?)\}/)).join('/');
 	/** @type {Object<string, string>} */
-	const query = event.rawQueryString ? Object.fromEntries(event.rawQueryString.split('&').map(x => x.split('=').map(k => decodeURIComponent(k)))) : '';
-	const keys = [];
+	const query = event.rawQueryString ? Object.fromEntries(event.rawQueryString.split('&').map(x => x.split('=').map(k => decodeURIComponent(k)))) : null;
+	const keys = event.pathParameters ? Object.values(event.pathParameters) : [];
 	if (event.pathParameters) Object.entries(event.pathParameters).forEach(([k, v]) => keys[k] = v);
 	const body = (['post', 'put'].includes(method) && event.body) ?
 		parse_body(event.body, event.headers['content-type'], event.isBase64Encoded) :

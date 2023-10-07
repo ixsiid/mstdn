@@ -72,9 +72,15 @@ class EventGenerator {
 			isBase64Encoded: false
 		};
 
+		const pathParameters = {};
 		const _key = path.split('/').map(x => {
 			const m = x.match(/^\{(.*?)=(.*?)\}/);
-			return m ? '{' + m[1] + '}' : x;
+			if (m) {
+				pathParameters[m[1]] = m[2];
+				return '{' + m[1] + '}';
+			}
+
+			return x;
 		}).join('/');
 		const _path = path.split('/').map(x => {
 			const m = x.match(/^\{(.*?)=(.*?)\}/);
@@ -89,6 +95,7 @@ class EventGenerator {
 				.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
 				.join('&')
 		) : '';
+		if (Object.keys(pathParameters).length > 0) e.pathParameters = pathParameters;
 
 		e.requestContext.http.method = method.toUpperCase();
 		e.requestContext.http.path = e.rawPath;

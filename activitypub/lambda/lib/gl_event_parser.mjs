@@ -65,44 +65,24 @@ export const parse_body = (body, content_type, isBase64Encoded) => {
  * @param {object} event.headers
  * @param {object} event.body
  * @param {boolean} event.isBase64Encoded
- * @returns {{method: "get"|"post"|"put"|"head"|"delete"|"patch"|"option", path: string, keys: Array<string>, body: Activity}}
+ * @returns {{method: "get"|"post"|"put"|"head"|"delete"|"patch"|"option", path: string, query: Object<string, string>, keys: Object<string, string>|Array<string>, body: Activity}}
  */
 export const parse = event => {
-	const [_method, __key] = event.routeKey.split(' ');
-	const method = _method.toLowerCase();
-	const key = __key.split('/').filter(x => x);
-	const path = event.rawPath.split('/').filter(x => x);
-	// ステージ名を除去
-	path.shift();
-
-	const p = [];
+	/** @type {"get"|"post"} */
+	const method = event.requestContext.http.method.toLowerCase();
+	const path = event.routeKey.split(' ')[1].split('/').filter(x => !x.match(/\{(.*?)\}/)).join('/');
+	/** @type {Object<string, string>} */
+	const query = event.rawQueryString ? Object.fromEntries(event.rawQueryString.split('&').map(x => x.split('=').map(k => decodeURIComponent(k)))) : '';
 	const keys = [];
-
-	for (let i = 0; i < path.length; i++) {
-		if (path[i] === key[i]) {
-			p.push(path[i]);
-			continue;
-		}
-		// プラス付きパラメーターの場合、後続をすべてキーにする
-		if (key[i].match(/^\{[a-zA-Z\-_0-9]+\+\}$/)) {
-			keys.push(...path.slice(i));
-			break;
-		}
-		// プラスが付かないパラメーターの場合、単一のキーとする
-		if (key[i].match(/^\{[a-zA-Z\-_0-9]+\}$/)) {
-			keys.push(path[i]);
-			continue;
-		}
-		throw `Unknown key: ${key[i]}, ${path[i]}`;
-	}
-
+	if (event.pathParameters) Object.entries(event.pathParameters).forEach(([k, v]) => keys[k] = v);
 	const body = (['post', 'put'].includes(method) && event.body) ?
 		parse_body(event.body, event.headers['content-type'], event.isBase64Encoded) :
 		undefined;
 
 	return {
 		method,
-		path: '/' + p.join('/'),
+		path,
+		query,
 		keys,
 		body,
 	};

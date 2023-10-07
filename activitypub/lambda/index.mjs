@@ -1,7 +1,7 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
-import { parse_body } from './lib/gl_event_parser.mjs';
+import gl from './lib/gl_event_parser.mjs';
 import {
 	signed_fetch,
 	generate_sign_preset
@@ -40,20 +40,19 @@ export const handler = async event => {
 		return processing_result;
 	}
 
-	/** @type {"get"|"post"} */
-	const method = event.requestContext.http.method.toLowerCase();
-	const path = event.routeKey.split(' ')[1].split('/').filter(x => !x.match(/\{(.*?)\}/)).join('/');
-	/** @type {Object<string, string>} */
-	const query = Object.fromEntries(event.rawQueryString.split('&').map(x => x.split('=').map(k => decodeURIComponent(k))));
-	const keys = event.pathParameters;
-	const body = (['post', 'put'].includes(method) && event.body) ?
-		parse_body(event.body, event.headers['content-type'], event.isBase64Encoded) :
-		undefined;
+	const {
+		method,
+		path,
+		keys,
+		query,
+		body,
+	} = gl.parse(event);
 
 	console.debug({
 		method,
 		path,
 		keys,
+		query,
 		body,
 	});
 

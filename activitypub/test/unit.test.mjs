@@ -18,26 +18,7 @@ import {
 
 import event from './follow_event.json' assert {type: 'json'};
 
-{
-	const algorithm = 'RSA-SHA256';
-
-	Promise.all(['./public.test.key', './private.test.key']
-		.map(x => fs.readFile(path.join(script_directory, x))))
-		.then(x => x.map(k => k.toString()))
-		.then(([public_key, private_key]) => {
-			const data = Buffer.from('Hello, world');
-			const signature = crypto.sign(algorithm, data, private_key);
-			const verified = crypto.verify(algorithm, data, public_key, signature);
-			console.log('Result: ' + verified);
-
-			return [public_key, private_key];
-		})
-		.catch(err => {
-			console.error(err);
-		})
-}
-
-test('Http signature', t => {
+await test('Http signature', t => {
 	return fs.readFile(path.join(script_directory, '..', '..', 'secret', 'priv.key'))
 		.then(private_key => {
 			return signed_fetch('https://hogehoge.fugafuga/users/user/inbox', {
@@ -61,7 +42,7 @@ test('Http signature', t => {
 });
 
 
-test('verify_http_signatured_message_event', t => {
+await test('verify_http_signatured_message_event', t => {
 	// API Gatewayがホスト情報を書き換えるため、元のアクセスホストに戻す
 	event.headers.host = 'mstdn.halzion.net';
 	return verify_event(event)
@@ -69,7 +50,7 @@ test('verify_http_signatured_message_event', t => {
 });
 
 
-test('fetch_by_https', t => {
+await test('fetch_by_https', t => {
 	// google不通だと失敗するので、expressでサーバー建ててからそこにアクセスするように変える
 	return fetch_by_https('https://www.google.com')
 		.then(res => {

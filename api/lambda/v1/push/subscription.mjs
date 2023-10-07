@@ -1,8 +1,8 @@
-import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { dynamodb } from '../../data/global.mjs';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
 import config from '../../data/config.mjs';
-const { region, vapid_key, dynamodb_subscriptions } = config;
+const { vapid_key, dynamodb_subscriptions } = config;
 
 import get_subscription from '../../lib/get_subscription.mjs';
 
@@ -14,10 +14,6 @@ import get_subscription from '../../lib/get_subscription.mjs';
 export default async (event, auth) => {
 	// JWT Authorizerに一任していいはず
 	// if (auth.account_id !== 0) return { statusCode: 401 };
-
-	const option = { region };
-	if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
-	const dynamo = new DynamoDB(option);
 
 	if (event.httpMethod === 'GET' || event.httpMethod === 'PUT') {
 		return get_subscription(auth.account_id)
@@ -44,7 +40,7 @@ export default async (event, auth) => {
 	}
 
 	if (event.httpMethod === 'POST') {
-		return dynamo.putItem({
+		return dynamodb.putItem({
 			TableName: dynamodb_subscriptions,
 			Item: marshall({
 				id: 0,

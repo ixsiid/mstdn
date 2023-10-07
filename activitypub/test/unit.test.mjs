@@ -46,9 +46,7 @@ test('Http signature', t => {
 					Accept: 'application/activity+json',
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({
-
-				}),
+				body: JSON.stringify({}),
 			}, generate_sign_preset(
 				`https://${process.env.domain}/users/${Object.keys(JSON.parse(process.env.users))[0]}/info`,
 				private_key,

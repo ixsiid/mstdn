@@ -41,8 +41,8 @@ export const handler = async event => {
 	}
 
 	/** @type {string} */
-	const method = event.requestContext.method.toLowerCase();
-	const path = event.routeKey.split(' ')[1].split('/').filter(x => x.match(/\{(.*?)\}/)).join('/');
+	const method = event.requestContext.http.method.toLowerCase();
+	const path = event.routeKey.split(' ')[1].split('/').filter(x => !x.match(/\{(.*?)\}/)).join('/');
 	const keys = event.pathParameters;
 	const body = (['post', 'put'].includes(method) && event.body) ?
 		parse_body(event.body, event.headers['content-type'], event.isBase64Encoded) :

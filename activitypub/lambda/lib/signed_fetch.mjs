@@ -155,6 +155,7 @@ export const signed_fetch = async (url, options, sign_options, self_verification
 	].join(',');
 
 	if (self_verification) {
+		console.debug('Use self verification mode, do not fetch request url');
 		// Lambdaイベント用に合わせたフォーマットをする
 		return verify_event({
 			...options,

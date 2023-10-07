@@ -55,51 +55,6 @@ export const handler = async event => {
 		body,
 	});
 
-	// /.well-known
-	if (path === '/.well-known/host-meta') {
-		return {
-			statusCode: 200,
-			headers: { 'content-type': 'application/xrd+xml' },
-			body: `<?xml version="1.0"?>
-<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
-<Link rel="lrdd" type="application/xrd+xml" template="https://${domain}/.well-known/webfinger?resource={uri}"/>
-</XRD>`,
-		};
-	}
-
-	if (path === '/.well-known/nodeinfo') {
-		return {
-			statusCode: 200,
-			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify({
-				links: [{
-					rel: 'http://nodeinfo.diaspora.software/ns/schema/2.1',
-					href: `https://${domain}/.well-known/nodeinfo`,
-				}],
-			}),
-		};
-	}
-
-	if (path === '/.well-known/webfinger') {
-		const user = 'user';
-		return {
-			statusCode: 200,
-			headers: { 'content-type': 'application/jrd+json' },
-			body: JSON.stringify({
-				subject: `acct:${user}@${domain}`,
-				links: [{
-					rel: 'self',
-					type: 'application/activity+json',
-					href: `https://${domain}/users/${user}/info`,
-				}],
-			}),
-		};
-	}
-
-
-	// /users
-
-
 	const {
 		base_url,
 		owner,
@@ -107,7 +62,7 @@ export const handler = async event => {
 		key_id,
 	} = get_user_info(keys.id);
 
-	if (path === '/users/info' || path === '/users/key') {
+	if (path === '/info' || path === '/key') {
 		return {
 			statusCode: 200,
 			headers: { 'content-type': type_act_json },
@@ -139,7 +94,7 @@ export const handler = async event => {
 		};
 	}
 
-	if (path === '/users/key') {
+	if (path === '/key') {
 		return {
 			statusCode: 200,
 			headers: { 'content-type': type_ld_json },
@@ -156,7 +111,7 @@ export const handler = async event => {
 	}
 
 
-	if (path === '/users/inbox') {
+	if (path === '/inbox') {
 		if (body.object !== owner && body.object?.object !== owner) return { statusCode: 404 };
 		// inbox: follow
 		/**

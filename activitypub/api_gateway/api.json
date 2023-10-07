@@ -24,7 +24,7 @@
 	},
 	"x-amazon-apigateway-importexport-version": "1.0",
 	"paths": {
-		"/host-meta": {
+		"/.well-known/host-meta": {
 			"get": {
 				"summary": "host-meta",
 				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
@@ -36,7 +36,7 @@
 				}
 			}
 		},
-		"/webfinger": {
+		"/.well-known/webfinger": {
 			"get": {
 				"summary": "webfinger",
 				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
@@ -48,7 +48,7 @@
 				}
 			}
 		},
-		"/nodeinfo": {
+		"/.well-known/nodeinfo": {
 			"get": {
 				"summary": "nodeinfo",
 				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
@@ -60,7 +60,7 @@
 				}
 			}
 		},
-		"/{id}/inbox": {
+		"/users/{id}/inbox": {
 			"post": {
 				"summary": "Inbox",
 				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
@@ -81,7 +81,7 @@
 				}
 			]
 		},
-		"/{id}/outbox": {
+		"/users/{id}/outbox": {
 			"post": {
 				"summary": "Outbox",
 				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
@@ -102,7 +102,7 @@
 				}
 			]
 		},
-		"/{id}/key": {
+		"/users/{id}/key": {
 			"post": {
 				"summary": "Main public key",
 				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
@@ -123,7 +123,7 @@
 				}
 			]
 		},
-		"/{id}/info": {
+		"/users/{id}/info": {
 			"get": {
 				"summary": "User infomation",
 				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },

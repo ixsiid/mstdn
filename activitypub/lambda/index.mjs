@@ -45,7 +45,7 @@ export const handler = async event => {
 	});
 
 	// /.well-known
-	if (path === '/host-meta') {
+	if (path === '/.well-known/host-meta') {
 		return {
 			statusCode: 200,
 			headers: { 'content-type': 'application/xrd+xml' },
@@ -56,7 +56,7 @@ export const handler = async event => {
 		};
 	}
 
-	if (path === '/nodeinfo') {
+	if (path === '/.well-known/nodeinfo') {
 		return {
 			statusCode: 200,
 			headers: { 'content-type': 'application/json' },
@@ -69,7 +69,7 @@ export const handler = async event => {
 		};
 	}
 
-	if (path === '/webfinger') {
+	if (path === '/.well-known/webfinger') {
 		const user = 'user';
 		return {
 			statusCode: 200,
@@ -96,7 +96,7 @@ export const handler = async event => {
 		key_id,
 	} = get_user_info(keys[0]);
 
-	if (path === '/info' || path === '/key') {
+	if (path === '/users/info' || path === '/users/key') {
 		return {
 			statusCode: 200,
 			headers: { 'content-type': type_act_json },
@@ -128,7 +128,7 @@ export const handler = async event => {
 		};
 	}
 
-	if (path === '/key') {
+	if (path === '/users/key') {
 		return {
 			statusCode: 200,
 			headers: { 'content-type': type_ld_json },
@@ -145,7 +145,7 @@ export const handler = async event => {
 	}
 
 
-	if (path === '/inbox') {
+	if (path === '/users/inbox') {
 		if (body.object !== owner && body.object?.object !== owner) return { statusCode: 404 };
 		// inbox: follow
 		/**

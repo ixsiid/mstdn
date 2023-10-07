@@ -1,8 +1,8 @@
-import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { dynamodb } from '../data/global.mjs';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
 import config from '../data/config.mjs';
-const { region, dynamodb_statuses, domain } = config;
+const { dynamodb_statuses, domain } = config;
 
 import status_template from '../data/status.mjs';
 import to_status from '../lib/to_status.mjs';
@@ -66,19 +66,13 @@ export default async (event, auth, id, args) => {
 			status.spoiler_text = post.spoiler_text || '';
 			status.visibility = post.visibility || 'public';
 
-
-			const option = { region };
-			if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
-			const dynamo = new DynamoDB(option);
-
-
 			const created_at = new Date().getTime();
 			// scanで最大値をとっていたのを一旦やめる
 			// getTimeは重複する可能性があるが、現状1アカウントのためほぼない。
 			// 恒久対策は別途検討する
 			const id = new Date().getTime();
 
-			return dynamo.putItem({
+			return dynamodb.putItem({
 				TableName: dynamodb_statuses,
 				Item: marshall({
 					id,

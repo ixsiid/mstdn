@@ -1,7 +1,7 @@
-import { DynamoDB } from "@aws-sdk/client-dynamodb";
+import { dynamodb } from '../../data/global.mjs';
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import config from '../../data/config.mjs';
-const { region, dynamodb_statuses, domain } = config;
+const { dynamodb_statuses, domain } = config;
 
 import to_status from '../../lib/to_status.mjs';
 
@@ -12,10 +12,6 @@ export default async (event, auth, args) => {
 	if (kind !== 'public' && !auth) {
 		return { statusCode: 401 };
 	}
-
-	const option = { region };
-	if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
-	const dynamo = new DynamoDB(option);
 
 	let limit = 20;
 	const conditions = ['account_id = :zero'];
@@ -44,7 +40,7 @@ export default async (event, auth, args) => {
 		}
 	}
 
-	return dynamo.query({
+	return dynamodb.query({
 		TableName: dynamodb_statuses,
 		Limit: limit,
 		ScanIndexForward: false,

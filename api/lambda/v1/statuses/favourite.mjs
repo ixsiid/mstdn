@@ -1,8 +1,8 @@
-import { DynamoDB } from "@aws-sdk/client-dynamodb";
+import { dynamodb } from '../../data/global.mjs';
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 import config from '../../data/config.mjs';
-const { region, dynamodb_statuses } = config;
+const { dynamodb_statuses } = config;
 
 import to_status from "../../lib/to_status.mjs";
 import { NotificationTypes, send_notification } from "../../lib/send_notification.mjs";
@@ -14,14 +14,10 @@ import { NotificationTypes, send_notification } from "../../lib/send_notificatio
  * @returns {MethodResponse}
  */
 export default (event, auth, id) => {
-	const option = { region };
-	if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
-	const dynamo = new DynamoDB(option);
-
 	const conditions = ['account_id = :zero', 'id = :id'];
 	const condition_values = { ':zero': 0, ':id': parseInt(id) };
 
-	return dynamo.query({
+	return dynamodb.query({
 		TableName: dynamodb_statuses,
 		Limit: 1,
 		ScanIndexForward: false,

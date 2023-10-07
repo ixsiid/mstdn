@@ -24,6 +24,42 @@
 	},
 	"x-amazon-apigateway-importexport-version": "1.0",
 	"paths": {
+		"/host-meta": {
+			"get": {
+				"summary": "host-meta",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/xrd+xml": { "type": "object" } }
+					}
+				}
+			}
+		},
+		"/webfinger": {
+			"get": {
+				"summary": "webfinger",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/jrd+json": { "type": "object" } }
+					}
+				}
+			}
+		},
+		"/nodeinfo": {
+			"get": {
+				"summary": "nodeinfo",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/json": { "type": "object" } }
+					}
+				}
+			}
+		},
 		"/{id}/inbox": {
 			"post": {
 				"summary": "Inbox",

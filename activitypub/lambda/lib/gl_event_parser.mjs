@@ -5,7 +5,7 @@
  * @param {boolean} isBase64Encoded 
  * @returns {object}
  */
-const parse_body = (body, content_type, isBase64Encoded) => {
+export const parse_body = (body, content_type, isBase64Encoded) => {
 	const buffer = isBase64Encoded ? Buffer.from(body, 'base64') : undefined;
 	const type = content_type.split(';')[0].replace(/\/(.*?)\+/, '/');
 	console.debug(`type: ${type} [${buffer?.length}]`);
@@ -109,5 +109,6 @@ export const parse = event => {
 };
 
 export default {
+	parse_body,
 	parse,
 };

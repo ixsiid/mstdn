@@ -1,7 +1,7 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
-import gl from './lib/gl_event_parser.mjs';
+import { parse_body } from './lib/gl_event_parser.mjs';
 import {
 	signed_fetch,
 	generate_sign_preset
@@ -21,6 +21,11 @@ import {
 const type_ld_json = 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"';
 const type_act_json = 'application/activity+json';
 
+
+/**
+ * @param {IntegrationEvent} event 
+ * @returns 
+ */
 export const handler = async event => {
 	console.debug(`[LAMBDA] ${event.rawPath}`);
 	console.debug(JSON.stringify(event));
@@ -35,7 +40,13 @@ export const handler = async event => {
 		return processing_result;
 	}
 
-	const { method, path, keys, body } = gl.parse(event);
+	/** @type {string} */
+	const method = event.requestContext.method.toLowerCase();
+	const path = event.routeKey.split(' ')[1].split('/').filter(x => x.match(/\{(.*?)\}/)).join('/');
+	const keys = event.pathParameters;
+	const body = (['post', 'put'].includes(method) && event.body) ?
+		parse_body(event.body, event.headers['content-type'], event.isBase64Encoded) :
+		undefined;
 
 	console.debug({
 		method,
@@ -94,7 +105,7 @@ export const handler = async event => {
 		owner,
 		userinfo,
 		key_id,
-	} = get_user_info(keys[0]);
+	} = get_user_info(keys.id);
 
 	if (path === '/users/info' || path === '/users/key') {
 		return {

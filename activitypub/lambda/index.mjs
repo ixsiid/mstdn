@@ -44,6 +44,50 @@ export const handler = async event => {
 		body,
 	});
 
+	// /.well-known
+	if (path === '/host-meta') {
+		return {
+			statusCode: 200,
+			headers: { 'content-type': 'application/xrd+xml' },
+			body: `<?xml version="1.0"?>
+<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
+<Link rel="lrdd" type="application/xrd+xml" template="https://${domain}/.well-known/webfinger?resource={uri}"/>
+</XRD>`,
+		};
+	}
+
+	if (path === '/nodeinfo') {
+		return {
+			statusCode: 200,
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				links: [{
+					rel: 'http://nodeinfo.diaspora.software/ns/schema/2.1',
+					href: `https://${domain}/.well-known/nodeinfo`,
+				}],
+			}),
+		};
+	}
+
+	if (path === '/webfinger') {
+		const user = 'user';
+		return {
+			statusCode: 200,
+			headers: { 'content-type': 'application/jrd+json' },
+			body: JSON.stringify({
+				subject: `acct:${user}@${domain}`,
+				links: [{
+					rel: 'self',
+					type: 'application/activity+json',
+					href: `https://${domain}/users/${user}/info`,
+				}],
+			}),
+		};
+	}
+
+
+	// /users
+
 
 	const {
 		base_url,

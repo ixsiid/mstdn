@@ -8,6 +8,7 @@
  * @prop {Headers} heders
  * @prop {"GET"|"POST"|"PUT"|"PATCH"|"DELETE"} httpMethod
  * @prop {object} parsed_body
+ * @prop {string} rawQueryString
  */
 
 /**

@@ -40,9 +40,11 @@ export const handler = async event => {
 		return processing_result;
 	}
 
-	/** @type {string} */
+	/** @type {"get"|"post"} */
 	const method = event.requestContext.http.method.toLowerCase();
 	const path = event.routeKey.split(' ')[1].split('/').filter(x => !x.match(/\{(.*?)\}/)).join('/');
+	/** @type {Object<string, string>} */
+	const query = Object.fromEntries(event.rawQueryString.split('&').map(x => x.split('=').map(k => decodeURIComponent(k))));
 	const keys = event.pathParameters;
 	const body = (['post', 'put'].includes(method) && event.body) ?
 		parse_body(event.body, event.headers['content-type'], event.isBase64Encoded) :
@@ -54,6 +56,25 @@ export const handler = async event => {
 		keys,
 		body,
 	});
+
+	if (path === '/.well-known/webfinger') {
+		if (!query.resource?.startsWith('acct:')) return { statusCode: 405 };
+		const acct = query.resource?.substring(5);
+		const user = acct.split('@')[0];
+		// アカウントの存在チェックは今はしない
+		return {
+			statusCode: 200,
+			headers: { 'content-type': 'application/jrd+json' },
+			body: JSON.stringify({
+				subject: query.resource,
+				links: [{
+					rel: 'self',
+					type: 'application/activity+json',
+					href: 'https://' + domain + '/users/' + user + '/info',
+				}],
+			}),
+		};
+	}
 
 	const {
 		base_url,
@@ -126,7 +147,7 @@ export const handler = async event => {
 
 		// table-scheme
 		const undo = body.type === 'Undo';
-		/** @type {Object<string, ActivityType} */
+		/** @type {Object<string, ActivityType>} */
 		const type_to_undo = {
 			'Follow': 'Unfollow',
 		};

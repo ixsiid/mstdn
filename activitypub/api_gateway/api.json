@@ -24,6 +24,18 @@
 	},
 	"x-amazon-apigateway-importexport-version": "1.0",
 	"paths": {
+		"/.well-known/webfinger": {
+			"get": {
+				"summary": "webfinger",
+				"x-amazon-apigateway-integration": { "$ref": "#/components/x-amazon-apigateway-integrations/lambda-integration" },
+				"responses": {
+					"default": {
+						"description": "",
+						"content": { "application/jrd+json": { "type": "object" } }
+					}
+				}
+			}
+		},
 		"/{id}/inbox": {
 			"post": {
 				"summary": "Inbox",

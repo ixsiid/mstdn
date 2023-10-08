@@ -164,7 +164,7 @@ export const handler = async event => {
 							is_valid: !undo,
 							inbox: json.inbox,
 							outbox: json.outbox,
-							shared_inbox: json.endpoints?.sharedInbox,
+							shared_inbox: json.sharedInbox ?? json.endpoints?.sharedInbox,
 						};
 					})
 					.then(item => {

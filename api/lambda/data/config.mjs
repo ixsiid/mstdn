@@ -1,7 +1,6 @@
 export const {
 	region,
 	s3bucket,
-	user_pool_id,
 
 	domain,
 	vapid_public_key,

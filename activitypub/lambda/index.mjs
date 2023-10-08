@@ -161,7 +161,7 @@ export const handler = async event => {
 							actor: body.actor,
 							last_modified: new Date().getTime(),
 							follow_type: 'follow', // follow か follower
-							is_valid: !type,
+							is_valid: !undo,
 							inbox: json.inbox,
 							outbox: json.outbox,
 							shared_inbox: json.endpoints?.sharedInbox,

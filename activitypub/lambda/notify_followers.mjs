@@ -73,12 +73,33 @@ export const notify_followers = (records) => {
 		console.debug(err);
 		throw err;
 	}).then(follower => {
-		const matrix = follower.map(({ actor, inbox }) => activities.map(_activity => {
+		// inboxが共通する宛先は同時配信する
+		/**
+		 * @typedef ActorInbox
+		 * @prop {Array<string>} actors
+		 * @prop {string} inbox
+		 */
+
+		const shared = follower.reduce((/** @type {Array<ActorInbox>} */ a, { actor, inbox, shared_inbox }) => {
+			const t = shared_inbox ?? inbox;
+			const n = a.find(x => x.inbox === t);
+			if (n) {
+				if (!n.actors.inclueds(actor)) n.actors.push(actor);
+			} else {
+				a.push({ actors: [actor], inbox: t });
+			}
+
+			
+			return a;
+		}, []);
+		const matrix = shared.map(({ actors, inbox }) => activities.map(_activity => {
 			const activity = { ..._activity };
-			activity.cc = [actor];
-			activity.object.cc = [actor];
+			activity.cc = actors;
+			activity.object.cc = actors;
 			return { inbox, activity };
 		})).flat();
+
+		console.debug(matrix);
 
 		return Promise.all(matrix.map(({ inbox, activity }) =>
 			signed_fetch(inbox, {

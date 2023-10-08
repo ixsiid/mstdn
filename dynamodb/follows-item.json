@@ -9,7 +9,7 @@
 		"N": 0
 	},
 	"follow_type": {
-		"S": "follow|follower"
+		"S": "follow|follower|broadcast"
 	},
 	"is_valid": {
 		"BOOL": true

@@ -169,6 +169,7 @@ export const handler = async event => {
 							is_valid: type !== 'Unfollow',
 							inbox: json.inbox,
 							outbox: json.outbox,
+							shared_inbox: json.endpoints?.sharedInbox,
 						};
 					})
 					.then(item => {

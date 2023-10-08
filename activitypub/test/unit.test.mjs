@@ -1,6 +1,5 @@
 import assert from 'node:assert';
 import test from 'node:test';
-import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -18,6 +17,13 @@ import {
 
 import event from './follow_event.json' assert {type: 'json'};
 
+const {
+	domain,
+} = process.env;
+
+/** @type {UserInfo} */
+const user = JSON.parse(process.env.user_test);
+
 await test('Http signature', t => {
 	return fs.readFile(path.join(script_directory, '..', '..', 'secret', 'priv.key'))
 		.then(private_key => {
@@ -29,7 +35,7 @@ await test('Http signature', t => {
 				},
 				body: JSON.stringify({}),
 			}, generate_sign_preset(
-				`https://${process.env.domain}/users/${Object.keys(JSON.parse(process.env.users))[0]}/info`,
+				`https://${domain}/users/${user.preferredUsername}/info`,
 				private_key,
 				'mastodon'
 			), true);

@@ -3,7 +3,7 @@ import { unmarshall } from '@aws-sdk/util-dynamodb';
 import { generate_sign_preset, signed_fetch } from './lib/signed_fetch.mjs';
 
 import {
-	follow_table_name,
+	table_follows,
 	region,
 	dynamodb_endpoint,
 	get_user_info,
@@ -55,7 +55,7 @@ export const notify_followers = (records) => {
 	});
 
 	return dynamo.query({
-		TableName: follow_table_name,
+		TableName: table_follows,
 		Limit: limit,
 		ScanIndexForward: false,
 		ExpressionAttributeValues: condition_values,

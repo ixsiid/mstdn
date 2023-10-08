@@ -146,7 +146,7 @@ export const handler = async event => {
 
 		// table-scheme
 		const undo = body.type === 'Undo';
-		const type = undo ? type_to_undo[body.object.type] : body.type;
+		const type = undo ? body.object.type : body.type;
 		if (!type) return { statusCode: 405 };
 
 		switch (type) {

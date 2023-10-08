@@ -1,8 +1,5 @@
-import { dynamodb } from '../../data/global.mjs';
+import { dynamodb, table_statuses } from '../../data/global.mjs';
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-
-import config from '../../data/config.mjs';
-const { dynamodb_statuses } = config;
 
 import to_status from "../../lib/to_status.mjs";
 import { NotificationTypes, send_notification } from "../../lib/send_notification.mjs";
@@ -18,7 +15,7 @@ export default (event, auth, id) => {
 	const condition_values = { ':zero': 0, ':id': parseInt(id) };
 
 	return dynamodb.query({
-		TableName: dynamodb_statuses,
+		TableName: table_statuses,
 		Limit: 1,
 		ScanIndexForward: false,
 		ExpressionAttributeValues: marshall(condition_values),

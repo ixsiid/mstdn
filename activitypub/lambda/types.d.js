@@ -53,6 +53,7 @@
  * @prop {string} name
  * @prop {string} preferredUsername
  * @prop {string} summary
+ * @prop {string} acct
  */
 
 /**

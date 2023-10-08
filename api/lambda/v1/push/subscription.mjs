@@ -1,8 +1,7 @@
-import { dynamodb } from '../../data/global.mjs';
+import { dynamodb, table_subscriptions } from '../../data/global.mjs';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
-import config from '../../data/config.mjs';
-const { vapid_key, dynamodb_subscriptions } = config;
+import { vapid_public_key } from '../../data/config.mjs';
 
 import get_subscription from '../../lib/get_subscription.mjs';
 
@@ -23,7 +22,7 @@ export default async (event, auth) => {
 				body: JSON.stringify({
 					id: auth.account_id,
 					endpoint: subscription.endpoint,
-					server_key: vapid_key,
+					server_key: vapid_public_key,
 					// アラートは設定していないためすべてtrueで返す
 					alerts: {
 						favourite: true,
@@ -41,7 +40,7 @@ export default async (event, auth) => {
 
 	if (event.httpMethod === 'POST') {
 		return dynamodb.putItem({
-			TableName: dynamodb_subscriptions,
+			TableName: table_subscriptions,
 			Item: marshall({
 				id: 0,
 				created_at: new Date().getTime(),
@@ -62,7 +61,7 @@ export default async (event, auth) => {
 					mention: true,
 					poll: true,
 				},
-				server_key: vapid_key,
+				server_key: vapid_public_key,
 			}),
 		})).catch(err => {
 			console.error(err);

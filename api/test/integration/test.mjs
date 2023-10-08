@@ -4,6 +4,9 @@
 */
 import './config.mjs';
 
+import path from 'node:path';
+const script_directory = path.dirname(process.argv[1]);
+
 import q from './lambda-query.mjs';
 import { handler } from '../../lambda/index.mjs';
 
@@ -13,17 +16,24 @@ import fs from 'node:fs/promises';
 import assert from 'node:assert';
 import test from 'node:test';
 
-
 const dynamo = new DynamoDB({ region: process.env.region, endpoint: process.env.dynamodb_endpoint });
+
+/** @type {UserInfo} */
+const user = JSON.parse(process.env.user_test);
+
+const server_key = process.env.vapid_public_key;
 
 console.debug = () => { };
 
+const table_statuses = process.env.instance + '-statuses';
+const table_subscriptions = process.env.instance + '-subscriptions';
+
 const account = {
-	id: 0, username: process.env.username, acct: process.env.username + "@fugafuga.hogehoge.com",
-	display_name: "USER", locked: false,
+	id: 0, username: user.preferredUsername, acct: user.acct,
+	display_name: user.name, locked: false,
 	created_at: "2000-01-01T00:00:00.000Z",
 	followers_count: 0, following_count: 0, statuses_count: 0,
-	note: "It is my account for solo instance.",
+	note: user.summary,
 	url: "https://fugafuga.hogehoge.com",
 	avatar: "https://fugafuga.hogehoge.com/avatar/icon.png",
 	avatar_static: "https://fugafuga.hogehoge.com/avatar/icon.gif",
@@ -45,37 +55,37 @@ test('Integration', async t => {
 
 	// テスト用Dynamo DB localテーブル準備。初回テスト時はテーブルがないため、例外を無視する
 	await Promise.all(
-		[process.env.dynamodb_statuses, process.env.dynamodb_subscriptions]
+		[table_statuses, table_subscriptions]
 			.map(TableName => dynamo.deleteTable({ TableName }))
 	).catch(() => { }).finally(() => { });
 
 	// statusesテーブル作成
 	await Promise.all([
-		fs.readFile('./dynamodb/schema.json'),
-		fs.readFile('./dynamodb/first-item.json'),
+		fs.readFile(path.join(script_directory, '..', '..', '..', 'dynamodb', 'schema.json')),
+		fs.readFile(path.join(script_directory, '..', '..', '..', 'dynamodb', 'first-item.json')),
 	])
 		.then(buffers => buffers.map(x => JSON.parse(x.toString())))
 		.then(([table_schema, first_item]) => {
 			return dynamo.createTable({
 				...table_schema,
-				TableName: process.env.dynamodb_statuses,
+				TableName: table_statuses,
 				ProvisionedThroughput: {
 					ReadCapacityUnits: 2,
 					WriteCapacityUnits: 2,
 				}
 			}).then(res => dynamo.putItem({
 				Item: first_item,
-				TableName: process.env.dynamodb_statuses,
+				TableName: table_statuses,
 			}));
 		})
 		.then(res => console.log('Prepared statuses tables'));
 
 	// subscriptionsテーブル作成
-	await fs.readFile('./dynamodb/subscriptions-schema.json')
+	await fs.readFile(path.join(script_directory, '..', '..', '..', 'dynamodb', 'subscriptions-schema.json'))
 		.then(buffer => JSON.parse(buffer.toString()))
 		.then(table_schema => dynamo.createTable({
 			...table_schema,
-			TableName: process.env.dynamodb_subscriptions,
+			TableName: table_subscriptions,
 			ProvisionedThroughput: {
 				ReadCapacityUnits: 2,
 				WriteCapacityUnits: 2,
@@ -202,7 +212,7 @@ test('Integration', async t => {
 						id: 0,
 						endpoint: subscription_body.subscription.endpoint,
 						alerts: subscription_body.data.alerts,
-						server_key: process.env.vapid_key,
+						server_key,
 					});
 				}))
 				.then(() => handler(q.generate_event('/v1/push/subscription', 'get', auth_context)))
@@ -212,7 +222,7 @@ test('Integration', async t => {
 						id: 0,
 						endpoint: subscription_body.subscription.endpoint,
 						alerts: subscription_body.data.alerts,
-						server_key: process.env.vapid_key,
+						server_key,
 					});
 				}))
 		})

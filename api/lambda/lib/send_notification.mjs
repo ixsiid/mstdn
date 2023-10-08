@@ -1,10 +1,9 @@
-import { domain, vapid_key, vapid_private_key } from "../data/config.mjs";
+import { url, vapid_public_key, vapid_private_key, users } from "../data/config.mjs";
+const email = users[0].acct;
+
 import { webPush } from 'web-push-min';
 import { SupportedContentEncodings } from "web-push-min/src/web-push-constants.mjs";
 import get_subscription from "./get_subscription.mjs";
-
-import config from "../data/config.mjs";
-const { email } = config;
 
 /** @typedef {string} NotificationType */
 
@@ -26,7 +25,7 @@ const notification_types = Object.values(NotificationTypes);
  * @param {NotificationType} type 
  * @returns {string} url
  */
-const get_icon_uri = type => notification_types.includes(type) ? `https://${domain}/icon/${type}.png` : `https://${domain}/icon/undefined.png`;
+const get_icon_uri = type => notification_types.includes(type) ? url + `/icon/${type}.png` : url + '/icon/undefined.png';
 
 /**
  * マストドン通知用オブジェクトの作成
@@ -57,7 +56,7 @@ const generate_mastodon_notification = (type, text, title) => {
 export const send_notification = (account_id, type, text) => {
 	const options = {
 		vapidDetails: {
-			publicKey: vapid_key,
+			publicKey: vapid_public_key,
 			privateKey: vapid_private_key,
 			subject: 'mailto:' + email,
 		},

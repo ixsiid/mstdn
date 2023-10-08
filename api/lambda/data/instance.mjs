@@ -1,4 +1,4 @@
-import config from './config.mjs';
+import { url, domain, users } from './config.mjs';
 
 /**
  * @typedef Instance
@@ -12,17 +12,17 @@ import config from './config.mjs';
  * @property {Array<string>} languages
  */
 export default {
-	domain: config.domain,
-	title: `My Instance on ${config.domain}`,
+	domain,
+	title: `My Instance on ${domain}`,
 	version: '2.5.0',
 	source_url: 'https://github.com/ixsiid/mstdn',
 	description: 'For only myself instance',
 	usage: { users: { active_month: 0 } },
 	languages: ['jp', 'en'],
-	uri: config.domain,
+	uri: domain,
 	urls: {
-		rest_api: config.url,
+		rest_api: url,
 		// streaming_api: 'not implements',
 	},
-	email: config.email,
+	email: users[0].acct,
 };

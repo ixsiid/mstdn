@@ -1,5 +1,7 @@
-import config from './config.mjs';
-const { domain, username, display_name } = config;
+import { domain, url, users } from './config.mjs';
+
+/** @type {UserInfo} */
+const user = users[0];
 
 /**
  * @typedef Account
@@ -25,20 +27,20 @@ const { domain, username, display_name } = config;
 */
 export default {
 	id: 0,
-	username,
-	acct: `${username}@${domain}`,
-	display_name,
+	username: user.preferredUsername,
+	acct: user.acct,
+	display_name: user.name,
 	locked: false,
 	created_at: '2000-01-01T00:00:00.000Z',
 	followers_count: 0,
 	following_count: 0,
 	statuses_count: 0,
-	note: 'It is my account for solo instance.',
-	url: `https://${domain}`,
-	avatar: `https://${domain}/avatar/icon.png`,
-	avatar_static: `https://${domain}/avatar/icon.gif`,
-	header: `https://${domain}/avatar/header.png`,
-	header_static: `https://${domain}/avatar/header.gif`,
+	note: user.summary,
+	url,
+	avatar: url + '/avatar/icon.png',
+	avatar_static: url + '/avatar/icon.gif',
+	header: url + '/avatar/header.png',
+	header_static: url + '/avatar/header.gif',
 	emojis: [],
 	fields: [],
 	bot: false

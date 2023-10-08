@@ -1,7 +1,6 @@
-import { dynamodb } from '../../data/global.mjs';
+import { dynamodb, table_statuses } from '../../data/global.mjs';
 import { unmarshall } from "@aws-sdk/util-dynamodb";
-import config from '../../data/config.mjs';
-const { dynamodb_statuses, domain } = config;
+import { domain } from '../../data/config.mjs';
 
 import to_status from '../../lib/to_status.mjs';
 
@@ -41,7 +40,7 @@ export default async (event, auth, args) => {
 	}
 
 	return dynamodb.query({
-		TableName: dynamodb_statuses,
+		TableName: table_statuses,
 		Limit: limit,
 		ScanIndexForward: false,
 		ExpressionAttributeValues: condition_values,

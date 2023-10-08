@@ -178,3 +178,9 @@
 * @prop {string} outbox
 * @prop {string} shared_inbox
 */
+
+/**
+ * @typedef ActorInbox
+ * @prop {Array<string>} actors
+ * @prop {string} inbox
+ */

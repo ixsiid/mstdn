@@ -63,12 +63,8 @@ const login_form = `<!DOCTYPE html>
 </html>`;
 
 import { CognitoIdentityProviderClient, AdminInitiateAuthCommand } from '@aws-sdk/client-cognito-identity-provider';
-import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
 
-const { region, instance } = process.env;
-
-/** @type {string} */
-let user_pool_id;
+const { user_pool_id } = process.env;
 
 const AuthenticationResultCache = {};
 
@@ -112,13 +108,6 @@ export const handler = async event => {
 	console.debug(`[LAMBDA] postMessage: ${JSON.stringify(body, null, '\t')}`);
 
 	if (api_method === '/oauth/login') {
-		if (!user_pool_id) {
-			const ssm_client = new SSMClient({ region });
-			const command = new GetParameterCommand({ Name: instance + '.user_pool_id' });
-			user_pool_id = await ssm_client.send(command)
-				.then(res => res.Parameter?.Value);
-		}
-
 		const client = new CognitoIdentityProviderClient({});
 		const input = {
 			AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',

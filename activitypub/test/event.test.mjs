@@ -9,7 +9,6 @@ dotenv.config({ path: path.join(script_directory, '.env') });
 
 import EventGenerator from './event_generator.mjs';
 import { parse } from '../lambda/lib/gl_event_parser.mjs';
-import exp from 'node:constants';
 
 await test('EventGenerator', async t => {
 	const g = new EventGenerator('users');

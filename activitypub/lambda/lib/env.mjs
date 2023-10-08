@@ -1,15 +1,21 @@
 export const [public_key, private_key] = [process.env.public_key, process.env.private_key]
 	.map(x => x.replace(/\\n/g, '\n'));
 
-export const domain = process.env.domain;
+export const {
+	domain,
+	region,
+} = process.env;
 
-/**
- * @type {Object<string, UserInfo>}
- */
-export const users = JSON.parse(process.env.users);
+const instance = process.env.instance;
+export const table_follows = instance + '-follows';
 
-export const region = process.env.region;
-export const follow_table_name = process.env.follows_table_name;
+/** @type {Array<UserInfo> & Object<string, UserInfo>} */
+export const users = process.env.users_list.split(',').map(u => JSON.parse(process.env['user_' + u]));
+users.forEach(u => {
+	u.acct = u.preferredUsername + '@' + domain;
+	users[u.preferredUsername] = u;
+});
+
 /**
  * ロカールテスト時だけ、ローカルエンドポイントの値を入れます
  * @type {string|undefined}

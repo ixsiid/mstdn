@@ -12,18 +12,19 @@ import EventGenerator from './event_generator.mjs';
 const {
 	region,
 	dynamodb_endpoint,
-	follow_table_name,
+	table_follows,
 	domain,
 } = process.env;
-/** @type {Object<string, UserInfo>} */
-const users = JSON.parse(process.env.users);
+
+/** @type {UserInfo} */
+const user = JSON.parse(process.env.user_test);
 
 const __dirname = path.dirname(process.argv[1]);
 
 const dynamo = new DynamoDB({ region, endpoint: dynamodb_endpoint });
 
 const tables = [{
-	table_name: follow_table_name,
+	table_name: table_follows,
 	schema_file: path.join(__dirname, '..', 'dynamodb', 'follows-schema.json'),
 	items: [],
 }];
@@ -57,27 +58,24 @@ const { handler } = await import('../lambda/index.mjs');
 console.debug = console.error;
 
 await test('ActivityPub', async t => {
-	const user = Object.keys(users)[0];
-
 	const g = new EventGenerator('users');
 	await t.test('webfinger', async () => {
-		const acct = user + '@' + domain;
-		const r = await handler(g.get('/.well-known/webfinger', 'resource=' + encodeURIComponent('acct:' + acct)));
+		const r = await handler(g.get('/.well-known/webfinger', 'resource=' + encodeURIComponent('acct:' + user.acct)));
 		assert.equal(r.statusCode, 200);
 		assert.deepEqual(JSON.parse(r.body), {
-			subject: 'acct:' + acct,
+			subject: 'acct:' + user.acct,
 			links: [{
 				rel: 'self',
 				type: 'application/activity+json',
-				href: 'https://' + domain + '/users/' + user + '/info'
+				href: 'https://' + domain + '/users/' + user.preferredUsername + '/info'
 			}],
 		});
 	});
 
 	await t.test('info', async () => {
-		const r = await handler(g.get(`/{id=${user}}/info`));
+		const r = await handler(g.get(`/{id=${user.preferredUsername}}/info`));
 		assert.equal(r.statusCode, 200);
 		// 簡易チェック
-		assert.equal(JSON.parse(r.body).id, 'https://' + domain + '/users/' + user + '/info');
+		assert.equal(JSON.parse(r.body).id, 'https://' + domain + '/users/' + user.preferredUsername + '/info');
 	});
 });

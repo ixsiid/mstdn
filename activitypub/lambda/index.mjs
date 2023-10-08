@@ -12,7 +12,7 @@ import { notify_followers } from './notify_followers.mjs';
 import {
 	public_key, private_key,
 	region,
-	follow_table_name,
+	table_follows,
 	dynamodb_endpoint,
 	get_user_info,
 	domain,
@@ -198,7 +198,7 @@ export const handler = async event => {
 						const dynamo = new DynamoDB(option);
 
 						return dynamo.putItem({
-							TableName: follow_table_name,
+							TableName: table_follows,
 							Item: marshall(item),
 						});
 					})

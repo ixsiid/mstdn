@@ -146,16 +146,11 @@ export const handler = async event => {
 
 		// table-scheme
 		const undo = body.type === 'Undo';
-		/** @type {Object<string, ActivityType>} */
-		const type_to_undo = {
-			'Follow': 'Unfollow',
-		};
 		const type = undo ? type_to_undo[body.object.type] : body.type;
 		if (!type) return { statusCode: 405 };
 
 		switch (type) {
 			case 'Follow':
-			case 'Unfollow':
 				// 本来は先に webfinger を叩く
 				return fetch(body.actor, { headers: { Accept: type_ld_json } })
 					.then(res => res.json())
@@ -166,9 +161,10 @@ export const handler = async event => {
 							actor: body.actor,
 							last_modified: new Date().getTime(),
 							follow_type: 'follow', // follow か follower
-							is_valid: type !== 'Unfollow',
+							is_valid: !type,
 							inbox: json.inbox,
 							outbox: json.outbox,
+							shared_inbox: json.endpoints?.sharedInbox,
 						};
 					})
 					.then(item => {

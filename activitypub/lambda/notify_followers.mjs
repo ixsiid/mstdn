@@ -67,29 +67,22 @@ export const notify_followers = (records) => {
 	}).then(res => {
 		/** @type {Array<Follower>} */
 		const followers = res.Items.map(x => unmarshall(x));
-		return followers.filter(x => x.is_valid && x.follow_type === 'follow');
+		return followers.filter(x => x.is_valid && ['follow', 'broadcast'].includes(x.follow_type));
 	}).catch(err => {
 		console.debug('DynamoDB response parse error');
 		console.debug(err);
 		throw err;
 	}).then(follower => {
 		// inboxが共通する宛先は同時配信する
-		/**
-		 * @typedef ActorInbox
-		 * @prop {Array<string>} actors
-		 * @prop {string} inbox
-		 */
-
-		const shared = follower.reduce((/** @type {Array<ActorInbox>} */ a, { actor, inbox, shared_inbox }) => {
+		const shared = follower.reduce((/** @type {Array<ActorInbox>} */ a, { actor, inbox, shared_inbox, follow_type }) => {
 			const t = shared_inbox ?? inbox;
 			const n = a.find(x => x.inbox === t);
 			if (n) {
-				if (!n.actors.inclueds(actor)) n.actors.push(actor);
+				if (follow_type === 'follow' && !n.actors.inclueds(actor)) n.actors.push(actor);
 			} else {
-				a.push({ actors: [actor], inbox: t });
+				a.push({ actors: follow_type === 'follow' ? [actor] : [], inbox: t });
 			}
 
-			
 			return a;
 		}, []);
 		const matrix = shared.map(({ actors, inbox }) => activities.map(_activity => {

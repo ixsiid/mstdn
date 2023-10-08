@@ -146,7 +146,7 @@ export const handler = async event => {
 
 		// table-scheme
 		const undo = body.type === 'Undo';
-		const type = undo ? type_to_undo[body.object.type] : body.type;
+		const type = undo ? body.object.type : body.type;
 		if (!type) return { statusCode: 405 };
 
 		switch (type) {
@@ -161,7 +161,7 @@ export const handler = async event => {
 							actor: body.actor,
 							last_modified: new Date().getTime(),
 							follow_type: 'follow', // follow か follower
-							is_valid: !type,
+							is_valid: !undo,
 							inbox: json.inbox,
 							outbox: json.outbox,
 							shared_inbox: json.endpoints?.sharedInbox,

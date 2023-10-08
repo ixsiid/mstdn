@@ -226,6 +226,19 @@ test('Integration', async t => {
 					});
 				}))
 		})
+		// 単一のstatus
+		.then(() => handler(q.generate_event('/v1/statuses/{id=0}', 'get')))
+		.then(res => t.test('/v1/statuses/0:get', () => {
+			assert.equal(res.statusCode, 200);
+			const s = JSON.parse(res.body);
+			assert.equal(s.id, 0);
+			assert.equal(s.content, ret[ret.length - 1].content);
+		}))
+		// IDが存在しないときは404
+		.then(() => handler(q.generate_event('/v1/statuses/{id=123}', 'get')))
+		.then(res => t.test('/v1/statuses/123:get', () => {
+			assert.equal(res.statusCode, 404);
+		}))
 		// Not implements: post -> get
 		.catch(err => {
 			console.error(err);

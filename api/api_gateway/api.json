@@ -735,11 +735,11 @@
 					}
 				}
 			},
-			"post": {
+			"put": {
 				"summary": "",
 				"responses": {
 					"default": {
-						"description": "Default response for POST '/api/v1/statuses/{id}'",
+						"description": "Default response for PUT '/api/v1/statuses/{id}'",
 						"content": {
 							"application/json": {
 								"type": "object"

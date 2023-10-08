@@ -25,7 +25,7 @@ const dynamo = new DynamoDB({ region, endpoint: dynamodb_endpoint });
 
 const tables = [{
 	table_name: table_follows,
-	schema_file: path.join(__dirname, '..', 'dynamodb', 'follows-schema.json'),
+	schema_file: path.join(__dirname, '..', '..', 'dynamodb', 'follows-schema.json'),
 	items: [],
 }];
 

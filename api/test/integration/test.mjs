@@ -61,8 +61,8 @@ test('Integration', async t => {
 
 	// statusesテーブル作成
 	await Promise.all([
-		fs.readFile(path.join(script_directory, '..', '..', '..', 'dynamodb', 'schema.json')),
-		fs.readFile(path.join(script_directory, '..', '..', '..', 'dynamodb', 'first-item.json')),
+		fs.readFile(path.join(script_directory, '..', '..', '..', 'dynamodb', 'api-schema.json')),
+		fs.readFile(path.join(script_directory, '..', '..', '..', 'dynamodb', 'api-item.json')),
 	])
 		.then(buffers => buffers.map(x => JSON.parse(x.toString())))
 		.then(([table_schema, first_item]) => {

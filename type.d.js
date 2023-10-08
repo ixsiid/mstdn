@@ -110,10 +110,9 @@
  * @prop {Array<string>} raw.tags
  */
 
-// UnfollowとFollorRequestは誤解していた。
-// Todo: Unfollowはindex.mjs内で制御に使っているためそこも一緒に修正して消す
+
 /**
- * @typedef {"Accept"|"Add"|"Announce"|"Arrive"|"Bock"|"Create"|"Delete"|"Dislike"|"Flag"|"Follow"|"Ignore"|"Invite"|"Join"|"Leave"|"Like"|"Listen"|"Move"|"Offer"|"Question"|"Reject"|"Read"|"Remove"|"TentativeReject"|"TentativeAccept"|"Travel"|"Undo"|"Update"|"View"|"Unfollow"|"FollowRequest"} ActivityType
+ * @typedef {"Accept"|"Add"|"Announce"|"Arrive"|"Bock"|"Create"|"Delete"|"Dislike"|"Flag"|"Follow"|"Ignore"|"Invite"|"Join"|"Leave"|"Like"|"Listen"|"Move"|"Offer"|"Question"|"Reject"|"Read"|"Remove"|"TentativeReject"|"TentativeAccept"|"Travel"|"Undo"|"Update"|"View"} ActivityType
  */
 
 /**

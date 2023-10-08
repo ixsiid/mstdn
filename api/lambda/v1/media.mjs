@@ -1,8 +1,7 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import crypto from 'node:crypto';
 
-import config from '../data/config.mjs';
-const { region, s3bucket, domain } = config;
+import { region, s3bucket, url } from '../data/config.mjs';
 
 const media_types = ['image', 'audio', 'video']; // 'unknown', 'gifv'
 
@@ -49,8 +48,8 @@ export default async (event, auth, id) => {
 			body: JSON.stringify({
 				id: uuid,
 				type,
-				url: `https://${domain}/${Key}`,
-				preview_url: `https://${domain}/${Key}`,
+				url: url + '/' + Key,
+				preview_url: url + '/' + Key,
 				description: filename,
 			}),
 		};

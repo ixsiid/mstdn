@@ -1,5 +1,4 @@
-import config from './config.mjs';
-const { domain } = config;
+import { url } from './config.mjs';
 import account from './account.mjs';
 
 /**
@@ -22,7 +21,7 @@ import account from './account.mjs';
  */
 export default {
 	id: 0,
-	uri: `https://${domain}/statuses/0`,
+	uri: url + '/statuses/0',
 	created_at: '2000-01-01T00:01:00.000Z',
 	account,
 	content: 'Empty',

@@ -1,23 +1,16 @@
-import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { dynamodb, table_subscriptions } from '../data/global.mjs';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-
-import config from '../data/config.mjs';
-const { dynamodb_subscriptions, region } = config;
 
 /**
  * @param {number} account_id
  * @returns {Promise<Subscription>}
  */
 export default account_id => {
-	const option = { region };
-	if (process.env.dynamodb_endpoint) option.endpoint = process.env.dynamodb_endpoint;
-	const dynamo = new DynamoDB(option);
-
 	const conditions = ['account_id = :account_id'];
 	const condition_values = { ':account_id': account_id };
 
-	return dynamo.query({
-		TableName: dynamodb_subscriptions,
+	return dynamodb.query({
+		TableName: table_subscriptions,
 		Limit: 1,
 		ScanIndexForward: false,
 		ExpressionAttributeValues: marshall(condition_values),

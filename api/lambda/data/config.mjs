@@ -1,23 +1,25 @@
-export const domain = process.env.domain;
-export const user_pool_id = process.env.user_pool_id;
-export const vapid_key = process.env.vapid_key;
-export const vapid_private_key = process.env.vapid_private_key;
+export const {
+	region,
+	s3bucket,
+	user_pool_id,
 
-export const client_id = process.env.client_id;
+	domain,
+	vapid_public_key,
+	vapid_private_key,
+	client_id,
+} = process.env;
+
 
 export const url = 'https://' + domain;
 
-export default {
-	display_name: process.env.display_name,
-	domain,
-	dynamodb_statuses: process.env.dynamodb_statuses,
-	dynamodb_subscriptions: process.env.dynamodb_subscriptions,
-	email: process.env.email,
-	region: process.env.region,
-	s3bucket: process.env.s3bucket,
-	username: process.env.username,
-	vapid_key,
-	vapid_private_key,
-	
-	url: `https://${domain}`,
-};
+const users_list = process.env.users_list.split(',');
+
+/** @type {Array<UserInfo> & Object<string, UserInfo>} */
+export const users = users_list.map(u => JSON.parse(process.env['user_' + u]));
+users.forEach(u => {
+	u.acct = u.preferredUsername + '@' + domain;
+	users[u.preferredUsername] = u;
+});
+
+// users[0] がオーナー
+

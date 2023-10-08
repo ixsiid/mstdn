@@ -1,12 +1,10 @@
-import { dynamodb } from '../data/global.mjs';
+import { dynamodb, table_statuses } from '../data/global.mjs';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
-import config from '../data/config.mjs';
-const { dynamodb_statuses, domain } = config;
+import { url } from '../data/config.mjs';
 
 import status_template from '../data/status.mjs';
 import to_status from '../lib/to_status.mjs';
-import { send_notification, NotificationTypes } from '../lib/send_notification.mjs';
 
 /**
  * @param {IntegrationEvent}
@@ -56,8 +54,8 @@ export default async (event, auth, id, args) => {
 				status.media_attachments = post.media_ids.map(id => ({
 					id,
 					type: 'image',
-					url: `https://${domain}/media/${id}`,
-					preview_url: `https://${domain}/media/${id}`,
+					url: url + '/media/' + id,
+					preview_url: url + '/media/' + id,
 					remote_url: null,
 					text_url: null,
 				}));
@@ -73,7 +71,7 @@ export default async (event, auth, id, args) => {
 			const id = new Date().getTime();
 
 			return dynamodb.putItem({
-				TableName: dynamodb_statuses,
+				TableName: table_statuses,
 				Item: marshall({
 					id,
 					created_at,

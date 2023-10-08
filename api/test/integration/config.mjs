@@ -1,5 +1,8 @@
+import path from 'node:path';
+const script_directory = path.dirname(process.argv[1]);
+
 import dotenv from 'dotenv';
-dotenv.config({ path: './api/test/integration/.env', override: false });
+dotenv.config({ path: path.join(script_directory, '.env'), override: true });
 
 // Dynamo DB localのエンドポイントが
 // ローカル実行時は http://localhost:8000

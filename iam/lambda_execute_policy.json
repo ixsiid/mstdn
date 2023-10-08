@@ -7,7 +7,6 @@
 			"dynamodb:BatchWriteItem",
 			"dynamodb:PutItem",
 			"dynamodb:GetItem",
-			"dynamodb:Scan",
 			"dynamodb:Query",
 			"dynamodb:UpdateItem",
 			"logs:CreateLogGroup",
